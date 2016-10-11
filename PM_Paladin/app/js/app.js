@@ -47,6 +47,18 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			}
 		}).
 
+		state('app.dashboard', {
+			url: '/dashboard',
+			templateUrl: appHelper.templatePath('dashboard'),
+			resolve: {
+				bars: function($ocLazyLoad){
+					return $ocLazyLoad.load([
+						ASSETS.chartist.bars,
+					]);
+				},
+			}
+		}).
+
 		// Dashboards
 		state('app.dashboard-variant-1', {
 			url: '/dashboard-variant-1',
@@ -823,6 +835,11 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 
 
 app.constant('ASSETS', {
+
+	'chartist': {
+		'bars': appHelper.assetPath('js/chartist/chartist.min.js')
+	},
+
 	'core': {
 		'bootstrap': appHelper.assetPath('js/bootstrap.min.js'), // Some plugins which do not support angular needs this
 
