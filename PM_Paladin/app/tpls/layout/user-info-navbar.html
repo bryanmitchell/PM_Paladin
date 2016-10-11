@@ -2,7 +2,7 @@
 <nav class="navbar user-info-navbar" ng-class="{'mobile-is-visible': layoutOptions.userInfoNavVisible}" ng-click="mobileUserInfoToggle()" role="navigation"><!-- User Info, Notifications and Menu Bar -->
 
 	<!-- Left links for user info navbar -->
-	<ul class="user-info-menu left-links list-inline list-unstyled">
+	<!--<ul class="user-info-menu left-links list-inline list-unstyled">
 
 		<li class="hidden-sm hidden-xs">
 			<a href="" ng-click="sidebarToggle()">
@@ -10,9 +10,9 @@
 			</a>
 		</li>
 
-		<li class="dropdown hover-line" on-toggle="updatePsScrollbars()">
-			<a href="" class="dropdown-toggle" data-toggle="dropdown">
-				<i class="fa-envelope-o"></i>
+		<!--<li class="dropdown hover-line" on-toggle="updatePsScrollbars()"> -->
+			<!-- <a href="" class="dropdown-toggle" data-toggle="dropdown"> -->
+				<!-- <i class="fa-envelope-o"></i>
 				<span class="badge badge-green">15</span>
 			</a>
 
@@ -22,7 +22,7 @@
 	<ul class="dropdown-menu-list list-unstyled ps-scrollbar">
 
 		<li class="active"><!-- "active" class means message is unread -->
-			<a href="">
+			<!-- <a href="">
 				<span class="line">
 					<strong>Luc Chartier</strong>
 					<span class="light small">- yesterday</span>
@@ -75,8 +75,8 @@
 
 		<!-- Repeated -->
 
-		<li class="active"><!-- "active" class means message is unread -->
-			<a href="">
+		<!-- <li class="active"><!-- "active" class means message is unread -->
+			<!-- <a href="">
 				<span class="line">
 					<strong>Luc Chartier</strong>
 					<span class="light small">- yesterday</span>
@@ -250,7 +250,7 @@
 		</li>
 
 		<!-- Added in v1.2 -->
-		<li class="dropdown hover-line language-switcher">
+		<!-- <li class="dropdown hover-line language-switcher">
 			<a href="" class="dropdown-toggle" data-toggle="dropdown">
 				<img src="assets/images/flags/flag-uk.png" alt="flag-uk" />
 				English
@@ -296,12 +296,12 @@
 			</ul>
 		</li>
 
-	</ul>
+	</ul> -->
 
 
 	<!-- Right links for user info navbar -->
 	<ul class="user-info-menu right-links list-inline list-unstyled">
-				<li class="fullscreen" ng-show="isFullscreenSupported">
+			<!--	<li class="fullscreen" ng-show="isFullscreenSupported">
 			<a href="" ng-click="goFullscreen()" title="Fullscreen">
 				<i ng-class="{'fa-expand': ! isFullscreen, 'fa-compress': isFullscreen == true}"></i>
 			</a>
@@ -309,7 +309,7 @@
 
 				<li class="search-form" ng-init="isFocused = false" ng-class="{focused: isFocused}"><!-- You can add "always-visible" to show make the search input visible -->
 
-			<form name="userinfo_search_form" ng-submit="userinfo_search_form.$valid" novalidate>
+			<!-- <form name="userinfo_search_form" ng-submit="userinfo_search_form.$valid" novalidate>
 				<input type="text" name="s" class="form-control search-field" placeholder="Type to search..." ng-blur="isFocused = false;" required />
 
 				<button type="submit" class="btn btn-link" ng-click="isFocused = ! isFocused; setFocusOnSearchField();">
@@ -317,13 +317,13 @@
 				</button>
 			</form>
 
-		</li>
+		</li> -->
 
 		<li class="dropdown user-profile">
 			<a href="" class="dropdown-toggle" data-toggle="dropdown">
 				<img src="assets/images/user-4.png" alt="user-image" class="img-circle img-inline userpic-32" width="28" />
 				<span>
-					John Smith
+					Log In
 					<i class="fa-angle-down"></i>
 				</span>
 			</a>
@@ -362,11 +362,11 @@
 			</ul>
 		</li>
 
-		<li>
+		<!--<li>
 			<a href="" ng-click="chatToggle();" data-toggle="chat">
 				<i class="fa-comments-o"></i>
 			</a>
-		</li>
+		</li> -->
 
 	</ul>
 
