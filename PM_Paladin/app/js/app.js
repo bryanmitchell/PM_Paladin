@@ -59,6 +59,11 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			}
 		}).
 
+		state('app.equipment_management', {
+			url: '/equipment_management',
+			templateUrl: appHelper.templatePath('equipment_management'),
+		}).
+
 		// Dashboards
 		state('app.dashboard-variant-1', {
 			url: '/dashboard-variant-1',

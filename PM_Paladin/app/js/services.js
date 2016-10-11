@@ -84,7 +84,7 @@ angular.module('xenon.services', []).
 		this.prepareSidebarMenu = function()
 		{
 			var dashboard   			 = this.addItem('Dashboard', 				'/app/dashboard', 			'linecons-desktop');
-			var equipment_management     = this.addItem('Equipment Management',		'/app/ui-buttons',			'linecons-cog');
+			var equipment_management     = this.addItem('Equipment Management',		'/app/equipment_management','linecons-cog');
 			var user_management  		 = this.addItem('User Management', 			'/app/widgets', 			'linecons-user');
 			var maintenance_confirmation = this.addItem('Maintenance Confirmation', '/app/dashboard-variant-3', 'linecons-thumbs-up');
 			var maintenance_approval  	 = this.addItem('Maintenance Approval',		'/app/update-highlights', 	'linecons-eye').setLabel('5', 'secondary', false);
