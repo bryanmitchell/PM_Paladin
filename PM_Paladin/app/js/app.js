@@ -64,6 +64,21 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			templateUrl: appHelper.templatePath('equipment_management'),
 		}).
 
+		state('app.user_management', {
+			url: '/user_management',
+			templateUrl: appHelper.templatePath('user_management'),
+		}).
+
+		state('app.maintenance_confirmation', {
+			url: '/maintenance_confirmation',
+			templateUrl: appHelper.templatePath('maintenance_confirmation'),
+		}).
+
+		state('app.maintenance_approval', {
+			url: '/maintenance_approval',
+			templateUrl: appHelper.templatePath('maintenance_approval'),
+		}).
+
 		// Dashboards
 		state('app.dashboard-variant-1', {
 			url: '/dashboard-variant-1',
