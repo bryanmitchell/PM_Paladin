@@ -1,4 +1,4 @@
-<page-title ng-if="layoutOptions.pageTitles" title="User Management"></page-title>
+	<page-title ng-if="layoutOptions.pageTitles" title="User Management"></page-title>
 <div class="row">
 	<div class="col-md-12">
 	
@@ -7,20 +7,10 @@
 			<div class="panel-body">
 			
 				<div class="row">
-					<div class="btn-group" dropdown>
-						<button type="button" class="btn btn-blue dropdown-toggle" data-toggle="dropdown">
-							Create User <span class="caret"></span>
+					<div class="btn-group">
+						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="openModal('modal-3', null, 'static');">
+							Create User
 						</button>
-						<ul class="dropdown-menu dropdown-blue no-spacing" role="menu">
-							<li>
-								<a href="" ng-click="openModal('modal-5', 'lg');">Administrator</a>
-							</li>
-							<li>
-								<a href="" ng-click="openModal('modal-5', 'lg');">Engineer</a>
-							</li>
-							<li>
-								<a href="" ng-click="openModal('modal-5', 'lg');">Technician</a>
-						</ul>
 					</div>
 					<div class="btn-group">
 						<button type="button" class="btn btn-success">Update</button>
@@ -71,13 +61,34 @@
 	</div>
 </div>
 
-<script type="text/ng-template" id="modal-5">
+<script type="text/ng-template" id="modal-3">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
-		<h4 class="modal-title">Modal Content is Responsive</h4>
+		<h4 class="modal-title">Sign Up</h4>
 	</div>
 	
 	<div class="modal-body">
+
+		<div class="row">
+
+			<div class="col-md-6">
+
+				<div class="form-group">
+
+				<label class="control-label">Employee ID</label>
+				</br>
+				<select>
+				  <option value="volvo">Volvo</option>
+				  <option value="saab">Saab</option>
+				  <option value="opel">Opel</option>
+				  <option value="audi">Audi</option>
+				</select>
+
+				</div>
+
+			</div>
+
+		</div>
 	
 		<div class="row">
 			<div class="col-md-6">
@@ -85,7 +96,7 @@
 				<div class="form-group">
 					<label for="field-1" class="control-label">Name</label>
 					
-					<input type="text" class="form-control" id="field-1" placeholder="John">
+					<input type="text" class="form-control" id="field-1" placeholder="First Name">
 				</div>	
 				
 			</div>
@@ -93,9 +104,9 @@
 			<div class="col-md-6">
 				
 				<div class="form-group">
-					<label for="field-2" class="control-label">Surname</label>
+					<label for="field-2" class="control-label">Last Name</label>
 					
-					<input type="text" class="form-control" id="field-2" placeholder="Doe">
+					<input type="text" class="form-control" id="field-2" placeholder="Last Name">
 				</div>	
 			
 			</div>
@@ -105,55 +116,60 @@
 			<div class="col-md-12">
 				
 				<div class="form-group">
-					<label for="field-3" class="control-label">Address</label>
+					<label for="field-3" class="control-label">Email Address</label>
 					
-					<input type="text" class="form-control" id="field-3" placeholder="Address">
+					<input type="text" class="form-control" id="field-3" placeholder="Email">
 				</div>	
 				
 			</div>
 		</div>
 	
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-6">
 				
 				<div class="form-group">
-					<label for="field-4" class="control-label">City</label>
+					<label for="field-4" class="control-label">Password</label>
 					
-					<input type="text" class="form-control" id="field-4" placeholder="Boston">
+					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters">
 				</div>	
 				
 			</div>
 			
-			<div class="col-md-4">
+			<div class="col-md-6">
 				
 				<div class="form-group">
-					<label for="field-5" class="control-label">Country</label>
+					<label for="field-5" class="control-label">Confirm Password</label>
 					
-					<input type="text" class="form-control" id="field-5" placeholder="United States">
+					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password">
 				</div>	
 			
 			</div>
 			
-			<div class="col-md-4">
-				
-				<div class="form-group">
-					<label for="field-6" class="control-label">Zip</label>
-					
-					<input type="text" class="form-control" id="field-6" placeholder="123456">
-				</div>	
-			
-			</div>
 		</div>
 	
 		<div class="row">
+				
 			<div class="col-md-12">
-				
+
 				<div class="form-group no-margin">
-					<label for="field-7" class="control-label">Personal Info</label>
 					
-					<textarea class="form-control autogrow" id="field-7" placeholder="Write something about yourself"></textarea>
+					<label for="field-7" class="control-label">Type of User</label>
+					
+					</br>
+					
+					<div class="col-sm-4">
+						<input type="checkbox" id="field-5"> Administrator
+					</div>
+					<div class="col-sm-4">
+						<input type="checkbox" id="field-5"> Engineer
+					</div>
+					<div class="col-sm-4">
+						<input type="checkbox" id="field-5"> Technician
+					</div>
+
+
+					
 				</div>	
-				
 			</div>
 		</div>
 		
@@ -161,6 +177,6 @@
 	
 	<div class="modal-footer">
 		<button type="button" class="btn btn-white" ng-click="currentModal.close();">Close</button>
-		<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save changes</button>
+		<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
 	</div>
 </script>

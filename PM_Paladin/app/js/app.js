@@ -45,12 +45,13 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 				$rootScope.isLockscreenPage   = false;
 				$rootScope.isMainPage         = true;
 			},
-			controller: 'UIModalsCtrl'
+			controller: 'UIModalsCtrl',
 		}).
 
 		state('app.dashboard', {
 			url: '/dashboard',
 			templateUrl: appHelper.templatePath('dashboard'),
+			controller: 'UIModalsCtrl',
 			resolve: {
 				bars: function($ocLazyLoad){
 					return $ocLazyLoad.load([
