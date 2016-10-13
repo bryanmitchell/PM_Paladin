@@ -31,7 +31,7 @@ app.run(function()
 
 app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASSETS){
 
-	$urlRouterProvider.otherwise('/app/dashboard-variant-1');
+	$urlRouterProvider.otherwise('/app/dashboard');
 
 	$stateProvider.
 		// Main Layout Structure
@@ -44,7 +44,8 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 				$rootScope.isLightLoginPage   = false;
 				$rootScope.isLockscreenPage   = false;
 				$rootScope.isMainPage         = true;
-			}
+			},
+			controller: 'UIModalsCtrl'
 		}).
 
 		state('app.dashboard', {
@@ -59,14 +60,17 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			}
 		}).
 
+		//UIModalsCtrl es pa los popups
 		state('app.equipment_management', {
 			url: '/equipment_management',
 			templateUrl: appHelper.templatePath('equipment_management'),
+			controller: 'UIModalsCtrl',
 		}).
 
 		state('app.user_management', {
 			url: '/user_management',
 			templateUrl: appHelper.templatePath('user_management'),
+			controller: 'UIModalsCtrl',
 		}).
 
 		state('app.maintenance_confirmation', {
