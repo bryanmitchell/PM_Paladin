@@ -39,13 +39,13 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			abstract: true,
 			url: '/app',
 			templateUrl: appHelper.templatePath('layout/app-body'),
-			controller: function($rootScope){
-				$rootScope.isLoginPage        = false;
-				$rootScope.isLightLoginPage   = false;
-				$rootScope.isLockscreenPage   = false;
-				$rootScope.isMainPage         = true;
-			},
-			controller: 'UIModalsCtrl',
+			// controller: function($rootScope){
+			// 	$rootScope.isLoginPage        = false;
+			// 	$rootScope.isLightLoginPage   = false;
+			// 	$rootScope.isLockscreenPage   = false;
+			// 	$rootScope.isMainPage         = true;
+			// },
+			controller: 'UIModalsTopCtrl',
 		}).
 
 		state('app.dashboard', {

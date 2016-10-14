@@ -273,6 +273,44 @@ angular.module('xenon.controllers', []).
 			$rootScope.modalContent = $sce.trustAsHtml('Modal content is loading...');
 		}
 	}).
+	controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
+	{
+		// Used to be done as a function in app.js state('app')
+		$rootScope.isLoginPage        = false;
+		$rootScope.isLightLoginPage   = false;
+		$rootScope.isLockscreenPage   = false;
+		$rootScope.isMainPage         = true;
+		
+		// Open Simple Modal
+		$scope.openModal = function(modal_id, modal_size, modal_backdrop)
+		{
+			$rootScope.currentModal = $modal.open({
+				templateUrl: modal_id,
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop
+			});
+		};
+
+		// Loading AJAX Content
+		$scope.openAjaxModal = function(modal_id, url_location)
+		{
+			$rootScope.currentModal = $modal.open({
+				templateUrl: modal_id,
+				resolve: {
+					ajaxContent: function($http)
+					{
+						return $http.get(url_location).then(function(response){
+							$rootScope.modalContent = $sce.trustAsHtml(response.data);
+						}, function(response){
+							$rootScope.modalContent = $sce.trustAsHtml('<div class="label label-danger">Cannot load ajax content! Please check the given url.</div>');
+						});
+					}
+				}
+			});
+
+			$rootScope.modalContent = $sce.trustAsHtml('Modal content is loading...');
+		}
+	}).
 	controller('PaginationDemoCtrl', function($scope)
 	{
 		$scope.totalItems = 64;
