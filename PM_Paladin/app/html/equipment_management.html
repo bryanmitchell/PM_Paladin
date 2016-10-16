@@ -22,13 +22,70 @@
 								<a href="" ng-click="openModal('modal-tool');">Tool</a>
 						</ul>
 					</div>
+
 					<div class="btn-group">
 						<button type="button" class="btn btn-success">Update</button>
 					</div>
+
 					<div class="btn-group pull-right">
 						<button type="button" class="btn btn-red">Delete</button>
 					</div>
 				</div>
+
+				<br>
+				<br>
+
+				<div class="row">
+
+					<div class="col-md-4">
+				
+						<table class="table table-condensed table-bordered table-striped floatedTable">
+							<thead>
+								<tr>
+									<th>Line</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="line in lines">
+									<td id="{{line.lineID}}" ng-click="">{{line.lineName}}</td>	
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-md-4">
+
+						<table class="table table-condensed table-bordered table-striped floatedTable">
+							<thead>
+								<tr>
+									<th>Workstation</th>
+								</tr>
+							</thead>
+							<tbody ng-repeat="line in lines">
+								<tr ng-repeat="ws in line.workstations">
+									<td id="{{ws.wsID}}">{{ws.wsName}}</td>							
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-md-4">
+
+						<table class="table table-condensed table-bordered table-striped floatedTable" ng-repeat="line in lines">
+							<thead>
+								<tr>
+									<th>Tool</th>
+								</tr>
+							</thead>
+							<tbody ng-repeat="ws in line.workstations">
+								<tr ng-repeat="tool in ws.tools">
+									<td id="{{tool.toolID}}">{{tool.toolName}}</td>	
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					</div>	
+
+				</div>	
 			
 			</div>
 			

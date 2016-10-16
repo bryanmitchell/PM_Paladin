@@ -25,23 +25,11 @@
 							</thead>
 							
 							<tbody>
-								<tr>
-									<td>1393</td>
-									<td>Tool_1</td>
-									<td>Isadora Duncan</td>
-									<td>14</td>
-								</tr>
-								
-								<tr>
-									<td>2</td>
-									<td>Art</td>
-									<td>Ramadani</td>
-								</tr>
-								
-								<tr>
-									<td>3</td>
-									<td>Filan</td>
-									<td>Fisteku</td>
+								<tr ng-repeat="item in upcomingTools">
+									<td>{{item.toolID}}</td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.personInCharge}}</td>
+									<td>{{item.days}}</td>
 								</tr>
 							</tbody>
 						</table>

@@ -22,22 +22,10 @@
 							</thead>
 							
 							<tbody>
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_1</td>
-									<td>Isadora Duncan</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_2</td>
-									<td>Juan Pachanga</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_3</td>
-									<td>Pablo Pueblo</td>
+								<tr ng-repeat="item in tools">
+									<td align="center"><input type="checkbox" id="{{item.toolID}}"></td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.personInCharge}}</td>
 								</tr>
 							</tbody>
 						</table>

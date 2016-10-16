@@ -4,3 +4,12 @@
  *
 */
 
+.selected {
+    background-color:black;
+    color:white;
+    font-weight:bold;
+}
+
+.floatedTable {
+    float:left;
+}

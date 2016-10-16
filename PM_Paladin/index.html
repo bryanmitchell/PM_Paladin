@@ -50,12 +50,8 @@
 
 
 </head>
-<body class="page-body" ng-controller="MainCtrl" ng-class="{'settings-pane-open': layoutOptions.settingsPane.isOpen, 'chat-open': layoutOptions.chat.isOpen, 'login-page': isLoginPage && isMainPage == false, 'login-light': isLightLoginPage && isMainPage == false, 'lockscreen-page': isLockscreenPage && isMainPage == false, 'right-sidebar': layoutOptions.sidebar.isRight, 'boxed-container': layoutOptions.container.isBoxed}">
+<body class="page-body" ng-controller="MainCtrl" ng-class="{'login-page': isLoginPage && isMainPage == false, 'login-light': isLightLoginPage && isMainPage == false, 'lockscreen-page': isLockscreenPage && isMainPage == false, 'boxed-container': layoutOptions.container.isBoxed}">
 
-
-	<settings-pane></settings-pane>
-
-	<horizontal-menu ng-if="layoutOptions.horizontalMenu.isVisible"></horizontal-menu>
 
 	<div class="page-container" ui-view></div>
 

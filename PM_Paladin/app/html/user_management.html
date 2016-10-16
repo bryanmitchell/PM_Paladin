@@ -1,4 +1,4 @@
-	<page-title ng-if="layoutOptions.pageTitles" title="User Management"></page-title>
+<page-title ng-if="layoutOptions.pageTitles" title="User Management"></page-title>
 <div class="row">
 	<div class="col-md-12">
 	
@@ -25,33 +25,21 @@
 
 				<div class="col-sm-6">
 				<table class="table table-bordered table-striped table-condensed table-hover">
-							<thead>
-								<tr>
-									<th> </th>
-									<th>Employee Name</th>
-									<th>Position</th>
-								</tr>
-							</thead>
-							
-							<tbody>
-								<tr>
-									<td align="center"><input type="radio" name="id1"></td>
-									<td>Isadora Duncan</td>
-									<td>Administrator</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="radio" name="id1"></td>
-									<td>Juan Pachanga</td>
-									<td>Engineer</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="radio" name="id1"></td>
-									<td>Pablo Pueblo</td>
-									<td>Technician</td>
-								</tr>
-							</tbody>
+					<thead>
+						<tr>
+							<th> </th>
+							<th>Employee Name</th>
+							<th>Position</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr ng-repeat="item in users">
+							<td align="center"><input type="radio" id="{{item.empID}}"></td>
+							<td>{{item.empName}}</td>
+							<td>{{item.empPosition}}</td>
+						</tr>
+					</tbody>
 				</table>
 				</div>			
 			</div>

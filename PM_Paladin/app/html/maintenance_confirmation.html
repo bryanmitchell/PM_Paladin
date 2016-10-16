@@ -23,25 +23,11 @@
 							</thead>
 							
 							<tbody>
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_1</td>
-									<td>Welding Line</td>
-									<td>Y</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_2</td>
-									<td>Assembly Line</td>
-									<td>Y</td>
-								</tr>
-								
-								<tr>
-									<td align="center"><input type="checkbox" name="id1"></td>
-									<td>Tool_3</td>
-									<td>Testing Line</td>
-									<td>N</td>
+								<tr ng-repeat="item in tools">
+									<td align="center"><input type="checkbox" id="{{item.toolID}}"></td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.line}}</td>
+									<td>{{item.confStatus}}</td>
 								</tr>
 							</tbody>
 						</table>
