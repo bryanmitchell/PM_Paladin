@@ -39,46 +39,57 @@
 
 					<div class="col-md-4">
 				
-						<table class="table table-condensed table-bordered table-striped floatedTable">
+						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
 									<th>Line</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="line in lines">
-									<td id="{{line.lineID}}" ng-click="">{{line.lineName}}</td>	
+								<tr ng-repeat="line in lines" ng-class="{'selected':line.lineID == selectedRow}" ng-click="setClickedRow(line.lineID)">
+									
+									<td id="{{line.lineID}}">{{line.lineName}}
+									<i class="fa-angle-right pull-right"></i>
+									</td>
+
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<div class="col-md-4">
 
-						<table class="table table-condensed table-bordered table-striped floatedTable">
+						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
 									<th>Workstation</th>
 								</tr>
 							</thead>
 							<tbody ng-repeat="line in lines">
-								<tr ng-repeat="ws in line.workstations">
-									<td id="{{ws.wsID}}">{{ws.wsName}}</td>							
+								<tr ng-repeat="ws in line.workstations" ng-class="{'selected':ws.wsID == selectedRow}" ng-click="setClickedRow(ws.wsID)">
+
+									<td id="{{ws.wsID}}">{{ws.wsName}}
+									<i class="fa-angle-right pull-right"></i>
+									</td>
+																
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<div class="col-md-4">
 
-						<table class="table table-condensed table-bordered table-striped floatedTable" ng-repeat="line in lines">
+						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
 									<th>Tool</th>
 								</tr>
 							</thead>
-							<tbody ng-repeat="ws in line.workstations">
-								<tr ng-repeat="tool in ws.tools">
+							<tbody>
+								<tr ng-repeat-start="line in lines"></tr>
+								<tr ng-repeat-start="ws in line.workstations"></tr>
+								<tr ng-repeat-end ng-repeat="tool in ws.tools" ng-class="{'selected':tool.toolID == selectedRow}" ng-click="setClickedRow(tool.toolID)">
 									<td id="{{tool.toolID}}">{{tool.toolName}}</td>	
 								</tr>
+								<tr ng-repeat-end></tr>
 							</tbody>
 						</table>
 					</div>

@@ -303,6 +303,11 @@ angular.module('xenon.controllers', []).
 	}).
 	controller('EquipmentMgmtCtrl', function($scope)
 	{
+		$scope.selectedRow = null;  // initialize our variable to null
+		$scope.setClickedRow = function(index){  //function that sets the value of selectedRow to current index
+		    $scope.selectedRow = index;
+		}
+
 		$scope.lines = [{
 			lineID: '1',
 			lineName: 'Line_1',
@@ -321,10 +326,42 @@ angular.module('xenon.controllers', []).
 			{
 				wsID: '1.2',
 				wsName: 'WS_2',
-				tools: {
+				tools: [{
 					toolID: '1.2.1',
-					toolName: 'Tool_1',
-				}
+					toolName: 'Tool_3',
+				},
+				{
+					toolID: '1.2.2',
+					toolName: 'Tool_4',
+				}]
+			}]
+		},
+		{
+			lineID: '2',
+			lineName: 'Line_2',
+			workstations: [{
+				wsID: '2.1',
+				wsName: 'WS_3',
+				tools: [{
+					toolID: '2.1.1',
+					toolName: 'Tool_5',
+				},
+				{
+					toolID: '2.1.2',
+					toolName: 'Tool_6',
+				}]
+			},
+			{
+				wsID: '2.2',
+				wsName: 'WS_4',
+				tools: [{
+					toolID: '2.2.1',
+					toolName: 'Tool_7',
+				},
+				{
+					toolID: '2.2.2',
+					toolName: 'Tool_8',
+				}]
 			}]
 		}];
 	});
