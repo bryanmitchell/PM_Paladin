@@ -46,7 +46,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="line in lines" ng-class="{'selected':line.lineID == selectedRow}" ng-click="setClickedRow(line.lineID)">
+								<tr ng-repeat="line in lines" ng-class="{'selected':line.lineID == selectedLine}" ng-click="setClickedLine(line.lineID)">
 									
 									<td id="{{line.lineID}}">{{line.lineName}}
 									<i class="fa-angle-right pull-right"></i>
@@ -64,13 +64,13 @@
 									<th>Workstation</th>
 								</tr>
 							</thead>
-							<tbody ng-repeat="line in lines">
-								<tr ng-repeat="ws in line.workstations" ng-class="{'selected':ws.wsID == selectedRow}" ng-click="setClickedRow(ws.wsID)">
+							<tbody>
+								<tr ng-repeat="ws in workstations | filter: {lineID:selectedLine}" ng-class="{'selected':ws.wsID == selectedWS}" ng-click="setClickedWS(ws.wsID)">
 
 									<td id="{{ws.wsID}}">{{ws.wsName}}
 									<i class="fa-angle-right pull-right"></i>
 									</td>
-																
+
 								</tr>
 							</tbody>
 						</table>
@@ -84,12 +84,9 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat-start="line in lines"></tr>
-								<tr ng-repeat-start="ws in line.workstations"></tr>
-								<tr ng-repeat-end ng-repeat="tool in ws.tools" ng-class="{'selected':tool.toolID == selectedRow}" ng-click="setClickedRow(tool.toolID)">
+								<tr ng-repeat="tool in tools | filter: {wsID:selectedWS}" ng-class="{'selected':tool.toolID == selectedTool}" ng-click="setClickedTool(tool.toolID)">
 									<td id="{{tool.toolID}}">{{tool.toolName}}</td>	
 								</tr>
-								<tr ng-repeat-end></tr>
 							</tbody>
 						</table>
 					</div>
