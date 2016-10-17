@@ -341,6 +341,11 @@ angular.module('xenon.controllers', []).
 			wsName: 'WS_2',
 		},
 		{
+			lineID: '1',
+			wsID: '1.3',
+			wsName: 'WS_5',
+		},
+		{
 			lineID: '2',
 			wsID: '2.1',
 			wsName: 'WS_3',

@@ -34,10 +34,10 @@
 					</thead>
 					
 					<tbody>
-						<tr ng-repeat="item in users">
-							<td align="center"><input type="radio" id="{{item.empID}}"></td>
-							<td>{{item.empName}}</td>
-							<td>{{item.empPosition}}</td>
+						<tr ng-repeat="user in users">
+							<td align="center"><input type="radio" ng-model="$parent.empID" ng-value="user.empID" /></td>
+							<td>{{user.empName}}</td>
+							<td>{{user.empPosition}}</td>
 						</tr>
 					</tbody>
 				</table>

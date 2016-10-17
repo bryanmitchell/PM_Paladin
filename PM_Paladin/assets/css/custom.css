@@ -14,13 +14,7 @@
     float:left;
 }
 
-/*.icon-active i {
-	display: none;
+.equipment_buttons {
+	width: 100% auto;
+	text-align: center;
 }
-
-.icon-active i.show-icon {
-	display: block;
-	background-color:#27662f;
-    color:white;
-    font-weight:bold;
-}*/
