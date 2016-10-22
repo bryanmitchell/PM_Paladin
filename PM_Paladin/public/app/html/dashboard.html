@@ -1,0 +1,151 @@
+<page-title ng-if="layoutOptions.pageTitles" title="Dashboard"></page-title>
+
+<!-- Table Styles -->
+<div class="row">
+	<div class="col-md-12">
+	
+		<div class="panel panel-default">
+
+			<div class="panel-body">
+			
+				<div class="row">
+					<div class="col-sm-6">
+					
+						<!-- Condensed Table -->
+						<strong>Upcoming Tools</strong>
+						
+						<table class="table table-bordered table-striped table-condensed table-hover">
+							<thead>
+								<tr>
+									<th>Tool ID</th>
+									<th>Tool Name</th>
+									<th>Maintenance by:</th>
+									<th>Days Left</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<tr ng-repeat="item in upcomingTools">
+									<td>{{item.toolID}}</td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.personInCharge}}</td>
+									<td>{{item.days}}</td>
+								</tr>
+							</tbody>
+						</table>
+					
+					</div>
+					<div class="col-sm-6">
+					
+						<!-- Combined Table -->
+						<strong>Past Due Tools</strong>
+						
+						<table class="table table-bordered table-striped table-condensed table-hover">
+							<thead>
+								<tr>
+									<th>Tool ID</th>
+									<th>Tool Name</th>
+									<th>Maintenance by:</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<tr>
+									<td>1</td>
+									<td>Arlind</td>
+									<td>Nushi</td>
+								</tr>
+								
+								<tr>
+									<td>2</td>
+									<td>Art</td>
+									<td>Ramadani</td>
+								</tr>
+								
+								<tr>
+									<td>3</td>
+									<td>Filan</td>
+									<td>Fisteku</td>
+								</tr>
+							</tbody>
+						</table>
+					
+					</div>
+				</div>
+			
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-12">
+	
+		<div class="panel panel-default">
+
+			<div class="panel-body">
+			
+				<div class="row">
+					<div class="col-sm-6">
+					
+					<div class="ct-chart ct-major-second" id="chart-1"></div>
+					
+					</div>
+					<div class="col-sm-6">
+					
+					<div class="ct-chart ct-perfect-fourth ct-label2" id="chart-2"></div>
+					
+					</div>
+				</div>
+			
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script type="text/javascript">
+var data = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  series: [
+    [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+    [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4]
+  ]
+};
+
+var options = {
+  seriesBarDistance: 10
+
+};
+
+var responsiveOptions = [
+  ['screen and (max-width: 640px)', {
+    seriesBarDistance: 5,
+    axisX: {
+      labelInterpolationFnc: function (value) {
+        return value[0];
+      }
+    }
+  }]
+];
+
+new Chartist.Bar('#chart-1', data, options, responsiveOptions);
+</script>
+
+<script type="text/javascript">
+	var data = {
+  series: [5, 3, 4]
+};
+
+var sum = function(a, b) { return a + b };
+
+new Chartist.Pie('#chart-2', data, {
+  labelInterpolationFnc: function(value) {
+    return Math.round(value / data.series.reduce(sum) * 100) + '%';
+  }
+});
+</script>

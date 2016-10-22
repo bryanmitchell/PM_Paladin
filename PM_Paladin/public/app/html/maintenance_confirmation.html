@@ -1,0 +1,47 @@
+<page-title ng-if="layoutOptions.pageTitles" title="Maintenance Confirmation"></page-title>
+
+<!-- Table Styles -->
+<div class="row">
+	<div class="col-md-12">
+	
+		<div class="panel panel-default">
+
+			<div class="panel-body">
+			
+				<div class="row">
+
+					<div class="col-sm-6">
+					
+						<table class="table table-bordered table-striped table-condensed table-hover">
+							<thead>
+								<tr>
+									<th> </th>
+									<th>Tool Name</th>
+									<th>Line</th>
+									<th>Partial</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<tr ng-repeat="item in tools">
+									<td align="center"><input type="checkbox" id="{{item.toolID}}"></td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.line}}</td>
+									<td>{{item.confStatus}}</td>
+								</tr>
+							</tbody>
+						</table>
+					
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<button type="button" class="btn btn-warning">Partially Confirm</button>
+						<button type="button" class="btn btn-success">Fully Confirm</button>
+					</div>
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
