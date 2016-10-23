@@ -4,19 +4,13 @@
 	
 		<div class="panel panel-default">
 
-			<div class="panel-body">
+			<div class="panel-body" ng-controller="UserMgmtCtrl as userCtrl">
 			
 				<div class="row">
 					<div class="btn-group">
 						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="openModal('modal-3', null, 'static');">
 							Create User
 						</button>
-					</div>
-					<div class="btn-group">
-						<button type="button" class="btn btn-success">Update</button>
-					</div>
-					<div class="btn-group pull-right">
-						<button type="button" class="btn btn-red">Delete</button>
 					</div>
 				</div>
 
@@ -27,17 +21,21 @@
 				<table class="table table-bordered table-striped table-condensed table-hover">
 					<thead>
 						<tr>
-							<th> </th>
 							<th>Employee Name</th>
 							<th>Position</th>
+							<th> </th>
+
 						</tr>
 					</thead>
 					
 					<tbody>
-						<tr ng-repeat="user in users">
-							<td align="center"><input type="radio" ng-model="$parent.empID" ng-value="user.empID" /></td>
-							<td>{{user.empName}}</td>
-							<td>{{user.empPosition}}</td>
+						<tr ng-repeat="user in userCtrl.users">
+							<td>{{user.empFirstName + " " + user.empLastName</td>
+							<td><label ng-bind="user.empPosition"></label></td>
+							<td>
+								<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="userCtrl.getUser($index);  openModal('modal-3-update', null, 'static');">Update</button>
+								<button type="button" class="btn btn-red" on-click="">Delete</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -49,32 +47,24 @@
 	</div>
 </div>
 
+<!-- Sign Up -->
 <script type="text/ng-template" id="modal-3">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Sign Up</h4>
 	</div>
 	
-	<div class="modal-body">
+	<div class="modal-body" ng-controller="UserMgmtCtrl">
 
 		<div class="row">
-
 			<div class="col-md-6">
-
 				<div class="form-group">
-
-				<label class="control-label">Employee ID</label>
-				<select style="width: 150px;">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
-				</select>
-
+					<label class="control-label">Employee ID</label>
+					<select style="width: 150px;" ng-model="userID" ng-options="user.empID for user in users">
+						<option value="">--- Select from list ---</option>
+					</select>
 				</div>
-
 			</div>
-
 		</div>
 	
 		<div class="row">
@@ -83,7 +73,7 @@
 				<div class="form-group">
 					<label for="field-1" class="control-label">Name</label>
 					
-					<input type="text" class="form-control" id="field-1" placeholder="First Name">
+					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="firstName">
 				</div>	
 				
 			</div>
@@ -93,7 +83,7 @@
 				<div class="form-group">
 					<label for="field-2" class="control-label">Last Name</label>
 					
-					<input type="text" class="form-control" id="field-2" placeholder="Last Name">
+					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="lastName">
 				</div>	
 			
 			</div>
@@ -105,7 +95,7 @@
 				<div class="form-group">
 					<label for="field-3" class="control-label">Email Address</label>
 					
-					<input type="text" class="form-control" id="field-3" placeholder="Email">
+					<input type="text" class="form-control" id="field-3" placeholder="Email" ng-model="email">
 				</div>	
 				
 			</div>
@@ -117,7 +107,7 @@
 				<div class="form-group">
 					<label for="field-4" class="control-label">Password</label>
 					
-					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters">
+					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="password">
 				</div>	
 				
 			</div>
@@ -127,7 +117,7 @@
 				<div class="form-group">
 					<label for="field-5" class="control-label">Confirm Password</label>
 					
-					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password">
+					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
 				</div>	
 			
 			</div>
@@ -160,6 +150,106 @@
 			</div>
 		</div>
 		
+	</div>
+	
+	<div class="modal-footer">
+		<button type="button" class="btn btn-white" ng-click="currentModal.close();">Close</button>
+		<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
+	</div>
+</script>
+
+<!-- update pop up -->
+<script type="text/ng-template" id="modal-3-update">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">Update User</h4>
+	</div>
+	
+	<div class="modal-body" ng-controller="UserMgmtCtrl as userCtrl">
+	
+		<div class="row">
+			<div class="col-md-6">
+				
+				<div class="form-group">
+					<label for="field-1" class="control-label">Name</label>
+					
+					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="userCtrl.userFirstName" />
+				</div>	
+				
+			</div>
+			
+			<div class="col-md-6">
+				
+				<div class="form-group">
+					<label for="field-2" class="control-label">Last Name</label>
+					
+					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="lastName">
+				</div>	
+			
+			</div>
+		</div>
+	
+		<div class="row">
+			<div class="col-md-12">
+				
+				<div class="form-group">
+					<label for="field-3" class="control-label">Email Address</label>
+					
+					<input type="email" class="form-control" id="field-3" placeholder="Email" ng-model="email">
+				</div>	
+				
+			</div>
+		</div>
+	
+		<div class="row">
+			<div class="col-md-6">
+				
+				<div class="form-group">
+					<label for="field-4" class="control-label">Password</label>
+					
+					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="password">
+				</div>	
+				
+			</div>
+			
+			<div class="col-md-6">
+				
+				<div class="form-group">
+					<label for="field-5" class="control-label">Confirm Password</label>
+					
+					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
+				</div>	
+			
+			</div>
+			
+		</div>
+	
+		<div class="row">
+				
+			<div class="col-md-12">
+
+				<div class="form-group no-margin">
+					
+					<label for="field-7" class="control-label">Type of User</label>
+					
+					</br>
+
+					<label>{{selectedUserIndex}}</label>
+
+					<br>
+					
+					<div class="col-sm-4">
+						<input type="checkbox" id="admin" ng-model="userCtrl.userPosition" ng-checked=""> Administrator
+					</div>
+					<div class="col-sm-4">
+						<input type="checkbox" id="engineer" ng-model="isType" ng-checked="checkType()"> Engineer
+					</div>
+					<div class="col-sm-4">
+						<input type="checkbox" id="technician" ng-model="isType" ng-checked="checkType()"> Technician
+					</div>
+				</div>	
+			</div>
+		</div>
 	</div>
 	
 	<div class="modal-footer">

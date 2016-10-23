@@ -1,13 +1,6 @@
 angular.module('xenon.directives', []).
 
 	// Layout Related Directives
-	directive('settingsPane', function(){
-		return {
-			restrict: 'E',
-			templateUrl: appHelper.templatePath('layout/settings-pane'),
-			controller: 'SettingsPaneCtrl'
-		};
-	}).
 	directive('horizontalMenu', function(){
 		return {
 			restrict: 'E',
@@ -23,33 +16,11 @@ angular.module('xenon.directives', []).
 			controller: 'SidebarMenuCtrl'
 		};
 	}).
-	directive('sidebarChat', function(){
-		return {
-			restrict: 'E',
-			replace: true,
-			templateUrl: appHelper.templatePath('layout/sidebar-chat')
-		};
-	}).
-	directive('footerChat', function(){
-		return {
-			restrict: 'E',
-			replace: true,
-			controller: 'FooterChatCtrl',
-			templateUrl: appHelper.templatePath('layout/footer-chat')
-		};
-	}).
 	directive('sidebarLogo', function(){
 		return {
 			restrict: 'E',
 			replace: true,
 			templateUrl: appHelper.templatePath('layout/sidebar-logo')
-		};
-	}).
-	directive('sidebarProfile', function(){
-		return {
-			restrict: 'E',
-			replace: true,
-			templateUrl: appHelper.templatePath('layout/sidebar-profile')
 		};
 	}).
 	directive('userInfoNavbar', function(){
@@ -1037,4 +1008,4 @@ angular.module('xenon.directives', []).
 				});
 			}
 		};
-	});
+});

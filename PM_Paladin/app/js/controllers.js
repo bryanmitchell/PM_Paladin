@@ -244,24 +244,6 @@ angular.module('xenon.controllers', []).
 			days: '1'
 		}];
 	}).
-	controller('UserMgmtCtrl', function($scope)
-	{
-		$scope.users = [{
-			empID: '1',
-			empName: 'Isadora Duncan',
-			empPosition: 'Admin'
-		},
-		{
-			empID: '2',
-			empName: 'Juan Pachanga',
-			empPosition: 'Engineer'
-		},
-		{
-			empID: '3',
-			empName: 'Pablo Pueblo',
-			empPosition: 'Technician'
-		}];
-	}).
 	controller('MaintConfCtrl', function($scope)
 	{
 		$scope.tools = [{
@@ -322,42 +304,42 @@ angular.module('xenon.controllers', []).
 		}
 
 		$scope.lines = [{
-			lineID: '1',
+			lineID: 1,
 			lineName: 'Line_1',
 		},
 		{
-			lineID: '2',
+			lineID: 2,
 			lineName: 'Line_2',
 		}];
 
 		$scope.workstations = [{
-			lineID: '1',
-			wsID: '1.1',
+			lineID: 1,
+			wsID: 1.1,
 			wsName: 'WS_1',
 		},
 		{
-			lineID: '1',
-			wsID: '1.2',
+			lineID: 1,
+			wsID: 1.2,
 			wsName: 'WS_2',
 		},
 		{
-			lineID: '1',
-			wsID: '1.3',
+			lineID: 1,
+			wsID: 1.3,
 			wsName: 'WS_5',
 		},
 		{
-			lineID: '2',
-			wsID: '2.1',
+			lineID: 2,
+			wsID: 2.1,
 			wsName: 'WS_3',
 		},
 		{
-			lineID: '2',
-			wsID: '2.2',
+			lineID: 2,
+			wsID: 2.2,
 			wsName: 'WS_4',
 		}];
 
 		$scope.tools = [{
-			wsID: '1.1',
+			wsID: 1.1,
 			toolID: '1.1.1',
 			toolName: 'Tool_1',
 		},
@@ -396,4 +378,113 @@ angular.module('xenon.controllers', []).
 			toolID: '2.2.2',
 			toolName: 'Tool_8',
 		}];
+	}).
+	controller('UserMgmtCtrl', function($scope, $http){
+		$http.get('users.json')
+		.success(function (data) {
+			$scope.users = data;
+			console.log("sucess");
+		}).error(function (data, status) {
+			alert();
+		});
+
+
+
+
 	});
+
+
+	// $scope.users = [{
+	// 		empID: 1,
+	// 		empFirstName: 'Isadora',
+	// 		empLastName: 'Duncan',
+	// 		empPosition: 'Admin',
+	// 		empEmail: 'isadora.duncan@ge.com',
+	// 		empPass: 'celia',
+	// 	},
+	// 	{
+	// 		empID: 2,
+	// 		empFirstName: 'Juan',
+	// 		empLastName: 'Pachanga',
+	// 		empPosition: 'Engineer',
+	// 		empEmail: 'juan.pachanga@ge.com',
+	// 		empPass: 'ruben',
+	// 	},
+	// 	{
+	// 		empID: 3,
+	// 		empFirstName: 'Pablo',
+	// 		empLastName: 'Pueblo',
+	// 		empPosition: 'Technician',
+	// 		empEmail: 'pablo.pablo@ge.com',
+	// 		empPass: 'blades',
+	// 	},
+	// 	{
+	// 		empID: 4,
+	// 		empFirstName: 'Maximo',
+	// 		empLastName: 'Chamorro',
+	// 		empPosition: 'Engineer',
+	// 		empEmail: 'maximo.chamorro@ge.com',
+	// 		empPass: 'blades',
+	// 	}];
+
+
+		// this.selectedUserID = null;
+		// var selectedUserPosition = "";
+		// var userIndex = "";
+
+
+		// function getUserIndex() {
+		// 	for (var i=0; i < users.length; i++) {
+		// 		if (selectedUserID == users[i].empID) {
+		// 			var userIndex = i;
+		// 			selectedUserPosition = users[i].empPosition;
+		// 			console.log("user index: " + userIndex);
+		// 			console.log("user position: " + selectedUserPosition);
+		// 		} 
+		// 	}
+		// 	selectedUserIndex = userIndex;
+		// 	return userIndex;
+		// };
+
+		// $scope.getUserPosition = function () {
+		// 	return $scope.users[getUserIndex()].empPosition;;
+		// };
+		// selectedUserIndex = getUserIndex();
+
+
+
+
+
+		// var isAdmin = true;
+		// var isEngineer = false;
+		// var isTechnician = false;
+		// var isType = false	
+
+		// checkType = function () {
+
+		// 	// $scope.position = $scope.selectedUserIndex;
+		// 	// console.log($scope.selectedUserPosition);
+
+		// 	if (selectedUserPosition == 'Admin') {
+		// 		console.log("entre a admin");
+		// 		return true;
+		// 	}
+		// 	else if (selectedUserPosition == 'Engineer') {
+		// 		console.log("entre a eng");
+		// 		return true;
+		// 	}
+		// 	else if (selectedUserPosition == 'Technician') {
+		// 		console.log("entre a tec");
+		// 		return true;
+		// 	}
+		// 	else{
+		// 		console.log("entre a nada");
+		// 		return false;
+		// 	}	
+		// }
+	
+
+		
+
+
+	

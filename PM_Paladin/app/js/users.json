@@ -1,0 +1,36 @@
+{	
+	"users" : [
+		{
+			"empID": 1,
+			"empFirstName": "Isadora",
+			"empLastName": "Duncan",
+			"empPosition": "Admin",
+			"empEmail": "isadora.duncan@ge.com",
+			"empPass": "celia",
+		},
+		{
+			"empID": 2,
+			"empFirstName": "Juan",
+			"empLastName": "Pachanga",
+			"empPosition": "Engineer",
+			"empEmail": "juan.pachanga@ge.com",
+			"empPass": "ruben",
+		},
+		{
+			"empID": 3,
+			"empFirstName": "Pablo",
+			"empLastName": "Pueblo",
+			"empPosition": "Technician",
+			"empEmail": "pablo.pablo@ge.com",
+			"empPass": "blades",
+		},
+		{
+			"empID": 4,
+			"empFirstName": "Maximo",
+			"empLastName": "Chamorro",
+			"empPosition": "Engineer",
+			"empEmail": "maximo.chamorro@ge.com",
+			"empPass": "blades",
+		}
+	]
+}
