@@ -52,7 +52,7 @@
 </head>
 <body class="page-body" ng-controller="MainCtrl" ng-class="{'login-page': isLoginPage && isMainPage == false, 'login-light': isLightLoginPage && isMainPage == false, 'lockscreen-page': isLockscreenPage && isMainPage == false, 'boxed-container': layoutOptions.container.isBoxed}">
 
-
+	<base href="/app/dashboard">
 	<div class="page-container" ui-view></div>
 
 	<!-- Remove this code if you want to disable Loading Overlay in the beginning of document loading -->
@@ -69,14 +69,9 @@
 	<script src="public/app/js/oc-lazyload/ocLazyLoad.min.js"></script>
 	<script src="public/app/js/angular-fullscreen.js"></script>
 	<script src="public/assets/js/chartist/chartist.min.js"></script>
-	<script src="public/assets/js/paladin/chartist_example.js"></script>
 	<script src="public/assets/js/TweenMax.min.js"></script>
 	<script src="public/assets/js/joinable.js"></script>
 	<script src="public/assets/js/resizeable.js"></script>
-	<script src="public/assets/js/finderjs/finder.min.js"></script>
-	<script src="public/assets/js/finderjs/jquery.finder.js"></script>
-	<script src="public/app/html/example-async.js"></script>
-
 
 
 

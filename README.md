@@ -27,12 +27,15 @@ Download project from Git
 Install Node.js (v4.6.1 included)
 ```
 C:\Users\You> npm install npm@latest -g
-C:\Users\You> npm install -g expres
+C:\Users\You> npm install -g express
 C:\Users\You> npm install -g express-generator
 C:\Users\You> cd Your\Path\PM_Paladin\PM_Paladin
 C:\Users\You\PM_Paladin\PM_Paladin> express --ejs` (You should skip this, this creates the express scaffold
 C:\Users\You\PM_Paladin\PM_Paladin> npm install
 C:\Users\You\PM_Paladin\PM_Paladin> npm install -g nodemon
+C:\Users\You\PM_Paladin\PM_Paladin> npm install sendgrid
+C:\Users\You\PM_Paladin\PM_Paladin> npm install -g browserify
+C:\Users\You\PM_Paladin\PM_Paladin> npm install dotenv --save
 C:\Users\You\PM_Paladin\PM_Paladin> npm install mssql
 C:\Users\You\PM_Paladin\PM_Paladin> npm install bcryptjs
 ```
@@ -45,3 +48,7 @@ and leave running forever... :)
 
 Note that if you make BIG changes to the files, turn nodemon off or your computer WILL lag.
 
+Remember to set your ./public/app/.env file with:
+SENDGRID_USERNAME = your_username
+SENDGRID_PASSWORD = your_password
+TO = your.email@gmail.com

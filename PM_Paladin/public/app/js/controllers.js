@@ -244,8 +244,22 @@ angular.module('xenon.controllers', []).
 			days: '1'
 		}];
 	}).
-	controller('MaintConfCtrl', function($scope)
+	controller('MaintConfCtrl', function($scope, $http)
 	{
+
+		$scope.sendEmail = function () {
+			
+			console.log("TEST");
+	        //Request
+	        $http.post('../../api/email', $scope.email) 
+	        .success(function(data, status) {
+	            console.log("Sent ok");
+	        })
+	        .error(function(data, status) {
+	            console.log("Error");
+	        })
+		};
+
 		$scope.tools = [{
 			toolID: '1',
 			toolName: 'Tool_1',
@@ -304,8 +318,8 @@ angular.module('xenon.controllers', []).
 		}
 
 		$scope.lines = [{
-			lineID: 1,
-			lineName: 'Line_1',
+			"lineID": 1,
+			"lineName": 'Line_1',
 		},
 		{
 			lineID: 2,
