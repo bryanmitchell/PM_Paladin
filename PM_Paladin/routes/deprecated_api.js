@@ -206,6 +206,8 @@ function getEmployees(type){
 	}
 }
 
+// TODO input taskId
+// output engineer.email, eng.name, task.name
 
 //----------------------------
 // UPDATE (Tool, Workstation, Line, Employee)

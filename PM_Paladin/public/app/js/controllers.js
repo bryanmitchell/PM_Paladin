@@ -247,11 +247,24 @@ angular.module('xenon.controllers', []).
 	controller('MaintConfCtrl', function($scope, $http)
 	{
 
+		$scope.selection = [];
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
 		$scope.sendEmail = function () {
 			
 			console.log("TEST");
 	        //Request
-	        $http.post('../../api/email', $scope.email) 
+	        $http.post('../../api/email', $scope.selection) 
 	        .success(function(data, status) {
 	            console.log("Sent ok");
 	        })
@@ -261,22 +274,22 @@ angular.module('xenon.controllers', []).
 		};
 
 		$scope.tools = [{
-			toolID: '1',
-			toolName: 'Tool_1',
-			line: 'Welding Line',
-			confStatus: 'Y'
+			'toolID': '1',
+			'toolName': 'Tool_1',
+			'line': 'Welding Line',
+			'confStatus': 'Y'
 		},
 		{
-			toolID: '2',
-			toolName: 'Tool_2',
-			line: 'Assembly Line',
-			confStatus: 'Y'
+			'toolID': '2',
+			'toolName': 'Tool_2',
+			'line': 'Assembly Line',
+			'confStatus': 'Y'
 		},
 		{
-			toolID: '3',
-			toolName: 'Tool_3',
-			line: 'Testing Line',
-			confStatus: 'N'
+			'toolID': '3',
+			'toolName': 'Tool_3',
+			'line': 'Testing Line',
+			'confStatus': 'N'
 		}];
 	}).
 	controller('MaintApprCtrl', function($scope)

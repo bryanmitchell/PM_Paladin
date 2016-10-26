@@ -24,7 +24,7 @@
 							
 							<tbody>
 								<tr ng-repeat="item in tools">
-									<td align="center"><input type="checkbox" id="{{item.toolID}}"></td>
+									<td align="center"><input type="checkbox"  value="{{item.toolID}}" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"></td>
 									<td>{{item.toolName}}</td>
 									<td>{{item.line}}</td>
 									<td>{{item.confStatus}}</td>

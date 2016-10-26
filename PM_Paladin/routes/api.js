@@ -9,7 +9,7 @@ var salt = bcrypt.genSaltSync(10);
 // dotenv.load();
 
 var sendgrid_api_key = process.env.SENDGRID_API_KEY;
-var sg = require('sendgrid')('');
+var sg = require('sendgrid')('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');
 
 
 var sqlConfig = {  
@@ -33,7 +33,18 @@ router.route('/employees')
 router.route('/email')
 	.post(function(req, res){
 		console.log("GET email");
-		send(helloEmail(), res);
+		console.log(req.body);
+		// var recordset = {};
+
+		// iterate through JSON to get objects
+		// for (var key in req.body) {
+		// 	if (req.body.hasOwnProperty(key)) {
+		// 		item = req.body[key];
+		// 		console.log(item);
+		// 		console.log(item.toolID);
+		// 	}
+		// }
+		send(partiallyConfirmedEmail(req), res);
 	})
 
 module.exports = router;
@@ -108,15 +119,35 @@ function send(toSend, res){
 }
 
 
-function helloEmail(){
-  var helper = require('sendgrid').mail;
-  from_email = new helper.Email("bryan.bmf@gmail.com");
-  to_email = new helper.Email("bryan.bmf@gmail.com");
-  subject = "Hello from PM Paladin bitch";
-  content = new helper.Content("text/plain", "it works. client side click to server side sent.");
-  mail = new helper.Mail(from_email, subject, to_email, content);
-  //email = new helper.Email("bryan.mitchell@upr.edu");
-  //mail.personalizations[0].addTo(email);
+function partiallyConfirmedEmail(req){
+	var helper = require('sendgrid').mail;
 
-  return mail.toJSON();
-}
+	var content_1 = "This is an automated message.";
+	var content_2 = "The following tasks have been partially confirmed: ";
+	var index = 0;
+	var toolIDs = [];
+
+	//Parse JSON for keys and values
+	for (var key in req.body) {
+		if (req.body.hasOwnProperty(key)) {
+			item = req.body[key];
+			toolIDs[index] = "<li>" + item.toolID + "</li>";
+			console.log(toolIDs);
+			index++;
+		}
+	};
+
+
+	from_email = new helper.Email("bryan.bmf@gmail.com");
+	to_email = new helper.Email("bryan.bmf@gmail.com");
+	subject = "Hello from PM Paladin";
+	content = new helper.Content("text/html", content_1 + "<br><br>" + content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>");
+	mail = new helper.Mail(from_email, subject, to_email, content);
+
+
+	//add multiple recipients
+	// email = new helper.Email("karla.valcarcel@gmail.com");
+	// mail.personalizations[0].addTo(email);
+
+	return mail.toJSON();
+} 
