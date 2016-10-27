@@ -30,21 +30,31 @@ router.route('/employees')
 		getEmployees("Engineer", res);
 	})
 
-router.route('/email')
+//Partial Confirmation Email
+router.route('/partial')
 	.post(function(req, res){
-		console.log("GET email");
+		console.log("GET partial email");
 		console.log(req.body);
 		// var recordset = {};
-
-		// iterate through JSON to get objects
-		// for (var key in req.body) {
-		// 	if (req.body.hasOwnProperty(key)) {
-		// 		item = req.body[key];
-		// 		console.log(item);
-		// 		console.log(item.toolID);
-		// 	}
-		// }
 		send(partiallyConfirmedEmail(req), res);
+	})
+
+//Full Confirmation Email
+router.route('/full')
+	.post(function(req, res){
+		console.log("GET full email");
+		console.log(req.body);
+		// var recordset = {};
+		send(fullyConfirmedEmail(req), res);
+	})
+
+//Maintenance Approval Email
+router.route('/approve')
+	.post(function(req, res){
+		console.log("GET approval email");
+		console.log(req.body);
+		// var recordset = {};
+		send(approvedEmail(req), res);
 	})
 
 module.exports = router;
@@ -124,6 +134,73 @@ function partiallyConfirmedEmail(req){
 
 	var content_1 = "This is an automated message.";
 	var content_2 = "The following tasks have been partially confirmed: ";
+	var index = 0;
+	var toolIDs = [];
+
+	//Parse JSON for keys and values
+	for (var key in req.body) {
+		if (req.body.hasOwnProperty(key)) {
+			item = req.body[key];
+			toolIDs[index] = "<li>" + item.toolID + "</li>";
+			console.log(toolIDs);
+			index++;
+		}
+	};
+
+
+	from_email = new helper.Email("bryan.bmf@gmail.com");
+	to_email = new helper.Email("bryan.bmf@gmail.com");
+	subject = "Hello from PM Paladin";
+	content = new helper.Content("text/html", content_1 + "<br><br>" + content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>");
+	mail = new helper.Mail(from_email, subject, to_email, content);
+
+
+	//add multiple recipients
+	// email = new helper.Email("karla.valcarcel@gmail.com");
+	// mail.personalizations[0].addTo(email);
+
+	return mail.toJSON();
+} 
+
+function fullyConfirmedEmail(req){
+	var helper = require('sendgrid').mail;
+
+	var content_1 = "This is an automated message.";
+	var content_2 = "The following tasks have been fully confirmed: ";
+	var content_3 = "After inspecting the tool, go to the Maintenance Approval page for final approval.";
+	var index = 0;
+	var toolIDs = [];
+
+	//Parse JSON for keys and values
+	for (var key in req.body) {
+		if (req.body.hasOwnProperty(key)) {
+			item = req.body[key];
+			toolIDs[index] = "<li>" + item.toolID + "</li>";
+			console.log(toolIDs);
+			index++;
+		}
+	};
+
+
+	from_email = new helper.Email("bryan.bmf@gmail.com");
+	to_email = new helper.Email("bryan.bmf@gmail.com");
+	subject = "Hello from PM Paladin";
+	content = new helper.Content("text/html", content_1 + "<br><br>" + content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>" + "<br>" + content_3);
+	mail = new helper.Mail(from_email, subject, to_email, content);
+
+
+	//add multiple recipients
+	// email = new helper.Email("karla.valcarcel@gmail.com");
+	// mail.personalizations[0].addTo(email);
+
+	return mail.toJSON();
+} 
+
+function approvedEmail(req){
+	var helper = require('sendgrid').mail;
+
+	var content_1 = "This is an automated message.";
+	var content_2 = "The following tasks have been approved: ";
 	var index = 0;
 	var toolIDs = [];
 

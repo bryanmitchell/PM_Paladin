@@ -260,17 +260,30 @@ angular.module('xenon.controllers', []).
 			}
 		};
 
-		$scope.sendEmail = function () {
+		$scope.sendEmail = function (type) {
 			
 			console.log("TEST");
 	        //Request
-	        $http.post('../../api/email', $scope.selection) 
-	        .success(function(data, status) {
-	            console.log("Sent ok");
-	        })
-	        .error(function(data, status) {
-	            console.log("Error");
-	        })
+	        if (type == "partial") {
+	        	console.log("Partial");
+		        $http.post('../../api/partial', $scope.selection) 
+		        .success(function(data, status) {
+		            console.log("Sent ok");
+		        })
+		        .error(function(data, status) {
+		            console.log("Error");
+		        })
+		    }
+		    else {
+		    	console.log("Full");
+		    	$http.post('../../api/full', $scope.selection) 
+		        .success(function(data, status) {
+		            console.log("Sent ok");
+		        })
+		        .error(function(data, status) {
+		            console.log("Error");
+		        })
+		    }
 		};
 
 		$scope.tools = [{
@@ -292,22 +305,50 @@ angular.module('xenon.controllers', []).
 			'confStatus': 'N'
 		}];
 	}).
-	controller('MaintApprCtrl', function($scope)
+	controller('MaintApprCtrl', function($scope, $http)
 	{
+
+		$scope.selection = [];
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.sendEmail = function () {
+			
+			console.log("TEST");
+	        //Request
+	        $http.post('../../api/approve', $scope.selection) 
+	        .success(function(data, status) {
+	            console.log("Sent ok");
+	        })
+	        .error(function(data, status) {
+	            console.log("Error");
+	        })
+		};
+
+
 		$scope.tools = [{
-			toolID: '1',
-			toolName: 'Tool_1',
-			personInCharge: 'Isadora Duncan',
+			'toolID': '1',
+			'toolName': 'Tool_1',
+			'personInCharge': 'Isadora Duncan',
 		},
 		{
-			toolID: '2',
-			toolName: 'Tool_2',
-			personInCharge: 'Juan Pachanga',
+			'toolID': '2',
+			'toolName': 'Tool_2',
+			'personInCharge': 'Juan Pachanga',
 		},
 		{
-			toolID: '3',
-			toolName: 'Tool_3',
-			personInCharge: 'Pablo Pueblo',
+			'toolID': '3',
+			'toolName': 'Tool_3',
+			'personInCharge': 'Pablo Pueblo',
 		}];
 	}).
 	controller('EquipmentMgmtCtrl', function($scope)
