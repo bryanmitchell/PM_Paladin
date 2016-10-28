@@ -266,23 +266,25 @@ angular.module('xenon.controllers', []).
 	        //Request
 	        if (type == "partial") {
 	        	console.log("Partial");
+	        	
 		        $http.post('../../api/partial', $scope.selection) 
 		        .success(function(data, status) {
 		            console.log("Sent ok");
 		        })
 		        .error(function(data, status) {
 		            console.log("Error");
-		        })
+		        });
 		    }
 		    else {
 		    	console.log("Full");
+		    	
 		    	$http.post('../../api/full', $scope.selection) 
 		        .success(function(data, status) {
 		            console.log("Sent ok");
 		        })
 		        .error(function(data, status) {
 		            console.log("Error");
-		        })
+		        });
 		    }
 		};
 
@@ -323,7 +325,7 @@ angular.module('xenon.controllers', []).
 
 		$scope.sendEmail = function () {
 			
-			console.log("TEST");
+			console.log("sendEmail from controller.js");
 	        //Request
 	        $http.post('../../api/approve', $scope.selection) 
 	        .success(function(data, status) {
@@ -448,13 +450,22 @@ angular.module('xenon.controllers', []).
 		}];
 	}).
 	controller('UserMgmtCtrl', function($scope, $http){
-		$http.get('users.json')
+		
+		$http.get('../../api/positions')
 		.success(function (data) {
-			$scope.users = data;
-			console.log("sucess");
+			$scope.empPositions = data;
 		}).error(function (data, status) {
 			alert();
 		});
+		
+		$http.get('../../api/employees')
+		.success(function (data) {
+			$scope.users = data;
+		}).error(function (data, status) {
+			alert();
+		});
+
+		
 
 
 

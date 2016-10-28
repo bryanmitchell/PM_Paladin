@@ -21,6 +21,7 @@ Luis Murphy: Lenovo Y40-80, Windows 10 Home
 6. Go to SQL Server Network Configuration > Protocols for SQL Express and make sure TCP/IP is on. If not, enable and restart the services (Server, Browser)
 7. Right-click mdf and ldf files, Properties, Security, Edit, Add, enter 'Log On As' value from Step 4
 8. Open SSMS, right-click on Databases folder (in Object Explorer), click Attach, add Your\Path\PM_Paladin\PM_Paladin\data\paladin.mdf and OK (might bump into an error...)
+9. If all else fails, open SSMS as admin, log on with Windows authentication, good luck.
 
 ## Setting up Node/Express development
 Download project from Git
