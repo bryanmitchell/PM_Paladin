@@ -17,7 +17,13 @@ var sg = require('sendgrid')('SG.ZZVrZJ3WQdesT1DmG9kd2w.O1YXLLsRyrtGc5OzPwtcM5Po
 router.route('/employees')
 	.get(function(req, res){
 		console.log("GET");
-		dbconn.getEmployees("Engineer", res);
+		dbconn.getEmployees("Technician", res);
+	});
+
+router.route('/selectedEmployee')
+	.get(function(req, res){
+		console.log("GET");
+		dbconn.getSelectedEmployee(req, res);
 	});
 
 router.route('/positions')
@@ -42,6 +48,12 @@ router.route('/full')
 router.route('/approve')
 	.post(function(req, res){
 		sendEmail(emailgen.approvedEmail(req), res);
+	});
+
+//New User Email
+router.route('/newUser')
+	.post(function(req, res){
+		sendEmail(emailgen.newUserEmail(req), res);
 	});
 
 module.exports = router;

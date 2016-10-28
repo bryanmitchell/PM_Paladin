@@ -451,21 +451,82 @@ angular.module('xenon.controllers', []).
 	}).
 	controller('UserMgmtCtrl', function($scope, $http){
 		
-		$http.get('../../api/positions')
-		.success(function (data) {
-			$scope.empPositions = data;
-		}).error(function (data, status) {
-			alert();
-		});
+		// $http.get('../../api/positions')
+		// .success(function (data) {
+		// 	$scope.empPositions = data;
+		// }).error(function (data, status) {
+		// 	alert();
+		// });
 		
 		$http.get('../../api/employees')
 		.success(function (data) {
 			$scope.users = data;
+			// console.log($scope.users);
 		}).error(function (data, status) {
 			alert();
 		});
 
-		
+		$scope.selection = [];
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.userInfo = {
+			'sso': '',
+			'firstName': '',
+			'lastName': '',
+			'email': '',
+			'password': '',
+			'employeeType': $scope.selection
+		};
+
+		// $scope.selectedUser = {};
+		// console.log($scope.selectedUser);
+		$scope.checkSelectedUser = function (userIndex) {
+			var tmp = $scope.users[userIndex];
+			// $scope.selectedUser.firstName = tmp.firstName;
+			// $scope.selectedUser.push(tmp);
+			console.log($scope.selectedUser);
+
+			// $http.get('../../api/selectedEmployee', $scope.selectedUser)
+			// .success(function (data) {
+			// 	$scope.clickedUser = data;
+			// 	console.log($scope.clickedUser);
+			// }).error(function (data, status) {
+			// 	alert();
+			// });
+		}
+
+		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+
+		$scope.sendEmail = function () {
+			console.log($scope.userInfo);
+			console.log("sendEmail from controller.js");
+	        
+	        //Request
+	        $http.post('../../api/newUser', $scope.userInfo) 
+	        .success(function(data, status) {
+	            console.log("Sent ok");
+	        })
+	        .error(function(data, status) {
+	            console.log("Error");
+	        })
+		};
+
+		 // [{"sso":1,
+		 // "firstName":"Brian",
+		 // "lastName":"Michelle",
+		 // "email":"bryan.mitchell@upr.edu",
+		 // "employeeType":"Engineer"}]
+
 
 
 

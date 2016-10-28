@@ -85,3 +85,14 @@ exports.approvedEmail = function(req){
 		content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
 		);
 };
+
+exports.newUserEmail = function(req){
+	var content_1 = "Hi " + req.body.firstName + ", <br><br> Yous a punk ass " + req.body.employeeType + " bitch.";
+
+	return formEmail(req, 
+		"bryan.bmf@gmail.com", 
+		req.body.email, 
+		"[PM Paladin] Welcome to PM Paladin",
+		content_1
+		);
+};

@@ -4,7 +4,7 @@ var sql = require('mssql');
 var sqlConfig = {  
 	user: 'paladin_watch',  
 	password: 'pmpaladin',  
-	server: 'LRMM-LENOVO-Y40\\SQLEXPRESS',
+	server: 'DESKTOP-CRJIBKD\\SQLEXPRESS',
 	database: 'paladin'
 };
 
@@ -52,6 +52,18 @@ exports.getEmployees = function(type, res){
 			WHERE et.employeeType = '{0}';
 			`.format(type), res);
 	}
+}
+
+exports.getSelectedEmployee = function(req, res){
+	console.log("Getting selected employee...");
+	runQuery(`
+		SELECT e.sso, e.firstName, e.lastName, e.email, et.employeeType 
+		FROM Employee AS e 
+		INNER JOIN EmployeeType AS et 
+		ON e.sso = et.sso 
+		WHERE et.employeeType = 'req.body.sso';
+		`.format(req), res);
+	
 }
 
 exports.getPositions = function(res){
