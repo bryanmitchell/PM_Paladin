@@ -11,19 +11,19 @@
 				<div class="row">
 
 					<div class="col-sm-6">
-					
+						{{tasks}}
 						<table class="table table-bordered table-striped table-condensed table-hover">
 							<thead>
 								<tr>
 									<th> </th>
-									<th>Tool Name</th>
+									<th>Task Name</th>
 									<th>Line</th>
 									<th>Partial</th>
 								</tr>
 							</thead>
 							
 							<tbody>
-								<tr ng-repeat="item in tools">
+								<tr ng-repeat="item in tasks">
 									<td align="center"><input type="checkbox"  value="{{item.toolID}}" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"></td>
 									<td>{{item.toolName}}</td>
 									<td>{{item.line}}</td>

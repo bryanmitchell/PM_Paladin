@@ -254,8 +254,32 @@ app.controller('DashboardCtrl', function($scope)
 
 app.controller('MaintConfCtrl', function($scope, $http)
 	{
+		$http.get('../../api/confirmtasks')
+		.success(function (data) {
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
 
 		$scope.selection = [];
+		// $scope.tools = [{
+		// 	'toolID': '1',
+		// 	'toolName': 'Tool_1',
+		// 	'line': 'Welding Line',
+		// 	'confStatus': 'Y'
+		// },
+		// {
+		// 	'toolID': '2',
+		// 	'toolName': 'Tool_2',
+		// 	'line': 'Assembly Line',
+		// 	'confStatus': 'Y'
+		// },
+		// {
+		// 	'toolID': '3',
+		// 	'toolName': 'Tool_3',
+		// 	'line': 'Testing Line',
+		// 	'confStatus': 'N'
+		// }];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -269,7 +293,6 @@ app.controller('MaintConfCtrl', function($scope, $http)
 		};
 
 		$scope.sendEmail = function (type) {
-			
 			console.log("TEST");
 	        //Request
 	        if (type == "partial") {
@@ -296,24 +319,6 @@ app.controller('MaintConfCtrl', function($scope, $http)
 		    }
 		};
 
-		$scope.tools = [{
-			'toolID': '1',
-			'toolName': 'Tool_1',
-			'line': 'Welding Line',
-			'confStatus': 'Y'
-		},
-		{
-			'toolID': '2',
-			'toolName': 'Tool_2',
-			'line': 'Assembly Line',
-			'confStatus': 'Y'
-		},
-		{
-			'toolID': '3',
-			'toolName': 'Tool_3',
-			'line': 'Testing Line',
-			'confStatus': 'N'
-		}];
 	});
 
 app.controller('MaintApprCtrl', function($scope, $http)
