@@ -4,7 +4,7 @@ var sql = require('mssql');
 var sqlConfig = {  
 	user: 'paladin_watch',  
 	password: 'pmpaladin',  
-	server: 'DESKTOP-CRJIBKD\\SQLEXPRESS',
+	server: 'LRMM-LENOVO-Y40\\SQLEXPRESS',
 	database: 'paladin'
 };
 

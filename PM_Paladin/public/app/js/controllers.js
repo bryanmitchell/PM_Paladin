@@ -1,28 +1,32 @@
 'use strict';
 
-angular.module('xenon.controllers', []).
-	controller('LoginCtrl', function($scope, $rootScope)
+var app = angular.module('xenon.controllers', []);
+
+app.controller('LoginCtrl', function($scope, $rootScope)
 	{
 		$rootScope.isLoginPage        = true;
 		$rootScope.isLightLoginPage   = false;
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = false;
-	}).
-	controller('LoginLightCtrl', function($scope, $rootScope)
+	});
+
+app.controller('LoginLightCtrl', function($scope, $rootScope)
 	{
 		$rootScope.isLoginPage        = true;
 		$rootScope.isLightLoginPage   = true;
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = false;
-	}).
-	controller('LockscreenCtrl', function($scope, $rootScope)
+	});
+
+app.controller('LockscreenCtrl', function($scope, $rootScope)
 	{
 		$rootScope.isLoginPage        = false;
 		$rootScope.isLightLoginPage   = false;
 		$rootScope.isLockscreenPage   = true;
 		$rootScope.isMainPage         = false;
-	}).
-	controller('MainCtrl', function($scope, $rootScope, $location, $layout, $layoutToggles, $pageLoadingBar, Fullscreen)
+	});
+
+app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $layoutToggles, $pageLoadingBar, Fullscreen)
 	{
 		$rootScope.isLoginPage        = false;
 		$rootScope.isLightLoginPage   = false;
@@ -162,8 +166,9 @@ angular.module('xenon.controllers', []).
 
 			$scope.isFullscreen = Fullscreen.isEnabled() ? true : false;
 		}
-	}).
-	controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $timeout, $location, $state, $layout)
+	});
+
+app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $timeout, $location, $state, $layout)
 	{
 
 		// Menu Items
@@ -184,8 +189,9 @@ angular.module('xenon.controllers', []).
 		$timeout(setup_sidebar_menu, 1);
 
 		ps_init(); // perfect scrollbar for sidebar
-	}).
-	controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
+	});
+
+app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 	{
 		// Used to be done as a function in app.js state('app')
 		$rootScope.isLoginPage        = false;
@@ -222,8 +228,9 @@ angular.module('xenon.controllers', []).
 
 			$rootScope.modalContent = $sce.trustAsHtml('Modal content is loading...');
 		}
-	}).
-	controller('DashboardCtrl', function($scope)
+	});
+
+app.controller('DashboardCtrl', function($scope)
 	{
 		$scope.upcomingTools = [{
 			toolID: '1393',
@@ -243,8 +250,9 @@ angular.module('xenon.controllers', []).
 			personInCharge: 'Pablo Pueblo',
 			days: '1'
 		}];
-	}).
-	controller('MaintConfCtrl', function($scope, $http)
+	});
+
+app.controller('MaintConfCtrl', function($scope, $http)
 	{
 
 		$scope.selection = [];
@@ -306,8 +314,9 @@ angular.module('xenon.controllers', []).
 			'line': 'Testing Line',
 			'confStatus': 'N'
 		}];
-	}).
-	controller('MaintApprCtrl', function($scope, $http)
+	});
+
+app.controller('MaintApprCtrl', function($scope, $http)
 	{
 
 		$scope.selection = [];
@@ -352,8 +361,9 @@ angular.module('xenon.controllers', []).
 			'toolName': 'Tool_3',
 			'personInCharge': 'Pablo Pueblo',
 		}];
-	}).
-	controller('EquipmentMgmtCtrl', function($scope)
+	});
+
+app.controller('EquipmentMgmtCtrl', function($scope)
 	{
 		$scope.selectedLine = null;  // initialize our variable to null
 		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
@@ -448,25 +458,30 @@ angular.module('xenon.controllers', []).
 			toolID: '2.2.2',
 			toolName: 'Tool_8',
 		}];
-	}).
-	controller('UserMgmtCtrl', function($scope, $http){
-		
-		// $http.get('../../api/positions')
-		// .success(function (data) {
-		// 	$scope.empPositions = data;
-		// }).error(function (data, status) {
-		// 	alert();
-		// });
-		
+	});
+
+app.controller('UserMgmtCtrl', function($scope, $http, $modal)
+	{	
+		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+		$scope.selection = [];
+		$scope.userInfo = {
+			'sso': '',
+			'firstName': '',
+			'lastName': '',
+			'email': '',
+			'password': '',
+			'employeeType': $scope.selection
+		};
+		$scope.selectedUser = {};
+		$scope.modalInstance = {};
+
 		$http.get('../../api/employees')
 		.success(function (data) {
 			$scope.users = data;
-			// console.log($scope.users);
 		}).error(function (data, status) {
 			alert();
 		});
 
-		$scope.selection = [];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -479,33 +494,10 @@ angular.module('xenon.controllers', []).
 			}
 		};
 
-		$scope.userInfo = {
-			'sso': '',
-			'firstName': '',
-			'lastName': '',
-			'email': '',
-			'password': '',
-			'employeeType': $scope.selection
-		};
-
-		// $scope.selectedUser = {};
-		// console.log($scope.selectedUser);
 		$scope.checkSelectedUser = function (userIndex) {
-			var tmp = $scope.users[userIndex];
-			// $scope.selectedUser.firstName = tmp.firstName;
-			// $scope.selectedUser.push(tmp);
+			$scope.selectedUser = $scope.users[userIndex];
 			console.log($scope.selectedUser);
-
-			// $http.get('../../api/selectedEmployee', $scope.selectedUser)
-			// .success(function (data) {
-			// 	$scope.clickedUser = data;
-			// 	console.log($scope.clickedUser);
-			// }).error(function (data, status) {
-			// 	alert();
-			// });
-		}
-
-		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+		};
 
 		$scope.sendEmail = function () {
 			console.log($scope.userInfo);
@@ -518,22 +510,29 @@ angular.module('xenon.controllers', []).
 	        })
 	        .error(function(data, status) {
 	            console.log("Error");
-	        })
+	        });
 		};
 
-		 // [{"sso":1,
-		 // "firstName":"Brian",
-		 // "lastName":"Michelle",
-		 // "email":"bryan.mitchell@upr.edu",
-		 // "employeeType":"Engineer"}]
-
-
-
-
+		$scope.myOpenModal = function(modal_id, modal_size, modal_backdrop){
+			console.log("myOpenModal");
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'UpdateUserModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				resolve: {
+					selectedUser: function(){return $scope.selectedUser;}
+				}
+			});
+		};
 
 	});
 
-
+app.controller('UpdateUserModalCtrl', function($scope, $modalInstance, selectedUser)
+{
+	console.log("UpdateUserModalCtrl");
+	$scope.selectedUser = selectedUser;
+});
 	// $scope.users = [{
 	// 		empID: 1,
 	// 		empFirstName: 'Isadora',
