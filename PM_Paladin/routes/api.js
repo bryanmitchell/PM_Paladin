@@ -7,11 +7,8 @@ var salt = bcrypt.genSaltSync(10);
 var emailgen = require('./emailgen');
 var dbconn = require('./dbconn');
 
-// var dotenv = require('dotenv');
-// dotenv.load();
-
-var sendgrid_api_key = process.env.SENDGRID_API_KEY;
-var sg = require('sendgrid')('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');
+require('dotenv').config();
+var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
 
 router.route('/employees')

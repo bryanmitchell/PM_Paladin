@@ -1,11 +1,12 @@
 var exports = module.exports = {};
 var sql = require('mssql');
+require('dotenv').config();
 
 var sqlConfig = {  
-	user: 'paladin_watch',  
-	password: 'pmpaladin',  
-	server: 'LRMM-LENOVO-Y40\\SQLEXPRESS',
-	database: 'paladin'
+	user: process.env.SQL_USER,  
+	password: process.env.SQL_PASSWORD,  
+	server: process.env.SQL_SERVER,
+	database: process.env.SQL_DB
 };
 
 // https://journalofasoftwaredev.wordpress.com/2011/10/30/replicating-string-format-in-javascript/
@@ -70,6 +71,7 @@ exports.getConfirmationTasks = function(res, empSso){
 	console.log("Getting confirmation tasks...");
 	runQuery(`
 		SELECT tsk.taskId AS [Task], tsk.taskDescription AS [Desc], t.toolName AS [Tool], ws.workstationName AS [WS], pl.lineName AS [Line],
+			eng.firstName AS [EngFName], eng.lastName AS [EngLName], eng.email AS [EngEmail], 
 			REPLACE(CAST(CASE 
 				WHEN tsk.taskStatus = 'ConfirmPartial' THEN 'Y' 
 				ELSE 'N' 
@@ -89,10 +91,14 @@ exports.getConfirmationTasks = function(res, empSso){
 		ON wsl.lineId = pl.lineId 
 		INNER JOIN ToolAssignedTo AS tat 
 		ON t.toolId = tat.toolId 
-		INNER JOIN Employee AS emp 
-		ON tat.employeeSso = emp.sso 
+		INNER JOIN Employee AS tec 
+		ON tat.employeeSso = tec.sso 
+		INNER JOIN WorkstationAssignedTo AS wat 
+		ON ws.workstationId = wat.workstationId 
+		INNER JOIN Employee AS eng 
+		ON wat.employeeSso = eng.sso 
 		WHERE (tsk.taskStatus = 'ConfirmPending' OR tsk.taskStatus = 'ConfirmPartial') 
-		AND emp.sso = {0};
+		AND tec.sso = {0};
 		`.format(empSso), res);
 };
 
@@ -102,7 +108,8 @@ exports.getApprovalTasks = function(res, empSso){
 	console.log("Getting approval tasks...");
 	runQuery(`
 		SELECT tsk.taskId AS [Task], tsk.taskDescription AS [Desc], t.toolName AS [Tool], ws.workstationName AS [WS], pl.lineName AS [Line], 
-			eng.firstName AS [EngFName], eng.lastName AS [EngLName], tec.firstName AS [TecFName], tec.lastName AS [TecLName]
+			eng.firstName AS [EngFName], eng.lastName AS [EngLName], tec.firstName AS [TecFName], tec.lastName AS [TecLName], 
+			pl.supervisorFirstName AS [LineSupervisorFName], supervisorLastName AS [LineSupervisorLName], supervisorEmail AS [LineSupervisorEmail]
 		FROM Task as tsk 
 		INNER JOIN ToolRequiresTask AS trt 
 		ON trt.taskId = tsk.taskId 

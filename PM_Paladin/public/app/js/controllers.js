@@ -262,24 +262,6 @@ app.controller('MaintConfCtrl', function($scope, $http)
 		});
 
 		$scope.selection = [];
-		// $scope.tools = [{
-		// 	'toolID': '1',
-		// 	'toolName': 'Tool_1',
-		// 	'line': 'Welding Line',
-		// 	'confStatus': 'Y'
-		// },
-		// {
-		// 	'toolID': '2',
-		// 	'toolName': 'Tool_2',
-		// 	'line': 'Assembly Line',
-		// 	'confStatus': 'Y'
-		// },
-		// {
-		// 	'toolID': '3',
-		// 	'toolName': 'Tool_3',
-		// 	'line': 'Testing Line',
-		// 	'confStatus': 'N'
-		// }];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -356,22 +338,6 @@ app.controller('MaintApprCtrl', function($scope, $http)
 	        })
 		};
 
-
-		// $scope.tools = [{
-		// 	'toolID': '1',
-		// 	'toolName': 'Tool_1',
-		// 	'personInCharge': 'Isadora Duncan',
-		// },
-		// {
-		// 	'toolID': '2',
-		// 	'toolName': 'Tool_2',
-		// 	'personInCharge': 'Juan Pachanga',
-		// },
-		// {
-		// 	'toolID': '3',
-		// 	'toolName': 'Tool_3',
-		// 	'personInCharge': 'Pablo Pueblo',
-		// }];
 	});
 
 app.controller('EquipmentMgmtCtrl', function($scope)
@@ -536,13 +502,17 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 				}
 			});
 		};
-
 	});
 
 app.controller('UpdateUserModalCtrl', function($scope, $modalInstance, selectedUser)
 {
 	console.log("UpdateUserModalCtrl");
 	$scope.selectedUser = selectedUser;
+
+	$scope.close = function(){
+		$modalInstance.close();
+	};
+
 });
 	// $scope.users = [{
 	// 		empID: 1,

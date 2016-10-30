@@ -1,11 +1,8 @@
 <page-title ng-if="layoutOptions.pageTitles" title="User Management"></page-title>
 <div class="row">
 	<div class="col-md-12">
-	
 		<div class="panel panel-default">
-
 			<div class="panel-body">
-			
 				<div class="row">
 					<div class="btn-group">
 						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="openModal('modal-3', null, 'static');">
@@ -13,7 +10,6 @@
 						</button>
 					</div>
 				</div>
-
 				<br>
 				<br>
 				{{users}}
@@ -24,10 +20,8 @@
 							<th>Employee Name</th>
 							<th>Position</th>
 							<th> </th>
-
 						</tr>
 					</thead>
-					
 					<tbody>
 						<tr ng-repeat="user in users">
 							<td>{{user.firstName}} {{user.lastName}}</td>
@@ -39,13 +33,11 @@
 						</tr>
 					</tbody>
 				</table>
-				</div>			
-			</div>
-			
-		</div>
-		
-	</div>
-</div>
+				</div> <!--end col-md-12-->
+			</div> <!--end panel-body-->
+		</div> <!--end panel-->
+	</div> <!--end col-md-12-->
+</div> <!--end row-->
 
 <!-- Create User modal view template -->
 <script type="text/ng-template" id="modal-3">
@@ -162,7 +154,7 @@
 <script type="text/ng-template" id="modal-3-update">
 	<!-- Modal header -->
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<button type="button" class="close" ng-click="close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Update User</h4>
 	</div>
 	
@@ -238,7 +230,7 @@
 	
 	<!-- Modal footer -->
 	<div class="modal-footer">
-		<button type="button" class="btn btn-white" ng-click="currentModal.close();">Close</button>
-		<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
+		<button type="button" class="btn btn-white" ng-click="close();">Close</button>
+		<button type="button" class="btn btn-info" ng-click="dismiss();">Save</button>
 	</div>
 </script>
