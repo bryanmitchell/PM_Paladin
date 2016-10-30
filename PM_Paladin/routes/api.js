@@ -16,14 +16,20 @@ var sg = require('sendgrid')('SG.ZZVrZJ3WQdesT1DmG9kd2w.O1YXLLsRyrtGc5OzPwtcM5Po
 
 router.route('/employees')
 	.get(function(req, res){
-		console.log("GET");
+		console.log("router.route(/employees");
 		dbconn.getEmployees(res);
 	});
 
 router.route('/confirmtasks')
 	.get(function(req, res){
-		console.log("GET");
-		dbconn.getConfirmationTasks(res, 1);
+		console.log("router.route(/confirmtasks");
+		dbconn.getConfirmationTasks(res, 2);
+	});
+
+router.route('/approvetasks')
+	.get(function(req, res){
+		console.log("router.route(/approvetasks");
+		dbconn.getApprovalTasks(res, 1);
 	});
 
 router.route('/selectedEmployee')

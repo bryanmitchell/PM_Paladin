@@ -325,6 +325,12 @@ app.controller('MaintApprCtrl', function($scope, $http)
 	{
 
 		$scope.selection = [];
+		$http.get('../../api/approvetasks')
+		.success(function (data) {
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -341,7 +347,7 @@ app.controller('MaintApprCtrl', function($scope, $http)
 			
 			console.log("sendEmail from controller.js");
 	        //Request
-	        $http.post('../../api/approve', $scope.selection) 
+	        $http.post('../../api/approvetasks', $scope.selection) 
 	        .success(function(data, status) {
 	            console.log("Sent ok");
 	        })
@@ -351,21 +357,21 @@ app.controller('MaintApprCtrl', function($scope, $http)
 		};
 
 
-		$scope.tools = [{
-			'toolID': '1',
-			'toolName': 'Tool_1',
-			'personInCharge': 'Isadora Duncan',
-		},
-		{
-			'toolID': '2',
-			'toolName': 'Tool_2',
-			'personInCharge': 'Juan Pachanga',
-		},
-		{
-			'toolID': '3',
-			'toolName': 'Tool_3',
-			'personInCharge': 'Pablo Pueblo',
-		}];
+		// $scope.tools = [{
+		// 	'toolID': '1',
+		// 	'toolName': 'Tool_1',
+		// 	'personInCharge': 'Isadora Duncan',
+		// },
+		// {
+		// 	'toolID': '2',
+		// 	'toolName': 'Tool_2',
+		// 	'personInCharge': 'Juan Pachanga',
+		// },
+		// {
+		// 	'toolID': '3',
+		// 	'toolName': 'Tool_3',
+		// 	'personInCharge': 'Pablo Pueblo',
+		// }];
 	});
 
 app.controller('EquipmentMgmtCtrl', function($scope)

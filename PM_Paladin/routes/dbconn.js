@@ -23,16 +23,24 @@ String.prototype.format = function()
 function runQuery(query, res) {
 	console.log("Gonna connect and run...");
 	sql.connect(sqlConfig, function(err){
-		if(err){ console.log("Connection to db failed..."); }
-		else{ console.log("Connection to db success!"); }
-
-		new sql.Request().query(query, function(err, recordset){
-			if(err){ console.log("Query failed: "+query); }
-			else{ console.log("Query good!"); }
-
-			console.dir(recordset);
-			res.send(recordset);
-		})
+		if(err){
+			console.log("Connection to db failed: "); 
+			console.log(err);
+		}
+		else {
+			console.log("Connection to db success!"); 
+			new sql.Request().query(query, function(err, recordset){
+				if(err){
+					console.log("Query failed: "+query); 
+					console.log(err);
+				}
+				else{ 
+					console.log("Query good!"); 
+					console.dir(recordset);
+					res.send(recordset);
+				}
+			})
+		}
 	});
 };
 
@@ -59,14 +67,13 @@ exports.getEmployees = function(res){
 // Task list displayed in Maintenance Confirmation
 exports.getConfirmationTasks = function(res, empSso){
 	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
-	// TO TEST STILL!!!
 	console.log("Getting confirmation tasks...");
 	runQuery(`
 		SELECT tsk.taskId AS [Task], tsk.taskDescription AS [Desc], t.toolName AS [Tool], ws.workstationName AS [WS], pl.lineName AS [Line],
-			CAST(CASE 
-				WHEN tsk.taskStatus = 'ConfirmPartial') THEN 'Y' 
+			REPLACE(CAST(CASE 
+				WHEN tsk.taskStatus = 'ConfirmPartial' THEN 'Y' 
 				ELSE 'N' 
-				END AS CHAR) AS [Partial] 
+				END AS CHAR),' ', '') AS [Partial] 
 		FROM Task as tsk 
 		INNER JOIN ToolRequiresTask AS trt 
 		ON trt.taskId = tsk.taskId 
@@ -89,6 +96,39 @@ exports.getConfirmationTasks = function(res, empSso){
 		`.format(empSso), res);
 };
 
+// Task list displayed in Maintenance Approval
+exports.getApprovalTasks = function(res, empSso){
+	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
+	console.log("Getting approval tasks...");
+	runQuery(`
+		SELECT tsk.taskId AS [Task], tsk.taskDescription AS [Desc], t.toolName AS [Tool], ws.workstationName AS [WS], pl.lineName AS [Line], 
+			eng.firstName AS [EngFName], eng.lastName AS [EngLName], tec.firstName AS [TecFName], tec.lastName AS [TecLName]
+		FROM Task as tsk 
+		INNER JOIN ToolRequiresTask AS trt 
+		ON trt.taskId = tsk.taskId 
+		INNER JOIN Tool as t 
+		ON trt.toolId = t.toolId 
+		INNER JOIN ToolInWorkstation AS tws 
+		ON t.toolId = tws.toolId 
+		INNER JOIN Workstation AS ws 
+		ON tws.workstationId = ws.workstationId 
+		INNER JOIN WorkstationInLine AS wsl 
+		ON ws.workstationId = wsl.workstationId 
+		INNER JOIN ProductionLine AS pl 
+		ON wsl.lineId = pl.lineId 
+		INNER JOIN WorkstationAssignedTo AS wat 
+		ON ws.workstationId = wat.workstationId 
+		INNER JOIN Employee AS eng 
+		ON wat.employeeSso = eng.sso 
+		INNER JOIN ToolAssignedTo AS tat
+		ON tat.toolId = t.toolId
+		INNER JOIN Employee AS tec
+		ON tat.employeeSso = tec.sso
+		WHERE tsk.taskStatus = 'ApprovePending' 
+		AND eng.sso = {0};
+		`.format(empSso), res);
+};
+
 exports.getSelectedEmployee = function(req, res){
 	console.log("Getting selected employee...");
 	runQuery(`
@@ -106,11 +146,3 @@ exports.getPositions = function(res){
 		FROM EmployeeType;
 		`, res);
 };
-
-/*
-SELECT e.sso, e.firstName, e.lastName, e.email, et.employeeType 
-			FROM Employee AS e 
-			INNER JOIN EmployeeType AS et 
-			ON e.sso = et.sso 
-			WHERE et.employeeType = "{0}";
-			*/
