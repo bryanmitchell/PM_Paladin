@@ -274,6 +274,12 @@ app.controller('MaintConfCtrl', function($scope, $http)
 			}
 		};
 
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
 		$scope.sendEmail = function (type) {
 			console.log("TEST");
 	        //Request
@@ -323,6 +329,12 @@ app.controller('MaintApprCtrl', function($scope, $http)
 			else {
 				$scope.selection.push(item);
 			}
+		};
+
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
 		};
 
 		$scope.sendEmail = function () {
