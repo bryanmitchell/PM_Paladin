@@ -49,7 +49,6 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			controller: 'DashboardCtrl',
 		}).
 
-		//UIModalsCtrl es pa los popups
 		state('app.equipment_management', {
 			url: '/equipment_management',
 			templateUrl: appHelper.templatePath('equipment_management'),

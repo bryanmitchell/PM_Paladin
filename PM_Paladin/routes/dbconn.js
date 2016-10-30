@@ -9,6 +9,18 @@ var sqlConfig = {
 	database: process.env.SQL_DB
 };
 
+
+var connection = new sql.Connection(sqlConfig, function(err){
+	if (err){
+		console.log("Connection to db failed..."); 
+		console.log(err);
+	}
+	else {
+		console.log("Connection to db success!"); 
+		connection.connect();
+	}
+});
+
 // https://journalofasoftwaredev.wordpress.com/2011/10/30/replicating-string-format-in-javascript/
 String.prototype.format = function()
 {
@@ -23,24 +35,16 @@ String.prototype.format = function()
 
 function runQuery(query, res) {
 	console.log("Gonna connect and run...");
-	sql.connect(sqlConfig, function(err){
+	var request = new sql.Request(connection);
+	request.query(query, function(err, recordset){
 		if(err){
-			console.log("Connection to db failed: "); 
+			console.log("Query failed: "  + query); 
 			console.log(err);
 		}
-		else {
-			console.log("Connection to db success!"); 
-			new sql.Request().query(query, function(err, recordset){
-				if(err){
-					console.log("Query failed: "+query); 
-					console.log(err);
-				}
-				else{ 
-					console.log("Query good!"); 
-					console.dir(recordset);
-					res.send(recordset);
-				}
-			})
+		else{ 
+			console.log("Query good!"); 
+			console.dir(recordset);
+			res.send(recordset);
 		}
 	});
 };
@@ -147,9 +151,31 @@ exports.getSelectedEmployee = function(req, res){
 		`.format(req), res);
 };
 
-exports.getPositions = function(res){
+exports.getLines = function(res){
 	runQuery(`
-		SELECT * 
-		FROM EmployeeType;
+		SELECT pl.lineId AS [lineID], pl.lineName AS [lineName]
+		FROM ProductionLine AS pl;
+		`, res);
+};
+
+exports.getWorkstations = function(res){
+	runQuery(`
+		SELECT ws.workstationId AS [wsID], ws.workstationName AS [wsName], pl.lineId AS [lineID]
+		FROM Workstation AS ws 
+		INNER JOIN WorkstationInLine AS wsl 
+		ON ws.workstationId = wsl.workstationId 
+		INNER JOIN ProductionLine AS pl 
+		ON wsl.lineId = pl.lineId;
+		`, res);
+};
+
+exports.getTools = function(res){
+	runQuery(`
+		SELECT ws.workstationId AS [wsID], t.toolId AS [toolID], t.toolName AS [toolName] 
+		FROM Tool as t 
+		INNER JOIN ToolInWorkstation AS tws 
+		ON t.toolId = tws.toolId 
+		INNER JOIN Workstation AS ws 
+		ON tws.workstationId = ws.workstationId;
 		`, res);
 };

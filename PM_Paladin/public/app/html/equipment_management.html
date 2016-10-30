@@ -1,11 +1,10 @@
 <page-title ng-if="layoutOptions.pageTitles" title="Equipment Management"></page-title>
 <div class="row">
 	<div class="col-md-12">
-	
 		<div class="panel panel-default">
-
 			<div class="panel-body">
-			
+
+				<!-- CRUD BUTTONS -->
 				<div class="row">
 					<div class="btn-group" dropdown>
 						<button type="button" class="btn btn-blue dropdown-toggle" data-toggle="dropdown">
@@ -35,10 +34,11 @@
 				<br>
 				<br>
 
+				<!-- BRYAN'S FINDER -->
 				<div class="row">
 
+					<!-- LINE COLUMN -->
 					<div class="col-md-4">
-				
 						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
@@ -55,9 +55,10 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
-					<div class="col-md-4">
+					</div> <!-- END Line Col -->
 
+					<!-- WORKSTATION COLUMN -->
+					<div class="col-md-4">
 						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
@@ -74,9 +75,10 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
-					<div class="col-md-4">
+					</div> <!-- END Workstation Col -->
 
+					<!-- TOOL COLUMN -->
+					<div class="col-md-4">
 						<table class="table table-condensed table-bordered floatedTable">
 							<thead>
 								<tr>
@@ -89,10 +91,10 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
+					</div> <!-- END Tool Col -->
+				</div> <!-- END Finder -->
 
-				</div>
-
+				<!-- TOOL CONTROL BUTTONS -->
 				<div class="row">
 					<div class="equipment_buttons">
 						<div class="btn-group">
@@ -103,12 +105,9 @@
 							<button type="button" class="btn btn-success">Turn On</button>
 						</div>	
 					</div>
-				</div>	
-			
-			</div>
-			
-		</div>
-		
+				</div>	<!-- END Tool Control Buttons -->
+			</div> 
+		</div> <!-- END Panel -->
 	</div>
 </div>
 
