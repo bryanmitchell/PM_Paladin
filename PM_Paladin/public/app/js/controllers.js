@@ -274,6 +274,12 @@ app.controller('MaintConfCtrl', function($scope, $http)
 			}
 		};
 
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
 		$scope.sendEmail = function (type) {
 			console.log("TEST");
 	        //Request
@@ -325,11 +331,17 @@ app.controller('MaintApprCtrl', function($scope, $http)
 			}
 		};
 
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
 		$scope.sendEmail = function () {
 			
 			console.log("sendEmail from controller.js");
 	        //Request
-	        $http.post('../../api/approvetasks', $scope.selection) 
+	        $http.post('../../api/approve', $scope.selection) 
 	        .success(function(data, status) {
 	            console.log("Sent ok");
 	        })
