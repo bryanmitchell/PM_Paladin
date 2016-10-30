@@ -262,24 +262,6 @@ app.controller('MaintConfCtrl', function($scope, $http)
 		});
 
 		$scope.selection = [];
-		// $scope.tools = [{
-		// 	'toolID': '1',
-		// 	'toolName': 'Tool_1',
-		// 	'line': 'Welding Line',
-		// 	'confStatus': 'Y'
-		// },
-		// {
-		// 	'toolID': '2',
-		// 	'toolName': 'Tool_2',
-		// 	'line': 'Assembly Line',
-		// 	'confStatus': 'Y'
-		// },
-		// {
-		// 	'toolID': '3',
-		// 	'toolName': 'Tool_3',
-		// 	'line': 'Testing Line',
-		// 	'confStatus': 'N'
-		// }];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -347,7 +329,7 @@ app.controller('MaintApprCtrl', function($scope, $http)
 			
 			console.log("sendEmail from controller.js");
 	        //Request
-	        $http.post('../../api/approvetasks', $scope.selection) 
+	        $http.post('../../api/approve', $scope.selection) 
 	        .success(function(data, status) {
 	            console.log("Sent ok");
 	        })

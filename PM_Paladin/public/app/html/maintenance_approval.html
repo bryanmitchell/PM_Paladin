@@ -11,21 +11,26 @@
 				<div class="row">
 
 					<div class="col-sm-6">
-						{{tasks}}
 						<table class="table table-bordered table-striped table-condensed table-hover">
 							<thead>
 								<tr>
 									<th> </th>
-									<th>Tool Name</th>
-									<th>Maintenanced by:</th>
+									<th>Task Description</th>
+									<th>Tool</th>
+									<th>Workstation</th>
+									<th>Line</th>
+									<th>Technician in charge:</th>
 								</tr>
 							</thead>
 							
 							<tbody>
-								<tr ng-repeat="item in tools">
+								<tr ng-repeat="item in tasks">
 									<td align="center"><input type="checkbox" value="{{item.toolID}}" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"></td>
-									<td>{{item.toolName}}</td>
-									<td>{{item.personInCharge}}</td>
+									<td>{{item.Desc}}</td>
+									<td>{{item.Tool}}</td>
+									<td>{{item.WS}}</td>
+									<td>{{item.Line}}</td>
+									<td>{{item.TecFName}} {{item.TecLName}}</td>
 								</tr>
 							</tbody>
 						</table>
