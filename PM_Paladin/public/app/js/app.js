@@ -32,7 +32,6 @@ app.run(function()
 app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASSETS){
 
 	$urlRouterProvider.otherwise('/app/dashboard');
-	// $locationProvider.html5Mode(true);
 
 	$stateProvider.
 		// Main Layout Structure

@@ -31,12 +31,6 @@ router.route('/approvetasks')
 		dbconn.getApprovalTasks(res, 1);
 	});
 
-router.route('/selectedEmployee')
-	.get(function(req, res){
-		console.log("GET");
-		dbconn.getSelectedEmployee(req, res);
-	});
-
 // Getting tools and their workstations and lines
 router.route('/tools')
 	.get(function(req, res){

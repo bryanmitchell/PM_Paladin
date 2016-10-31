@@ -23,10 +23,12 @@ exports.partiallyConfirmedEmail = function(req){
 	//Parse JSON for keys and values
 	var index = 0;
 	var toolIDs = [];
+	var technicianName = "";
 	for (var key in req.body) {
 		if (req.body.hasOwnProperty(key)) {
 			item = req.body[key];
-			toolIDs[index] = "<li>" + item.WS + " - " + item.Tool + " - " + item.Desc + "</li>";
+			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
+			technicianName = item.TecFName + " " + item.TecLName;
 			console.log(toolIDs);
 			index++;    
 		}
@@ -34,7 +36,7 @@ exports.partiallyConfirmedEmail = function(req){
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
 		"bryan.bmf@gmail.com", 
-		"[PM Paladin] Tasks have been partially confirmed by technician ___",
+		"[PM Paladin] Tasks have been partially confirmed by technician " + technicianName + ".",
 		content_1 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
 		);
 };
@@ -50,7 +52,7 @@ exports.fullyConfirmedEmail = function(req){
 	for (var key in req.body) {
 		if (req.body.hasOwnProperty(key)) {
 			item = req.body[key];
-			toolIDs[index] = "<li>" + item.WS + " - " + item.Tool + " - " + item.Desc + "</li>";
+			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
 			technicianName = item.TecFName + " " + item.TecLName;
 			console.log(toolIDs);
 			index++;
@@ -75,7 +77,7 @@ exports.approvedEmail = function(req){
 	for (var key in req.body) {
 		if (req.body.hasOwnProperty(key)) {
 			item = req.body[key];
-			toolIDs[index] = "<li>" + item.WS + " - " + item.Tool + " - " + item.Desc + "</li>";
+			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
 			engineerName = item.EngFName + " " + item.EngLName;
 			console.log(toolIDs);
 			index++;
@@ -91,12 +93,21 @@ exports.approvedEmail = function(req){
 };
 
 exports.newUserEmail = function(req){
-	var content_1 = "Hi " + req.body.firstName + ", <br><br> Yous a punk ass " + req.body.employeeType + " bitch.";
+	var content_1 = "Hi " + req.body.firstName + ", <br><br>  You are now able to access PM Paladin by logging in with your SSO through the web application _______.";
 
 	return formEmail(req, 
 		"bryan.bmf@gmail.com", 
 		req.body.email, 
-		"[PM Paladin] Welcome to PM Paladin",
+		"[PM Paladin] Welcome to PM Paladin!",
 		content_1
 		);
 };
+
+
+//Upcoming
+/* Title: [PM Paladin] Tasks with upcoming maintenance due dates.
+	Body: listado
+
+*/ 
+
+
