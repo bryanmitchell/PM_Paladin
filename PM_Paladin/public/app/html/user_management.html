@@ -51,7 +51,7 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Employee ID</label>
-					<select style="width: 150px;" ng-model="user.sso" ng-options="user.sso for user in users">
+					<select style="width: 150px;" ng-model="userInfo.sso" ng-options="sso for sso in ssos">
 						<option value="">--- Select from list ---</option>
 					</select>
 				</div>
@@ -128,12 +128,6 @@
 					<div class="col-sm-4" ng-repeat="item in employeeTypes">
 						<input type="checkbox" value="{{item}}" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"> {{item}}
 					</div>
-					<!-- <div class="col-sm-4">
-						<input type="checkbox" value="Engineer" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"> Engineer
-					</div>
-					<div class="col-sm-4">
-						<input type="checkbox" value="Technician" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"> Technician
-					</div> -->
 				</div>	
 			</div>
 		</div>
@@ -143,7 +137,7 @@
 		<div class="text-right btn-toolbar">
 				<button class="btn-white btn" ng-click="currentModal.close();">Close</button>
 
-				<button class="btn-info btn" ng-click="currentModal.dismiss(); sendEmail();">Save</button> 
+				<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee();">Save</button> 
 		</div>	
 
 	</div> <!-- end modal body-->	

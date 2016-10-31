@@ -47,7 +47,21 @@ function runQuery(query, res) {
 		else{ 
 			console.log("Query good!"); 
 			console.dir(recordset);
-			res.send(recordset);
+			// res.send(recordset);
+			if (res !== null) {
+				res.send(recordset);
+			}
+		}
+	});
+};
+
+function runPostQuery(query) {
+	console.log("Gonna connect and run...");
+	var request = new sql.Request(connection);
+	request.query(query, function(err, recordset){
+		if(err){
+			console.log("Query failed: "  + query); 
+			console.log(err);
 		}
 	});
 };
@@ -192,21 +206,24 @@ exports.getTools = function(res){
 		`, res);
 };
 
-exports.createEmployee = function(req){
-	var r = req.body
-	runQuery(`
-		INSERT INTO [dbo].[Employee]
+exports.createEmployee = function(req, res){
+	console.log("Im in");
+	var r = req.body;
+	console.log(r);
+	runPostQuery(`
+		INSERT INTO Employee
 			([sso],[firstName],[lastName],[email],[passwordHash])
 		VALUES
-			({0},{1},{2},{3},{4});
-		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.pwd, salt)));
-	for (i = 0; i < r.type.length; i++){
-		runQuery(`
-		INSERT INTO [dbo].[EmployeeType]
+			({0},'{1}','{2}','{3}','{4}');
+		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.password, salt)));
+	for (i = 0; i < r.employeeType.length; i++){
+		console.log("for loop: "+i);
+		runPostQuery(`
+		INSERT INTO EmployeeType
 			([sso],[employeeType])
 		VALUES
-			({5},{6});
-		`.format(r.sso, r.type[i]));
+			({5},'{6}');
+		`.format(r.sso, r.employeeType[i]));
 	}
 	res.redirect('localhost:3000/#/app/usermanagement');
 };

@@ -199,37 +199,37 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
 
-		$scope.showDelete = function (menuItemTitle) {
-			if (menuItemTitle == 'User Management') {
-				return false;
-			}
-			return true;
+		// $scope.showDelete = function (menuItemTitle) {
+		// 	// if (menuItemTitle == 'User Management') {
+		// 	// 	return true;
+		// 	// }
+		// 	return true;
 
-			// switch(menuItemTitle){
-			// 	case 'Dashboard':
-			// 		return true;
-			// 	case 'Equipment Management':
-			// 		if ($rootScope.userPosition == 'Administrator' | 'Engineer' | 'Technician') {
-			// 			return true;
-			// 		}
-			// 		return false;
-			// 	case 'User Management':
-			// 		if ($rootScope.userPosition == 'Administrator') {
-			// 			return true;
-			// 		}
-			// 		return false;
-			// 	case 'Maintenance Confirmation':
-			// 		if ($rootScope.userPosition == 'Technician'){
-			// 			return true;
-			// 		}
-			// 		return false;
-			// 	case 'Maintenance Approval':
-			// 		if ($rootScope.userPosition == 'Engineer'){
-			// 			return true;
-			// 		}
-			// 		return false;
-			// }
-		};
+		// 	// switch(menuItemTitle){
+		// 	// 	case 'Dashboard':
+		// 	// 		return true;
+		// 	// 	case 'Equipment Management':
+		// 	// 		if ($rootScope.userPosition == 'Administrator' | 'Engineer' | 'Technician') {
+		// 	// 			return true;
+		// 	// 		}
+		// 	// 		return false;
+		// 	// 	case 'User Management':
+		// 	// 		if ($rootScope.userPosition == 'Administrator') {
+		// 	// 			return true;
+		// 	// 		}
+		// 	// 		return false;
+		// 	// 	case 'Maintenance Confirmation':
+		// 	// 		if ($rootScope.userPosition == 'Technician'){
+		// 	// 			return true;
+		// 	// 		}
+		// 	// 		return false;
+		// 	// 	case 'Maintenance Approval':
+		// 	// 		if ($rootScope.userPosition == 'Engineer'){
+		// 	// 			return true;
+		// 	// 		}
+		// 	// 		return false;
+		// 	// }
+		// };
 		
 		// Open Simple Modal
 		$scope.openModal = function(modal_id, modal_size, modal_backdrop)
@@ -508,6 +508,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal) {
 	};
 	$scope.selectedUser = {};
 	$scope.modalInstance = {};
+	$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10];
 
 	$http.get('../../api/employees')
 	.success(function (data) {
@@ -532,6 +533,21 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal) {
 		$scope.selectedUser = $scope.users[userIndex];
 		console.log($scope.selectedUser);
 	};
+
+	$scope.createEmployee = function () {
+		console.log($scope.userInfo);
+		console.log("createEmployee from controller.js")
+
+		//Request
+		$http.post('../../api/createemployee', $scope.userInfo) 
+		.success(function(data, status) {
+			console.log("Sent ok");
+		})
+		.error(function(data, status) {
+			console.log("Error");
+		});
+
+	}
 
 	$scope.sendEmail = function () {
 		console.log($scope.userInfo);
