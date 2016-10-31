@@ -1,5 +1,8 @@
 var exports = module.exports = {};
 var sql = require('mssql');
+var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+
 require('dotenv').config();
 
 var sqlConfig = {  
@@ -75,7 +78,7 @@ exports.getConfirmationTasks = function(res, empSso){
 	console.log("Getting confirmation tasks...");
 	runQuery(`
 		SELECT tsk.taskId AS [Task], tsk.taskDescription AS [Desc], t.toolName AS [Tool], ws.workstationName AS [WS], pl.lineName AS [Line],
-			eng.firstName AS [EngFName], eng.lastName AS [EngLName], eng.email AS [EngEmail], 
+			eng.firstName AS [EngFName], eng.lastName AS [EngLName], eng.email AS [EngEmail], tec.firstName AS [TecFName], tec.lastName AS [TecLName], 
 			REPLACE(CAST(CASE 
 				WHEN tsk.taskStatus = 'ConfirmPartial' THEN 'Y' 
 				ELSE 'N' 
@@ -151,6 +154,15 @@ exports.getSelectedEmployee = function(req, res){
 		`.format(req), res);
 };
 
+exports.getEmployeePassword = function(req, res){
+	var sso = req.body.sso;
+	runQuery(`
+		SELECT e.sso, e.passwordHash  
+		FROM Employee AS e 
+		WHERE e.sso = {0};
+		`.format(sso), res);
+};
+
 exports.getLines = function(res){
 	runQuery(`
 		SELECT pl.lineId AS [lineID], pl.lineName AS [lineName]
@@ -179,3 +191,23 @@ exports.getTools = function(res){
 		ON tws.workstationId = ws.workstationId;
 		`, res);
 };
+
+exports.createEmployee = function(req){
+	var r = req.body
+	runQuery(`
+		INSERT INTO [dbo].[Employee]
+			([sso],[firstName],[lastName],[email],[passwordHash])
+		VALUES
+			({0},{1},{2},{3},{4});
+		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.pwd, salt)));
+	for (i = 0; i < r.type.length; i++){
+		runQuery(`
+		INSERT INTO [dbo].[EmployeeType]
+			([sso],[employeeType])
+		VALUES
+			({5},{6});
+		`.format(r.sso, r.type[i]));
+	}
+	res.redirect('localhost:3000/#/app/usermanagement');
+};
+

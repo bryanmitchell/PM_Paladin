@@ -52,6 +52,13 @@ router.route('/lines')
 		dbconn.getLines(res);
 	});
 
+// Creating Employees
+router.route('/createemployee')
+	.post(function(req, res){
+		console.log("router.route(/lines)");
+		dbconn.createEmployee(req, res);
+	});
+
 /**
 EMAIL ROUTES
 **/
