@@ -201,9 +201,34 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 
 		$scope.showDelete = function (menuItemTitle) {
 			if (menuItemTitle == 'User Management') {
-				return true;
+				return false;
 			}
 			return true;
+
+			// switch(menuItemTitle){
+			// 	case 'Dashboard':
+			// 		return true;
+			// 	case 'Equipment Management':
+			// 		if ($rootScope.userPosition == 'Administrator' | 'Engineer' | 'Technician') {
+			// 			return true;
+			// 		}
+			// 		return false;
+			// 	case 'User Management':
+			// 		if ($rootScope.userPosition == 'Administrator') {
+			// 			return true;
+			// 		}
+			// 		return false;
+			// 	case 'Maintenance Confirmation':
+			// 		if ($rootScope.userPosition == 'Technician'){
+			// 			return true;
+			// 		}
+			// 		return false;
+			// 	case 'Maintenance Approval':
+			// 		if ($rootScope.userPosition == 'Engineer'){
+			// 			return true;
+			// 		}
+			// 		return false;
+			// }
 		};
 		
 		// Open Simple Modal
@@ -216,25 +241,6 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 			});
 		};
 
-		// Loading AJAX Content
-		$scope.openAjaxModal = function(modal_id, url_location)
-		{
-			$rootScope.currentModal = $modal.open({
-				templateUrl: modal_id,
-				resolve: {
-					ajaxContent: function($http)
-					{
-						return $http.get(url_location).then(function(response){
-							$rootScope.modalContent = $sce.trustAsHtml(response.data);
-						}, function(response){
-							$rootScope.modalContent = $sce.trustAsHtml('<div class="label label-danger">Cannot load ajax content! Please check the given url.</div>');
-						});
-					}
-				}
-			});
-
-			$rootScope.modalContent = $sce.trustAsHtml('Modal content is loading...');
-		}
 	});
 
 app.controller('DashboardCtrl', function($scope)
