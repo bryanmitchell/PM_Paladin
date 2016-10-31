@@ -198,6 +198,13 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 		$rootScope.isLightLoginPage   = false;
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
+
+		$scope.showDelete = function (menuItemTitle) {
+			if (menuItemTitle == 'User Management') {
+				return true;
+			}
+			return true;
+		};
 		
 		// Open Simple Modal
 		$scope.openModal = function(modal_id, modal_size, modal_backdrop)
@@ -371,6 +378,9 @@ app.controller('EquipmentMgmtCtrl', function($scope, $q, $http) {
 		.error(function(data, status) {
 			console.log("Error");
 		});
+
+		$scope.date = new Date();
+		console.log($scope.date);
 
 
 	// $q.all([
