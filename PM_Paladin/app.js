@@ -1,3 +1,6 @@
+/**
+ * Require middleware
+ */
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -7,41 +10,82 @@ var bodyParser = require('body-parser');
 var http = require('http');
 var passport = require('passport');
 
-// ME //
-var index = require('./routes/index');
-var api = require('./routes/api');
-// END ME //
 
+/**
+ * Create a connection pool to MS SQL Server database 
+ */
+var sql = require('mssql');
+require('dotenv').config();
+var sqlConfig = {
+  user: process.env.SQL_USER,  
+  password: process.env.SQL_PASSWORD,  
+  server: process.env.SQL_SERVER,
+  database: process.env.SQL_DB
+};
+// var cp = new sql.Connection(sqlConfig);
+// cp.connect(function(err){
+//   if (err){
+//     console.log("Connection to db failed..."); 
+//     console.log(err);
+//   } else {
+//     console.log("Connection to db success!");
+//   }
+// });
+var cp = new sql.Connection(sqlConfig, function(err){
+  if (err){
+    console.log("Connection to db failed..."); 
+    console.log(err);
+  }
+  else {
+    console.log("Connection to db success!"); 
+    cp.connect();
+  }
+});
+
+
+/**
+ * Get routers 
+ */
+var index = require('./routes/index');
+var api = require('./routes/api')(cp);
+
+/**
+ * Create Express app
+ */
 var app = express();
 
+
+/**
+ * Add middleware to use between the request and the response in your Express app
+ */
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// middleware
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ME //
+
+/**
+ * Set routers to URIs
+ */
 app.use('/', index);
 app.use('/api', api);
-// END ME //
 
-// catch 404 and forward to error handler
+/**
+ * Catch 404 and forward to error handler, and error handlers
+ */
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
+// development error handler, will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
@@ -52,8 +96,7 @@ if (app.get('env') === 'development') {
   });
 }
 
-// production error handler
-// no stacktraces leaked to user
+// production error handler, no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {

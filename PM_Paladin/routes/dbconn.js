@@ -1,28 +1,8 @@
 var exports = module.exports = {};
+
 var sql = require('mssql');
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
-
-require('dotenv').config();
-
-var sqlConfig = {  
-	user: process.env.SQL_USER,  
-	password: process.env.SQL_PASSWORD,  
-	server: process.env.SQL_SERVER,
-	database: process.env.SQL_DB
-};
-
-
-var connection = new sql.Connection(sqlConfig, function(err){
-	if (err){
-		console.log("Connection to db failed..."); 
-		console.log(err);
-	}
-	else {
-		console.log("Connection to db success!"); 
-		connection.connect();
-	}
-});
 
 // https://journalofasoftwaredev.wordpress.com/2011/10/30/replicating-string-format-in-javascript/
 String.prototype.format = function()
@@ -36,9 +16,10 @@ String.prototype.format = function()
 	return content;
 };
 
-function runQuery(query, res) {
-	console.log("Gonna connect and run...");
-	var request = new sql.Request(connection);
+function runQuery(query, cp, res) {
+	console.log("Gonna create request and run query...");
+	var request = new sql.Request(cp);
+	console.log(request);
 	request.query(query, function(err, recordset){
 		if(err){
 			console.log("Query failed: "  + query); 
@@ -47,17 +28,13 @@ function runQuery(query, res) {
 		else{ 
 			console.log("Query good!"); 
 			console.dir(recordset);
-			// res.send(recordset);
-			if (res !== null) {
-				res.send(recordset);
-			}
+			if (res !== null){ res.send(recordset);}
 		}
 	});
 };
 
-function runPostQuery(query) {
-	console.log("Gonna connect and run...");
-	var request = new sql.Request(connection);
+function runPostQuery(query, cp) {
+	var request = new sql.Request(cp);
 	request.query(query, function(err, recordset){
 		if(err){
 			console.log("Query failed: "  + query); 
@@ -67,7 +44,7 @@ function runPostQuery(query) {
 };
 
 // Displayed in User Management
-exports.getEmployees = function(res){
+exports.getEmployees = function(cp, res){
 	console.log("Getting all employees...");
 	runQuery(`
 		SELECT e.sso, e.firstName, e.lastName, e.email, typeList.types 
@@ -83,11 +60,11 @@ exports.getEmployees = function(res){
 			FROM EmployeeType st2
 		) [typeList] 
 		ON e.sso = typeList.sso;
-		`, res);
+		`, cp, res);
 };
 
 // Task list displayed in Maintenance Confirmation
-exports.getConfirmationTasks = function(res, empSso){
+exports.getConfirmationTasks = function(cp, res, empSso){
 	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
 	console.log("Getting confirmation tasks...");
 	runQuery(`
@@ -120,11 +97,11 @@ exports.getConfirmationTasks = function(res, empSso){
 		ON wat.employeeSso = eng.sso 
 		WHERE (tsk.taskStatus = 'ConfirmPending' OR tsk.taskStatus = 'ConfirmPartial') 
 		AND tec.sso = {0};
-		`.format(empSso), res);
+		`.format(empSso), cp, res);
 };
 
 // Task list displayed in Maintenance Approval
-exports.getApprovalTasks = function(res, empSso){
+exports.getApprovalTasks = function(cp, res, empSso){
 	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
 	console.log("Getting approval tasks...");
 	runQuery(`
@@ -154,10 +131,10 @@ exports.getApprovalTasks = function(res, empSso){
 		ON tat.employeeSso = tec.sso
 		WHERE tsk.taskStatus = 'ApprovePending' 
 		AND eng.sso = {0};
-		`.format(empSso), res);
+		`.format(empSso), cp, res);
 };
 
-exports.getSelectedEmployee = function(req, res){
+exports.getSelectedEmployee = function(cp, req, res){
 	console.log("Getting selected employee...");
 	runQuery(`
 		SELECT e.sso, e.firstName, e.lastName, e.email, et.employeeType 
@@ -165,26 +142,26 @@ exports.getSelectedEmployee = function(req, res){
 		INNER JOIN EmployeeType AS et 
 		ON e.sso = et.sso 
 		WHERE et.employeeType = 'req.body.sso';
-		`.format(req), res);
+		`.format(req), cp, res);
 };
 
-exports.getEmployeePassword = function(req, res){
+exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	runQuery(`
 		SELECT e.sso, e.passwordHash  
 		FROM Employee AS e 
 		WHERE e.sso = {0};
-		`.format(sso), res);
+		`.format(sso), cp, res);
 };
 
-exports.getLines = function(res){
+exports.getLines = function(cp, res){
 	runQuery(`
 		SELECT pl.lineId AS [lineID], pl.lineName AS [lineName]
 		FROM ProductionLine AS pl;
-		`, res);
+		`, cp, res);
 };
 
-exports.getWorkstations = function(res){
+exports.getWorkstations = function(cp, res){
 	runQuery(`
 		SELECT ws.workstationId AS [wsID], ws.workstationName AS [wsName], pl.lineId AS [lineID]
 		FROM Workstation AS ws 
@@ -192,10 +169,10 @@ exports.getWorkstations = function(res){
 		ON ws.workstationId = wsl.workstationId 
 		INNER JOIN ProductionLine AS pl 
 		ON wsl.lineId = pl.lineId;
-		`, res);
+		`, cp, res);
 };
 
-exports.getTools = function(res){
+exports.getTools = function(cp, res){
 	runQuery(`
 		SELECT ws.workstationId AS [wsID], t.toolId AS [toolID], t.toolName AS [toolName] 
 		FROM Tool as t 
@@ -203,28 +180,25 @@ exports.getTools = function(res){
 		ON t.toolId = tws.toolId 
 		INNER JOIN Workstation AS ws 
 		ON tws.workstationId = ws.workstationId;
-		`, res);
+		`, cp, res);
 };
 
-exports.createEmployee = function(req, res){
-	console.log("Im in");
+exports.createEmployee = function(cp, req, res){
 	var r = req.body;
-	console.log(r);
 	runPostQuery(`
 		INSERT INTO Employee
 			([sso],[firstName],[lastName],[email],[passwordHash])
 		VALUES
 			({0},'{1}','{2}','{3}','{4}');
-		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.password, salt)));
+		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.password, salt)), cp);
 	for (i = 0; i < r.employeeType.length; i++){
 		console.log("for loop: "+i);
+		console.log(r.employeeType[i]);
 		runPostQuery(`
-		INSERT INTO EmployeeType
-			([sso],[employeeType])
-		VALUES
-			({5},'{6}');
-		`.format(r.sso, r.employeeType[i]));
+			INSERT INTO EmployeeType ([sso],[employeeType]) 
+			VALUES ({0},'{1}');`
+			.format(r.sso, r.employeeType[i]), cp);
 	}
-	res.redirect('localhost:3000/#/app/usermanagement');
+	res.redirect('back');
 };
 

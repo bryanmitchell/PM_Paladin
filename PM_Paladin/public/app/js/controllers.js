@@ -265,419 +265,246 @@ app.controller('DashboardCtrl', function($scope)
 		}];
 	});
 
-app.controller('MaintConfCtrl', function($scope, $http) {
-	$http.get('../../api/confirmtasks')
-	.success(function (data) {
-		$scope.tasks = data;
-	}).error(function (data, status) {
-		alert();
+app.controller('MaintConfCtrl', function($scope, $http) 
+	{
+		$http.get('../../api/confirmtasks')
+		.success(function (data) {
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
+
+		$scope.selection = [];
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
+		$scope.sendEmail = function (type) {
+			console.log("TEST");
+			//Request
+			if (type == "partial") {
+				console.log("Partial");
+				
+				$http.post('../../api/partial', $scope.selection) 
+				.success(function(data, status) {
+					console.log("Sent ok");
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+			}
+			else {
+				console.log("Full");
+				
+				$http.post('../../api/full', $scope.selection) 
+				.success(function(data, status) {
+					console.log("Sent ok");
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+			}
+		};
 	});
 
-	$scope.selection = [];
+app.controller('MaintApprCtrl', function($scope, $http) 
+	{
+		$scope.selection = [];
+		$http.get('../../api/approvetasks')
+		.success(function (data) {
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
 
-	$scope.toggleSelection = function (item) {
-		var index = $scope.selection.indexOf(item);
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
 
-		if (index > -1) {
-			$scope.selection.splice(index, 1);
-		}
-		else {
-			$scope.selection.push(item);
-		}
-	};
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
 
-	$scope.uncheckBoxes = function () {
-		angular.forEach($scope.selection, function (item) {
-			item.Selected = false;
-		})
-	};
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
 
-	$scope.sendEmail = function (type) {
-		console.log("TEST");
-		//Request
-		if (type == "partial") {
-			console.log("Partial");
+		$scope.sendEmail = function () {
 			
-			$http.post('../../api/partial', $scope.selection) 
+			console.log("sendEmail from controller.js");
+			//Request
+			$http.post('../../api/approve', $scope.selection) 
 			.success(function(data, status) {
 				console.log("Sent ok");
 			})
 			.error(function(data, status) {
 				console.log("Error");
 			});
-		}
-		else {
-			console.log("Full");
-			
-			$http.post('../../api/full', $scope.selection) 
+		};
+	});
+
+app.controller('EquipmentMgmtCtrl', function($scope, $q, $http) 
+	{
+		$http.get('../../api/lines') 
 			.success(function(data, status) {
-				console.log("Sent ok");
+				$scope.lines = data;
 			})
 			.error(function(data, status) {
 				console.log("Error");
 			});
-		}
-	};
-});
 
-app.controller('MaintApprCtrl', function($scope, $http){
-	$scope.selection = [];
-	$http.get('../../api/approvetasks')
-	.success(function (data) {
-		$scope.tasks = data;
-	}).error(function (data, status) {
-		alert();
-	});
+		$http.get('../../api/workstations') 
+			.success(function(data, status) {
+				$scope.workstations = data;
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
 
-	$scope.toggleSelection = function (item) {
-		var index = $scope.selection.indexOf(item);
-
-		if (index > -1) {
-			$scope.selection.splice(index, 1);
-		}
-		else {
-			$scope.selection.push(item);
-		}
-	};
-
-	$scope.uncheckBoxes = function () {
-		angular.forEach($scope.selection, function (item) {
-			item.Selected = false;
-		})
-	};
-
-	$scope.sendEmail = function () {
-		
-		console.log("sendEmail from controller.js");
-		//Request
-		$http.post('../../api/approve', $scope.selection) 
-		.success(function(data, status) {
-			console.log("Sent ok");
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
-	};
-});
-
-app.controller('EquipmentMgmtCtrl', function($scope, $q, $http) {
-	$http.get('../../api/lines') 
-		.success(function(data, status) {
-			$scope.lines = data;
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
-
-	$http.get('../../api/workstations') 
-		.success(function(data, status) {
-			$scope.workstations = data;
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
-
-	$http.get('../../api/tools') 
-		.success(function(data, status) {
-			$scope.tools = data;
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
+		$http.get('../../api/tools') 
+			.success(function(data, status) {
+				$scope.tools = data;
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
 
 		$scope.date = new Date();
 		console.log($scope.date);
 
 
-	// $q.all([
-	// 	$http.get('../../api/lines'),
-	// 	$http.get('../../api/workstations'),
-	// 	$http.get('../../api/tools')
-	// ]).then(function(data){
-	// 	$scope.lines = data[0];
-	// 	$scope.workstations = data[1];
-	// 	$scope.tools = data[2];
-	// });
+		$scope.selectedLine = null;  // initialize our variable to null
+		$scope.selectedWS = null;  // initialize our variable to null
+		$scope.selectedTool = null;  // initialize our variable to null
 
-	$scope.selectedLine = null;  // initialize our variable to null
-	$scope.selectedWS = null;  // initialize our variable to null
-	$scope.selectedTool = null;  // initialize our variable to null
+		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
+			$scope.selectedLine = index;
+			$scope.selectedWS = null;  //para evitar que se guarde la seleccion de ws
+			$scope.selectedTool = null;
+		};
+		
+		$scope.setClickedWS = function(index){  //function that sets the value of selectedRow to current index
+			$scope.selectedWS = index;
+			$scope.selectedTool = null;
+		};
 
-	$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
-		$scope.selectedLine = index;
-		$scope.selectedWS = null;  //para evitar que se guarde la seleccion de ws
-		$scope.selectedTool = null;
-	};
-	
-	$scope.setClickedWS = function(index){  //function that sets the value of selectedRow to current index
-		$scope.selectedWS = index;
-		$scope.selectedTool = null;
-	};
-
-	$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
-		$scope.selectedTool = index;
-	};
-
-	// $scope.lines = [{
-	// 	"lineID": 1,
-	// 	"lineName": 'Line_1',
-	// },
-	// {
-	// 	lineID: 2,
-	// 	lineName: 'Line_2',
-	// }];
-
-	// $scope.workstations = [{
-	// 	lineID: 1,
-	// 	wsID: 1.1,
-	// 	wsName: 'WS_1',
-	// },
-	// {
-	// 	lineID: 1,
-	// 	wsID: 1.2,
-	// 	wsName: 'WS_2',
-	// },
-	// {
-	// 	lineID: 1,
-	// 	wsID: 1.3,
-	// 	wsName: 'WS_5',
-	// },
-	// {
-	// 	lineID: 2,
-	// 	wsID: 2.1,
-	// 	wsName: 'WS_3',
-	// },
-	// {
-	// 	lineID: 2,
-	// 	wsID: 2.2,
-	// 	wsName: 'WS_4',
-	// }];
-
-	// $scope.tools = [{
-	// 	wsID: 1.1,
-	// 	toolID: '1.1.1',
-	// 	toolName: 'Tool_1',
-	// },
-	// {
-	// 	wsID: '1.1',
-	// 	toolID: '1.1.2',
-	// 	toolName: 'Tool_2',
-	// },
-	// {
-	// 	wsID: '1.2',
-	// 	toolID: '1.2.1',
-	// 	toolName: 'Tool_3',
-	// },
-	// {
-	// 	wsID: '1.2',
-	// 	toolID: '1.2.2',
-	// 	toolName: 'Tool_4',
-	// },
-	// {
-	// 	wsID: '2.1',
-	// 	toolID: '2.1.1',
-	// 	toolName: 'Tool_5',
-	// },
-	// {
-	// 	wsID: '2.1',
-	// 	toolID: '2.1.2',
-	// 	toolName: 'Tool_6',
-	// },
-	// {
-	// 	wsID: '2.2',
-	// 	toolID: '2.2.1',
-	// 	toolName: 'Tool_7',
-	// },
-	// {
-	// 	wsID: '2.2',
-	// 	toolID: '2.2.2',
-	// 	toolName: 'Tool_8',
-	// }];
-});
-
-app.controller('UserMgmtCtrl', function($scope, $http, $modal) {	
-	$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
-	$scope.selection = [];
-	$scope.userInfo = {
-		'sso': '',
-		'firstName': '',
-		'lastName': '',
-		'email': '',
-		'password': '',
-		'employeeType': $scope.selection
-	};
-	$scope.selectedUser = {};
-	$scope.modalInstance = {};
-	$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10];
-
-	$http.get('../../api/employees')
-	.success(function (data) {
-		$scope.users = data;
-	}).error(function (data, status) {
-		alert();
+		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
+			$scope.selectedTool = index;
+		};
 	});
 
+app.controller('UserMgmtCtrl', function($scope, $http, $modal) 
+	{	
+		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+		$scope.selection = [];
+		$scope.userInfo = {
+			'sso': '',
+			'firstName': '',
+			'lastName': '',
+			'email': '',
+			'password': '',
+			'employeeType': $scope.selection
+		};
+		$scope.selectedUser = {};
+		$scope.modalInstance = {};
+		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10];
 
-	$scope.toggleSelection = function (item) {
-		var index = $scope.selection.indexOf(item);
+		$scope.getEmployees = function(){
+			$http.get('../../api/employees')
+			.success(function (data) {
+				$scope.users = data;
+			}).error(function (data, status) {
+				alert();
+			});	
+		};
 
-		if (index > -1) {
-			$scope.selection.splice(index, 1);
-		}
-		else {
-			$scope.selection.push(item);
-		}
-	};
+		$scope.getEmployees();
 
-	$scope.checkSelectedUser = function (userIndex) {
-		$scope.selectedUser = $scope.users[userIndex];
-		console.log($scope.selectedUser);
-	};
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
 
-	$scope.createEmployee = function () {
-		console.log($scope.userInfo);
-		console.log("createEmployee from controller.js")
-
-		//Request
-		$http.post('../../api/createemployee', $scope.userInfo) 
-		.success(function(data, status) {
-			console.log("Sent ok");
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
-
-	}
-
-	$scope.sendEmail = function () {
-		console.log($scope.userInfo);
-		console.log("sendEmail from controller.js");
-		
-		//Request
-		$http.post('../../api/newUser', $scope.userInfo) 
-		.success(function(data, status) {
-			console.log("Sent ok");
-		})
-		.error(function(data, status) {
-			console.log("Error");
-		});
-	};
-
-	$scope.myOpenModal = function(modal_id, modal_size, modal_backdrop){
-		console.log("myOpenModal");
-		$scope.modalInstance = $modal.open({
-			templateUrl: modal_id,
-			controller: 'UpdateUserModalCtrl',
-			size: modal_size,
-			backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
-			resolve: {
-				selectedUser: function(){return $scope.selectedUser;}
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
 			}
-		});
-	};
-});
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.checkSelectedUser = function (userIndex) {
+			$scope.selectedUser = $scope.users[userIndex];
+			console.log($scope.selectedUser);
+		};
+
+		$scope.createEmployee = function () {
+			console.log($scope.userInfo);
+			console.log("createEmployee from controller.js")
+
+			//Request
+			$http.post('../../api/createemployee', $scope.userInfo) 
+			.success(function(data, status) {
+				console.log("Sent ok");
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
+
+		}
+
+		$scope.sendEmail = function () {
+			console.log($scope.userInfo);
+			console.log("sendEmail from controller.js");
+			
+			//Request
+			$http.post('../../api/newUser', $scope.userInfo) 
+			.success(function(data, status) {
+				console.log("Sent ok");
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
+		};
+
+		$scope.myOpenModal = function(modal_id, modal_size, modal_backdrop){
+			console.log("myOpenModal");
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'UpdateUserModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				resolve: {
+					selectedUser: function(){return $scope.selectedUser;}
+				}
+			});
+		};
+	});
 
 app.controller('UpdateUserModalCtrl', function($scope, $modalInstance, selectedUser)
-{
-	console.log("UpdateUserModalCtrl");
-	$scope.selectedUser = selectedUser;
+	{
+		console.log("UpdateUserModalCtrl");
+		$scope.selectedUser = selectedUser;
 
-	$scope.close = function(){
-		$modalInstance.close();
-	};
+		$scope.close = function(){
+			$modalInstance.close();
+		};
 
-});
-	// $scope.users = [{
-	// 		empID: 1,
-	// 		empFirstName: 'Isadora',
-	// 		empLastName: 'Duncan',
-	// 		empPosition: 'Admin',
-	// 		empEmail: 'isadora.duncan@ge.com',
-	// 		empPass: 'celia',
-	// 	},
-	// 	{
-	// 		empID: 2,
-	// 		empFirstName: 'Juan',
-	// 		empLastName: 'Pachanga',
-	// 		empPosition: 'Engineer',
-	// 		empEmail: 'juan.pachanga@ge.com',
-	// 		empPass: 'ruben',
-	// 	},
-	// 	{
-	// 		empID: 3,
-	// 		empFirstName: 'Pablo',
-	// 		empLastName: 'Pueblo',
-	// 		empPosition: 'Technician',
-	// 		empEmail: 'pablo.pablo@ge.com',
-	// 		empPass: 'blades',
-	// 	},
-	// 	{
-	// 		empID: 4,
-	// 		empFirstName: 'Maximo',
-	// 		empLastName: 'Chamorro',
-	// 		empPosition: 'Engineer',
-	// 		empEmail: 'maximo.chamorro@ge.com',
-	// 		empPass: 'blades',
-	// 	}];
-
-
-		// this.selectedUserID = null;
-		// var selectedUserPosition = "";
-		// var userIndex = "";
-
-
-		// function getUserIndex() {
-		// 	for (var i=0; i < users.length; i++) {
-		// 		if (selectedUserID == users[i].empID) {
-		// 			var userIndex = i;
-		// 			selectedUserPosition = users[i].empPosition;
-		// 			console.log("user index: " + userIndex);
-		// 			console.log("user position: " + selectedUserPosition);
-		// 		} 
-		// 	}
-		// 	selectedUserIndex = userIndex;
-		// 	return userIndex;
-		// };
-
-		// $scope.getUserPosition = function () {
-		// 	return $scope.users[getUserIndex()].empPosition;;
-		// };
-		// selectedUserIndex = getUserIndex();
-
-
-
-
-
-		// var isAdmin = true;
-		// var isEngineer = false;
-		// var isTechnician = false;
-		// var isType = false	
-
-		// checkType = function () {
-
-		// 	// $scope.position = $scope.selectedUserIndex;
-		// 	// console.log($scope.selectedUserPosition);
-
-		// 	if (selectedUserPosition == 'Admin') {
-		// 		console.log("entre a admin");
-		// 		return true;
-		// 	}
-		// 	else if (selectedUserPosition == 'Engineer') {
-		// 		console.log("entre a eng");
-		// 		return true;
-		// 	}
-		// 	else if (selectedUserPosition == 'Technician') {
-		// 		console.log("entre a tec");
-		// 		return true;
-		// 	}
-		// 	else{
-		// 		console.log("entre a nada");
-		// 		return false;
-		// 	}	
-		// }
-	
-
-		
-
-
-	
+	});
