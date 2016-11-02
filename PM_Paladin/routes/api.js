@@ -73,9 +73,28 @@ module.exports = function(cp){
 	// Creating Employees
 	router.route('/createemployee')
 		.post(function(req, res){
-			console.log("router.route(/lines)");
+			console.log("router.route(/createemployee)");
 			dbconn.createEmployee(cp, req, res);
 		});
+
+	router.route('/createline')
+		.post(function(req, res){
+			console.log("router.route(/createline)");
+			dbconn.createLine(cp, req, res);
+		});
+
+	router.route('/createworkstation')
+		.post(function(req, res){
+			console.log("router.route(/createworkstation)");
+			dbconn.createWorkstation(cp, req, res);
+		});
+
+	router.route('/createtool')
+		.post(function(req, res){
+			console.log("router.route(/createtool)");
+			dbconn.createTool(cp, req, res);
+		});
+
 
 	/**
 	EMAIL ROUTES
