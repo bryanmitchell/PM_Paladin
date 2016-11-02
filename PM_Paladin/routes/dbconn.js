@@ -276,7 +276,7 @@ exports.createWorkstation = function(cp, req, res){
 		if(err){console.log(err);}
 		else{console.log("Query success!");}
 	});
-	
+
 	res.redirect('back');
 };
 
@@ -361,16 +361,5 @@ exports.createTool = function(cp, req, res){
 	// 	}
 	// });
 
-	res.redirect('back');
-};
-
-exports.createLine = function(cp, req, res){
-	var r = req.body;
-	runPostQuery(`
-		INSERT INTO ProductionLine
-			([lineName], [supervisorFirstName], [supervisorLastName], [supervisorEmail])
-		VALUES
-			('{0}', '{1}', '{2}', '{3}');
-		`.format(r.lineName, r.supervisorFirstName, r.supervisorLastName, r.supervisorEmail), cp);
 	res.redirect('back');
 };
