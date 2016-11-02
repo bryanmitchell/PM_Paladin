@@ -191,13 +191,40 @@ app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $time
 		ps_init(); // perfect scrollbar for sidebar
 	});
 
-app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
+app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http)
 	{
 		// Used to be done as a function in app.js state('app')
 		$rootScope.isLoginPage        = false;
 		$rootScope.isLightLoginPage   = false;
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
+		$rootScope.isLoggedIn		  = false;
+
+		$scope.logInUser = {
+			'sso': '',
+			'password': ''
+		};
+
+		$scope.getUserInfo = function (isValid) {
+
+			if (isValid) {
+				$http.post('../../api/getEmployeePassword', $scope.logInUser) 
+					.success(function(data, status) {
+						console.log("Log In");
+						$scope.dbUserInfo = data;
+						console.log($scope.dbUserInfo);
+					})
+					.error(function(data, status) {
+						console.log("Error");
+
+					});
+			}
+		};
+
+		// $scope.validateForm = function () {
+					
+		// };
+
 
 		// $scope.showDelete = function (menuItemTitle) {
 		// 	// if (menuItemTitle == 'User Management') {
@@ -424,6 +451,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			'password': '',
 			'employeeType': $scope.selection
 		};
+		$scope.confirmPassword = '';
 		$scope.selectedUser = {};
 		$scope.modalInstance = {};
 		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10];

@@ -202,3 +202,7 @@ exports.createEmployee = function(cp, req, res){
 	res.redirect('back');
 };
 
+exports.validateUser = function (cp, req, res) {
+	
+}
+

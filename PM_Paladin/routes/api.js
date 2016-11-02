@@ -77,6 +77,13 @@ module.exports = function(cp){
 			dbconn.createEmployee(cp, req, res);
 		});
 
+	// Get Log In Employee
+	router.route('/getEmployeePassword')
+		.post(function(req, res){
+			console.log("router.route(/getEmployeePassword)");
+			dbconn.getEmployeePassword(cp, req, res);
+		});
+
 	/**
 	EMAIL ROUTES
 	**/
