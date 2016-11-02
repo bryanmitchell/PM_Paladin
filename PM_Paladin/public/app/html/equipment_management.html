@@ -113,21 +113,21 @@
 </div>
 
 
+<!-- REGISTER MANUFACTURING LINE MODAL -->
 <script type="text/ng-template" id="modal-line">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Manufacturing Line</h4>
 	</div>
 	
-	<div class="modal-body">
+	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
 	
+		<!-- LIST OF LINES FROM PM PRO -->
 		<div class="row">
 			<div class="col-md-6">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Line Name</label>
-					
-					<select style="width: 150px;">
+					<select style="width: 150px;" ng-model="lineInfo.lineName">
 					  <option value="volvo">--- Select from list ---</option>
 					  <option value="saab">Saabdjdbnjdwjdnjwdkwebjwbefjkebw kjc dkbewkbfjkewbcejkwbkj</option>
 					  <option value="opel">Opel</option>
@@ -137,166 +137,153 @@
 			</div>
 		</div>
 
+		<!-- SUPERVISOR NAMES -->
 		<div class="row">
 			<div class="col-md-6">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Name</label>
-					
-					<input type="text" class="form-control" id="field-1" placeholder="First Name">
+					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="lineInfo.supervisorFirstName">
 				</div>	
-				
 			</div>
 			
 			<div class="col-md-6">
-				
 				<div class="form-group">
 					<label for="field-2" class="control-label">Last Name</label>
-					
-					<input type="text" class="form-control" id="field-2" placeholder="Last Name">
-				</div>	
-			
+					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="lineInfo.supervisorLastName">
+				</div>
 			</div>
-
 		</div>
 
+		<!-- SUPERVISOR EMAIL -->
 		<div class="row">
 			<div class="col-md-12">
-				
 				<div class="form-group">
 					<label for="field-3" class="control-label">Supervisor Email Address</label>
-					
-					<input type="text" class="form-control" id="field-3" placeholder="Email">
-				</div>	
-				
+					<input type="text" class="form-control" id="field-3" placeholder="Email" ng-model="lineInfo.supervisorEmail">
+				</div>
 			</div>
 		</div>
 
+		<!-- SAVE BUTTON -->
 		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
+			<button type="button" class="btn btn-info" ng-click="console.log(lineInfo.lineName);currentModal.dismiss();createLine();">Save</button>
 		</div>
+
 	</div>
 </script>
 
+<!-- REGISTER WORKSTATION MODAL -->
 <script type="text/ng-template" id="modal-ws">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Workstation</h4>
 	</div>
 	
-	<div class="modal-body">
-	
+	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
+		<!-- NAME -->
 		<div class="row">
 			<div class="col-md-6">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Workstation Name</label>
-					
-					<select style="width: 150px;">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saab</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
+					<select style="width: 150px;" ng-model="workstationInfo.workstationName">
+					  <option value="NO ONE">--- Select from list ---</option>
+					  <option value="Saab">Saab</option>
+					  <option value="Opel">Opel</option>
+					  <option value="Audi">Audi</option>
 					</select>				
 				</div>		
 			</div>
 		</div>
 
+		<!-- ADDRESSES -->
 		<div class="row">
 			<div class="col-md-6">
 			<h4>Stack Light OPC Addresses</h4>
 			</div>
 		</div>
 		<div class="row">
-
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Green</label>
-					<select style="width: 150px;">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saab</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
+					<select style="width: 150px;" ng-model="workstationInfo.greenLightOpcTag">
+					  <option value=0>--- Select from list ---</option>
+					  <option value=1>1</option>
+					  <option value=2>2</option>
+					  <option value=3>3</option>
 					</select>	
 				</div>	
-				
 			</div>
 			
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-2" class="control-label">Yellow</label>
-					
-					<select style="width: 150px;">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saab</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
+					<select style="width: 150px;" ng-model="workstationInfo.yellowLightOpcTag">
+					  <option value=0>--- Select from list ---</option>
+					  <option value=1>1</option>
+					  <option value=2>2</option>
+					  <option value=3>3</option>
 					</select>				
-				</div>	
-			
+				</div>
 			</div>
 
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-2" class="control-label">Red</label>
-					
-					<select style="width: 150px;">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saab</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
+					<select style="width: 150px;" ng-model="workstationInfo.redLightOpcTag">
+					  <option value=0>--- Select from list ---</option>
+					  <option value=1>1</option>
+					  <option value=2>2</option>
+					  <option value=3>3</option>
 					</select>				
 				</div>	
 			</div>
 		</div>
+		
 		<br>
+
+		<!-- Engineer in charge -->
 		<div class="row">
 			<div class="col-md-12">
-				
 				<div class="form-group">
 					<label for="field-3" class="control-label">Engineer in Charge</label>
-					
-					<select style="width: 150px;">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saab</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
+					<select style="width: 150px;" ng-model="workstationInfo.employeeSso">
+					  <option value=0>--- Select from list ---</option>
+					  <option value=1>1</option>
+					  <option value=2>2</option>
+					  <option value=3>3</option>
 					</select>				
-				</div>	
-				
+				</div>
 			</div>
 		</div>
 
 		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
+			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createWorkstation()">Save</button>
 		</div>
 	</div>
 </script>
 
+
+<!-- REGISTER TOOL MODAL -->
 <script type="text/ng-template" id="modal-tool">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Tool</h4>
 	</div>
 	
-	<div class="modal-body">
+	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
 	
+		<!-- TOOL NAME -->
 		<div class="row">
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Tool Name</label>
 				</div>
 			</div>
 					
 			<div class="col-md-4">
-
-				<select style="width: 150px;">
+				<select style="width: 150px;" ng-model="toolInfo.toolName">
 				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saabcdckdmcdkmcdkcmdkmckdmkcdmkcmdkcmdkmcdkm</option>
+				  <option value="saab">Saab</option>
 				  <option value="opel">Opel</option>
 				  <option value="audi">Audi</option>
 				</select>
@@ -304,104 +291,97 @@
 			</div>		
 		</div>
 
+		<!-- TOOL TYPE -->
 		<div class="row">
-
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">Tool Type</label>
 				</div>	
 			</div>
 
 			<div class="col-md-4">
-
-				<select style="width: 150px;">
+				<select style="width: 150px;" ng-model="toolInfo.toolType">
 				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
+				  <option value="Electric">Electric</option>
+				  <option value="Pneumatic">Pneumatic</option>
 				</select>				
 			</div>		
 		</div>
 
+		<!-- RFID TAG -->
 		<div class="row">
-
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-1" class="control-label">RFID Tag</label>
 				</div>
 			</div>
 			<div class="col-md-4">
-
-				<select style="width: 150px;">
+				<select style="width: 150px;" ng-model="toolInfo.rfidAddress">
 				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
+				  <option value=1>1</option>
+				  <option value=2>2</option>
+				  <option value=3>3</option>
 				</select>	
 			</div>	
 		</div>				
 
+		<!-- OPC TAG -->
 		<div class="row">
-
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-2" class="control-label">OPC Tag</label>
 				</div>
 			</div>
 
 			<div class="col-md-4">	
-				<select style="width: 150px;">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
+				<select style="width: 150px;" ng-model="toolInfo.opcTag">
+					<option value="volvo">--- Select from list ---</option>
+					<option value=1>1</option>
+					<option value=2>2</option>
+					<option value=3>3</option>
 				</select>				
 			</div>	
 		</div>
 
+		<!-- IO ADDRESS -->
 		<div class="row">
-
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-2" class="control-label">I/O Address</label>
 				</div>
 			</div>	
 
 			<div class="col-md-4">
-
-				<select style="width: 150px;">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
+				<select style="width: 150px;" ng-model="toolInfo.ioAddress">
+					<option value="volvo">--- Select from list ---</option>
+					<option value=1>1</option>
+					<option value=2>2</option>
+					<option value=3>3</option>
 				</select>				
 			</div>	
 		</div>
 
+		<!-- TECHNICIAN IN CHARGE -->
 		<div class="row">
 			<div class="col-md-4">
-				
 				<div class="form-group">
 					<label for="field-3" class="control-label">Technician in Charge</label>
 				</div>
 			</div>
 
 			<div class="col-md-1">
-				<select style="width: 150px;">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
+				<select style="width: 150px;" ng-model="toolInfo.employeeSso">
+					<option value="volvo">--- Select from list ---</option>
+					<option value=1>Saab</option>
+					<option value=2>Opel</option>
+					<option value=3>Audi</option>
 				</select>				
 			</div>	
 		</div>
 
+		<!-- SAVE BUTTON -->
 		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();">Save</button>
+			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createTool();">Save</button>
 		</div>
 	</div>
 </script>

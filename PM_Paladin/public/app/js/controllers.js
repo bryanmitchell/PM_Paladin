@@ -437,6 +437,68 @@ app.controller('EquipmentMgmtCtrl', function($scope, $q, $http)
 		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedTool = index;
 		};
+
+	});
+
+app.controller('EquipmentCreateCtrl', function($scope, $http)
+	{
+		$scope.lineInfo = {
+			'lineName': '',
+			'supervisorFirstName': '',
+			'supervisorLastName': '',
+			'supervisorEmail': ''
+		};
+
+		$scope.workstationInfo = {
+			'workstationName': '',
+			'greenLightOpcTag': '',
+			'yellowLightOpcTag': '',
+			'redLightOpcTag': '',
+			'employeeSso': ''
+		};
+
+		$scope.toolInfo = {
+			'toolName': '',
+			'toolType': '',
+			'rfidAddress': '',
+			'opcTag': '',
+			'ioAddress': '',
+			'employeeSso': ''
+		};
+
+		$scope.createLine = function () {
+			//Request
+			console.log("Called createLine");
+			$http.post('../../api/createline', $scope.lineInfo) 
+			.success(function(data, status) {
+				console.log("createline ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller createline Error");
+			});
+		};
+
+		$scope.createWorkstation = function () {
+			//Request
+			$http.post('../../api/createworkstation', $scope.workstationInfo) 
+			.success(function(data, status) {
+				console.log("createworkstation ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller createworkstation Error");
+			});
+		};
+
+		$scope.createTool = function () {
+			//Request
+			$http.post('../../api/createtool', $scope.toolInfo) 
+			.success(function(data, status) {
+				console.log("createtool ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller createtool Error");
+			});
+		};
 	});
 
 app.controller('UserMgmtCtrl', function($scope, $http, $modal) 
@@ -491,11 +553,12 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
 				console.log("Sent ok");
+				$scope.getEmployees();
+				$scope.$apply();
 			})
 			.error(function(data, status) {
 				console.log("Error");
 			});
-
 		}
 
 		$scope.sendEmail = function () {
