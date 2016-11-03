@@ -552,9 +552,9 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			//Request
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
-				console.log("Sent ok");
-				$scope.getEmployees();
-				$scope.$apply();
+				console.log("User created");
+				// $scope.getEmployees();
+				// $scope.$apply();
 			})
 			.error(function(data, status) {
 				console.log("Error");

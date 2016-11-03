@@ -51,11 +51,13 @@
 				<div class="col-md-6">
 
 					<!-- User ID -->
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.sso.$invalid && createUserForm.sso.$pristine }">
 						<label class="control-label">SSO</label>
 						<select style="width: 150px;" name="sso" ng-model="userInfo.sso" ng-options="sso for sso in ssos" required>
 							<option value="">--- Select from list ---</option>
 						</select>
+
+						<!-- <p ng-show="createUserForm.sso.$invalid && createUserForm.sso.$dirty" class="help-block">Select an SSO.</p> -->
 					</div>
 				</div>
 			</div>
@@ -67,7 +69,7 @@
 					<div class="form-group" ng-class="{ 'has-error': createUserForm.fName.$invalid && !createUserForm.fName.$pristine }">
 						<label for="field-1" class="control-label">Name</label>
 						
-						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="userInfo.firstName" required />
+						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="userInfo.firstName" ng-pattern="/^\w+\D$/" required />
 
 						<p ng-show="createUserForm.fName.$invalid && !createUserForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
 
@@ -134,27 +136,24 @@
 				<div class="col-md-12">
 
 					<!-- User Type -->
-					<div class="form-group no-margin" ng-class="{ 'has-error': createUserForm.type.$invalid && !createUserForm.type.$pristine }">
+					<div class="form-group no-margin" ng-class="{ 'has-error': createUserForm.type.$invalid && createUserForm.type.$pristine }">
 						
 						<label for="field-7" class="control-label">Type of User</label>
 						
 						</br>
 						
 						<div class="col-sm-4" ng-repeat="item in employeeTypes">
-							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required /> {{item}}
+							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required> {{item}}
 						</div>
-
-						<p ng-show="createUserForm.type.$invalid && !createUserForm.type.$pristine" class="help-block">At least one type must be chosen.</p>
 					</div>	
 				</div>
 			</div>
 
 			<br>
 				
-			<div class="text-right btn-toolbar">
-					<button class="btn-white btn" ng-click="currentModal.close();">Close</button>
+			<div class="modal-footer">
 
-					<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee(); getEmployees();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
+					<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee(); sendEmail();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
 			</div>	
 		</form>
 	</div> <!-- end modal body-->	

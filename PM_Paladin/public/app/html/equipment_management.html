@@ -122,53 +122,69 @@
 	
 	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
 	
-		<!-- LIST OF LINES FROM PM PRO -->
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Line Name</label>
-					<select style="width: 150px;" ng-model="lineInfo.lineName">
-					  <option value="volvo">--- Select from list ---</option>
-					  <option value="saab">Saabdjdbnjdwjdnjwdkwebjwbefjkebw kjc dkbewkbfjkewbcejkwbkj</option>
-					  <option value="opel">Opel</option>
-					  <option value="audi">Audi</option>
-					</select>				
-				</div>		
-			</div>
-		</div>
-
-		<!-- SUPERVISOR NAMES -->
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Name</label>
-					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="lineInfo.supervisorFirstName">
-				</div>	
-			</div>
-			
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Last Name</label>
-					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="lineInfo.supervisorLastName">
+		<form role="form" name="lineForm" novalidate>
+			<!-- LIST OF LINES FROM PM PRO -->
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group" ng-class="{ 'has-error': lineForm.lineName.$invalid && lineForm.lineName.$pristine }">
+						<label for="field-1" class="control-label">Line Name</label>
+						<select style="width: 150px;" name="lineName" ng-model="lineInfo.lineName" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value="saab">Saabdjdbnjdwjdnjwdkwebjwbefjkebw kjc dkbewkbfjkewbcejkwbkj</option>
+						  <option value="opel">Opel</option>
+						  <option value="audi">Audi</option>
+						</select>				
+					</div>		
 				</div>
 			</div>
-		</div>
 
-		<!-- SUPERVISOR EMAIL -->
-		<div class="row">
-			<div class="col-md-12">
-				<div class="form-group">
-					<label for="field-3" class="control-label">Supervisor Email Address</label>
-					<input type="text" class="form-control" id="field-3" placeholder="Email" ng-model="lineInfo.supervisorEmail">
+			<!-- SUPERVISOR NAMES -->
+			<div class="row">
+				<div class="col-md-6">
+					<!-- SUPERVISOR FIRST NAME -->
+					<div class="form-group" ng-class="{ 'has-error': lineForm.fName.$invalid && !lineForm.fName.$pristine }">
+
+						<label for="field-1" class="control-label">Name</label>
+
+						<input type="text" class="form-control" name="fName" 
+						placeholder="First Name" ng-model="lineInfo.supervisorFirstName" ng-pattern="/^\w+\D$/" required>
+
+						<p ng-show="lineForm.fName.$invalid && !lineForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
+					</div>	
+				</div>
+				
+				<div class="col-md-6">
+					<!-- SUPERVISOR LAST NAME -->
+					<div class="form-group" ng-class="{ 'has-error': lineForm.lName.$invalid && !lineForm.lName.$pristine }">
+
+						<label for="field-2" class="control-label">Last Name</label>
+
+						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="lineInfo.supervisorLastName" ng-pattern="/^\w+\D$/" required>
+
+						<p ng-show="lineForm.lName.$invalid && !lineForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- SAVE BUTTON -->
-		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="console.log(lineInfo.lineName);currentModal.dismiss();createLine();">Save</button>
-		</div>
+			<!-- SUPERVISOR EMAIL -->
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group" ng-class="{ 'has-error': lineForm.email.$invalid && !lineForm.email.$pristine }">
 
+						<label for="field-3" class="control-label">Supervisor Email Address</label>
+
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="lineInfo.supervisorEmail">
+
+						<p ng-show="lineForm.email.$invalid && !lineForm.email.$pristine" class="help-block">Enter a valid email address.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- SAVE BUTTON -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" ng-click="console.log(lineInfo.lineName);currentModal.dismiss();createLine();" ng-disabled="lineForm.$invalid">Save</button>
+			</div>
+		</form>
 	</div>
 </script>
 
@@ -180,85 +196,90 @@
 	</div>
 	
 	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
-		<!-- NAME -->
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Workstation Name</label>
-					<select style="width: 150px;" ng-model="workstationInfo.workstationName">
-					  <option value="NO ONE">--- Select from list ---</option>
-					  <option value="Saab">Saab</option>
-					  <option value="Opel">Opel</option>
-					  <option value="Audi">Audi</option>
-					</select>				
-				</div>		
-			</div>
-		</div>
+		<form role="form" name="wsForm" novalidate>
+			<div class="row">
+				<div class="col-md-6">
 
-		<!-- ADDRESSES -->
-		<div class="row">
-			<div class="col-md-6">
-			<h4>Stack Light OPC Addresses</h4>
+					<!-- NAME -->
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsName.$invalid && wsForm.wsName.$pristine }">
+						<label for="field-1" class="control-label">Workstation Name</label>
+						<select style="width: 150px;" ng-model="workstationInfo.workstationName" name="wsName" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value="Saab">Saab</option>
+						  <option value="Opel">Opel</option>
+						  <option value="Audi">Audi</option>
+						</select>				
+					</div>		
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Green</label>
-					<select style="width: 150px;" ng-model="workstationInfo.greenLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>	
-				</div>	
+
+			<div class="row">
+				<div class="col-md-6">
+				<h4>Stack Light OPC Addresses</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsGreen.$invalid && wsForm.wsGreen.$pristine }">
+
+						<!-- ADDRESSES -->
+						<label for="field-1" class="control-label">Green</label>
+						<select style="width: 150px;" ng-model="workstationInfo.greenLightOpcTag" name="wsGreen" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value=1>1</option>
+						  <option value=2>2</option>
+						  <option value=3>3</option>
+						</select>	
+					</div>	
+				</div>
+				
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsYellow.$invalid && wsForm.wsYellow.$pristine }">
+						<label for="field-2" class="control-label">Yellow</label>
+						<select style="width: 150px;" ng-model="workstationInfo.yellowLightOpcTag" name="wsYellow" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value=1>1</option>
+						  <option value=2>2</option>
+						  <option value=3>3</option>
+						</select>				
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsRed.$invalid && wsForm.wsRed.$pristine }">
+						<label for="field-2" class="control-label">Red</label>
+						<select style="width: 150px;" ng-model="workstationInfo.redLightOpcTag" name="wsRed" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value=1>1</option>
+						  <option value=2>2</option>
+						  <option value=3>3</option>
+						</select>				
+					</div>	
+				</div>
 			</div>
 			
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Yellow</label>
-					<select style="width: 150px;" ng-model="workstationInfo.yellowLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>				
+			<br>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsPerson.$invalid && wsForm.wsPerson.$pristine }">
+
+						<!-- Engineer in charge -->
+						<label for="field-3" class="control-label">Engineer in Charge</label>
+						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" required>
+						  <option value="">--- Select from list ---</option>
+						  <option value=1>1</option>
+						  <option value=2>2</option>
+						  <option value=3>3</option>
+						</select>				
+					</div>
 				</div>
 			</div>
 
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Red</label>
-					<select style="width: 150px;" ng-model="workstationInfo.redLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>				
-				</div>	
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createWorkstation()" ng-disabled="wsForm.$invalid">Save</button>
 			</div>
-		</div>
-		
-		<br>
-
-		<!-- Engineer in charge -->
-		<div class="row">
-			<div class="col-md-12">
-				<div class="form-group">
-					<label for="field-3" class="control-label">Engineer in Charge</label>
-					<select style="width: 150px;" ng-model="workstationInfo.employeeSso">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>				
-				</div>
-			</div>
-		</div>
-
-		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createWorkstation()">Save</button>
-		</div>
+		</form>
 	</div>
 </script>
 
@@ -271,117 +292,118 @@
 	</div>
 	
 	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
-	
-		<!-- TOOL NAME -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Tool Name</label>
+		<form role="form" name="toolForm" novalidate>
+			<!-- TOOL NAME -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.toolName.$invalid && toolForm.toolName.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-1" class="control-label">Tool Name</label>
+					</div>
 				</div>
+						
+				<div class="col-md-4">
+					<select style="width: 150px;" ng-model="toolInfo.toolName" name="toolName" required>
+					  <option value="">--- Select from list ---</option>
+					  <option value="saab">Saab</option>
+					  <option value="opel">Opel</option>
+					  <option value="audi">Audi</option>
+					</select>
+
+				</div>		
 			</div>
-					
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.toolName">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
-				</select>
 
-			</div>		
-		</div>
+			<!-- TOOL TYPE -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.toolType.$invalid && toolForm.toolType.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-1" class="control-label">Tool Type</label>
+					</div>	
+				</div>
 
-		<!-- TOOL TYPE -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Tool Type</label>
+				<div class="col-md-4">
+					<select style="width: 150px;" ng-model="toolInfo.toolType" name="toolType" required>
+					  <option value="">--- Select from list ---</option>
+					  <option value="Electric">Electric</option>
+					  <option value="Pneumatic">Pneumatic</option>
+					</select>				
+				</div>		
+			</div>
+
+			<!-- RFID TAG -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-1" class="control-label">RFID Tag</label>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required>
+					  <option value="">--- Select from list ---</option>
+					  <option value=1>1</option>
+					  <option value=2>2</option>
+					  <option value=3>3</option>
+					</select>	
+				</div>	
+			</div>				
+
+			<!-- OPC TAG -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.opc.$invalid && toolForm.opc.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-2" class="control-label">OPC Tag</label>
+					</div>
+				</div>
+
+				<div class="col-md-4">	
+					<select style="width: 150px;" ng-model="toolInfo.opcTag" name="opc" required>
+						<option value="">--- Select from list ---</option>
+						<option value=1>1</option>
+						<option value=2>2</option>
+						<option value=3>3</option>
+					</select>				
 				</div>	
 			</div>
 
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.toolType">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="Electric">Electric</option>
-				  <option value="Pneumatic">Pneumatic</option>
-				</select>				
-			</div>		
-		</div>
+			<!-- IO ADDRESS -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.io.$invalid && toolForm.io.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-2" class="control-label">I/O Address</label>
+					</div>
+				</div>	
 
-		<!-- RFID TAG -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">RFID Tag</label>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.rfidAddress">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value=1>1</option>
-				  <option value=2>2</option>
-				  <option value=3>3</option>
-				</select>	
-			</div>	
-		</div>				
-
-		<!-- OPC TAG -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">OPC Tag</label>
-				</div>
+				<div class="col-md-4">
+					<select style="width: 150px;" ng-model="toolInfo.ioAddress" name="io" required>
+						<option value="">--- Select from list ---</option>
+						<option value=1>1</option>
+						<option value=2>2</option>
+						<option value=3>3</option>
+					</select>				
+				</div>	
 			</div>
 
-			<div class="col-md-4">	
-				<select style="width: 150px;" ng-model="toolInfo.opcTag">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>1</option>
-					<option value=2>2</option>
-					<option value=3>3</option>
-				</select>				
-			</div>	
-		</div>
-
-		<!-- IO ADDRESS -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">I/O Address</label>
+			<!-- TECHNICIAN IN CHARGE -->
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.technician.$invalid && toolForm.technician.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-3" class="control-label">Technician in Charge</label>
+					</div>
 				</div>
-			</div>	
 
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.ioAddress">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>1</option>
-					<option value=2>2</option>
-					<option value=3>3</option>
-				</select>				
-			</div>	
-		</div>
-
-		<!-- TECHNICIAN IN CHARGE -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-3" class="control-label">Technician in Charge</label>
-				</div>
+				<div class="col-md-1">
+					<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="technician" required>
+						<option value="">--- Select from list ---</option>
+						<option value=1>Saab</option>
+						<option value=2>Opel</option>
+						<option value=3>Audi</option>
+					</select>				
+				</div>	
 			</div>
 
-			<div class="col-md-1">
-				<select style="width: 150px;" ng-model="toolInfo.employeeSso">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>Saab</option>
-					<option value=2>Opel</option>
-					<option value=3>Audi</option>
-				</select>				
-			</div>	
-		</div>
-
-		<!-- SAVE BUTTON -->
-		<div class="modal-footer">
-			<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createTool();">Save</button>
-		</div>
+			<!-- SAVE BUTTON -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createTool();" ng-disabled="toolForm.$invalid">Save</button>
+			</div>
+		</form>
 	</div>
 </script>
