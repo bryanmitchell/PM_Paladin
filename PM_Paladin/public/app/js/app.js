@@ -40,6 +40,14 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			url: '/app',
 			templateUrl: appHelper.templatePath('layout/app-body'),
 			controller: 'UIModalsTopCtrl',
+			resolve: {
+				resources: function($ocLazyLoad){
+					return $ocLazyLoad.load([
+						ASSETS.forms.jQueryValidate,
+						ASSETS.extra.toastr,
+					]);
+				},
+			}
 		}).
 
 		state('app.dashboard', {

@@ -46,88 +46,116 @@
 	</div>
 	
 	<div class="modal-body" ng-controller="UserMgmtCtrl">
+		<form role="form" name="createUserForm" novalidate>
+			<div class="row">
+				<div class="col-md-6">
 
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label class="control-label">Employee ID</label>
-					<select style="width: 150px;" ng-model="userInfo.sso" ng-options="sso for sso in ssos">
-						<option value="">--- Select from list ---</option>
-					</select>
+					<!-- User ID -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.sso.$invalid && createUserForm.sso.$pristine }">
+						<label class="control-label">SSO</label>
+						<select style="width: 150px;" name="sso" ng-model="userInfo.sso" ng-options="sso for sso in ssos" required>
+							<option value="">--- Select from list ---</option>
+						</select>
+
+						<!-- <p ng-show="createUserForm.sso.$invalid && createUserForm.sso.$dirty" class="help-block">Select an SSO.</p> -->
+					</div>
 				</div>
 			</div>
-		</div>
 	
-		<!-- USER NAME -->
-		<div class="row">
-			<div class="col-md-6">
-				
-				<div class="form-group">
-					<label for="field-1" class="control-label">Name</label>
-					
-					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="userInfo.firstName">
-				</div>	
-				
-			</div>
-			
-			<div class="col-md-6">
-				
-				<div class="form-group">
-					<label for="field-2" class="control-label">Last Name</label>
-					
-					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="userInfo.lastName">
-				</div>	
-			
-			</div>
-		</div>
-	
-		<!-- EMAIL -->
-		<div class="row">
-			<div class="col-md-12">
-				<div class="form-group">
-					<label for="field-3" class="control-label">Email Address</label>
-					<input type="text" class="form-control" id="field-3" placeholder="Email" ng-model="userInfo.email">
-			</div>
-		</div>
-	
-		<!-- PASSWORD AND CONFIRM -->
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-4" class="control-label">Password</label>
-					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="userInfo.password">
-				</div>	
-			</div>
-			
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-5" class="control-label">Confirm Password</label>
-					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
-				</div>	
-			</div>
-		</div>
+			<div class="row">
+				<div class="col-md-6">
 
-		<!-- TYPES OF USERS (3) -->
-		<div class="row">
-			<div class="col-md-12">
-				<div class="form-group no-margin">
-					<label for="field-7" class="control-label">Type of User</label>
-					</br>
-					<div class="col-sm-4" ng-repeat="item in employeeTypes">
-						<input type="checkbox" value="{{item}}" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)"> {{item}}
-					</div>
-				</div>	
-			</div>
-		</div>
+					<!-- User First Name -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.fName.$invalid && !createUserForm.fName.$pristine }">
+						<label for="field-1" class="control-label">Name</label>
+						
+						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="userInfo.firstName" ng-pattern="/^\w+\D$/" required />
 
-		<br>
+						<p ng-show="createUserForm.fName.$invalid && !createUserForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
+
+					</div>	
+				</div>
+					
+				<div class="col-md-6">
+					
+					<!-- User Last Name -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.lName.$invalid && !createUserForm.lName.$pristine }">
+						<label for="field-2" class="control-label">Last Name</label>
+						
+						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="userInfo.lastName" ng-pattern="/^\w+\D$/" required />
+
+						<p ng-show="createUserForm.lName.$invalid && !createUserForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
+					</div>	
+				
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12">
+					<!-- User Email Address -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.email.$invalid && !createUserForm.email.$pristine }" required>
+						<label for="field-3" class="control-label">Email Address</label>
+						
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="userInfo.email" required>
+
+						<p ng-show="createUserForm.email.$invalid && !createUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
+					</div>	
+					
+				</div>
+			</div>
 		
-		<div class="text-right btn-toolbar">
-				<button class="btn-white btn" ng-click="currentModal.close();">Close</button>
+			<div class="row">
+				<div class="col-md-6">
+					
+					<!-- User Password -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.password.$invalid && !createUserForm.password.$pristine }" required>
+						<label for="field-4" class="control-label">Password</label>
+						
+						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="userInfo.password"  ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required />
 
-				<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee();">Save</button> 
-		</div>	
+						<p ng-show="createUserForm.password.$error.pattern" class="help-block">Password must contain at least one number, one upper and lower case letter, and one special character.</p>
+					</div>	
+					
+				</div>
+				
+				<div class="col-md-6">
+					
+					<!-- User Confirm Password -->
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.confirmPassword.$invalid && !createUserForm.confirmPassword.$pristine }" required>
+						<label for="field-5" class="control-label">Confirm Password</label>
+						
+						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="userInfo.password" required />
 
+						<p ng-show="createUserForm.confirmPassword.$error.passwordVerify" class="help-block">Must match password in previous field.</p>
+					</div>	
+				</div>	
+			</div>
+			
+			<div class="row">
+					
+				<div class="col-md-12">
+
+					<!-- User Type -->
+					<div class="form-group no-margin" ng-class="{ 'has-error': createUserForm.type.$invalid && createUserForm.type.$pristine }">
+						
+						<label for="field-7" class="control-label">Type of User</label>
+						
+						</br>
+						
+						<div class="col-sm-4" ng-repeat="item in employeeTypes">
+							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required> {{item}}
+						</div>
+					</div>	
+				</div>
+			</div>
+
+			<br>
+				
+			<div class="modal-footer">
+
+					<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee(); sendEmail();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
+			</div>	
+		</form>
 	</div> <!-- end modal body-->	
 </script>
 

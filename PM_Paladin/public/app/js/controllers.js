@@ -191,45 +191,81 @@ app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $time
 		ps_init(); // perfect scrollbar for sidebar
 	});
 
-app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
+app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http)
 	{
 		// Used to be done as a function in app.js state('app')
 		$rootScope.isLoginPage        = false;
 		$rootScope.isLightLoginPage   = false;
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
+		$rootScope.isLoggedIn		  = false;
+		$rootScope.userPosition		  = '';
 
-		// $scope.showDelete = function (menuItemTitle) {
-		// 	// if (menuItemTitle == 'User Management') {
-		// 	// 	return true;
-		// 	// }
-		// 	return true;
+		$scope.logInUser = {
+			'sso': '',
+			'password': ''
+		};
 
-		// 	// switch(menuItemTitle){
-		// 	// 	case 'Dashboard':
-		// 	// 		return true;
-		// 	// 	case 'Equipment Management':
-		// 	// 		if ($rootScope.userPosition == 'Administrator' | 'Engineer' | 'Technician') {
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'User Management':
-		// 	// 		if ($rootScope.userPosition == 'Administrator') {
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'Maintenance Confirmation':
-		// 	// 		if ($rootScope.userPosition == 'Technician'){
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'Maintenance Approval':
-		// 	// 		if ($rootScope.userPosition == 'Engineer'){
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// }
-		// };
+		$scope.validateLogIn = function () {
+			console.log("entre");
+			console.log($scope.logInUser);
+
+			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
+			.success(function(data, status) {
+				console.log("Log In");
+				$rootScope.isLoggedIn = true;
+				console.log(data[0].types);
+				$rootScope.userPosition = data[0].types;
+				console.log(data);
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
+
+		};
+
+
+		$scope.showDelete = function (menuItemTitle) {
+			// if (menuItemTitle == 'User Management') {
+			// 	return true;
+			// }
+			// return true;
+			console.log($rootScope.userPosition);
+			// console.log($isLoggedIn);
+
+			switch(menuItemTitle){
+				case 'Dashboard':
+					return true;
+				case 'Equipment Management':
+					if ($rootScope.userPosition == 'Administrator') {
+						return true;
+					}
+					else if ($rootScope.userPosition == 'Engineer') {
+						return true;
+					}
+					else if ($rootScope.userPosition == 'Technician') {
+						return true;
+					}
+					return false;
+				case 'User Management':
+					if ($rootScope.userPosition == 'Administrator') {
+						return true;
+					}
+					return false;
+				case 'Maintenance Confirmation':
+					if ($rootScope.userPosition == 'Technician'){
+						return true;
+					}
+					return false;
+				case 'Maintenance Approval':
+					if ($rootScope.userPosition == 'Engineer'){
+						return true;
+					}
+					return false;
+			}
+		};
+
+			
 		
 		// Open Simple Modal
 		$scope.openModal = function(modal_id, modal_size, modal_backdrop)
@@ -617,6 +653,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 		$scope.selectedUser = {}; // User (obtained from DB) to pass to Update User modal
 		
 		$scope.users = {}; // Just a declaration
+		$scope.confirmPassword = '';
 
 		$scope.getEmployees = function(){
 			$http.get('../../api/employees')
@@ -655,9 +692,9 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			//Request
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
-				console.log("Sent ok");
-				$scope.getEmployees();
-				$scope.$apply();
+				console.log("User created");
+				// $scope.getEmployees();
+				// $scope.$apply();
 			})
 			.error(function(data, status) {
 				console.log("Error");
