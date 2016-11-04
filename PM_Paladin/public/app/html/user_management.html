@@ -26,7 +26,7 @@
 							<td>{{user.firstName}} {{user.lastName}}</td>
 							<td>{{user.types}}</td>
 							<td>
-								<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser($index); myOpenModal('modal-3-update', null, 'static');">Update</button>
+								<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');">Update</button>
 								<button type="button" class="btn btn-red" on-click="">Delete</button>
 							</td>
 						</tr>
@@ -169,77 +169,71 @@
 	
 	<!-- Modal body-->
 	<!-- <div class="modal-body" ng-controller="UserMgmtCtrl"> -->
-	<div class="modal-body">
-	
-		<div class="row"> <!-- Name Row -->
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Name</label>
-					<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="selectedUser.firstName" />
+	<form role="form" name="updateUserForm" novalidate>
+		<div class="modal-body">
+			<div class="row"> <!-- Name Row -->
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="field-1" class="control-label">Name</label>
+						<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="selectedUser.firstName" />
+					</div>
 				</div>
-			</div>
-			
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Last Name</label>
-					<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="selectedUser.lastName">
-				</div>
-			</div>
-		</div>
-	
-		<div class="row"> <!-- Email Row -->
-			<div class="col-md-12">
 				
-				<div class="form-group">
-					<label for="field-3" class="control-label">Email Address</label>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="field-2" class="control-label">Last Name</label>
+						<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="selectedUser.lastName">
+					</div>
+				</div>
+			</div>
+		
+			<div class="row"> <!-- Email Row -->
+				<div class="col-md-12">
 					
-					<input type="email" class="form-control" id="field-3" placeholder="Email" ng-model="selectedUser.email">
-				</div>	
-				
-			</div>
-		</div>
-	
-		<div class="row"> <!-- Password Row -->
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-4" class="control-label">Password</label>
-					<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="password">
+					<div class="form-group">
+						<label for="field-3" class="control-label">Email Address</label>
+						
+						<input type="email" class="form-control" id="field-3" placeholder="Email" ng-model="selectedUser.email">
+					</div>	
+					
 				</div>
 			</div>
-			
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="field-5" class="control-label">Confirm Password</label>
-					<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
-				</div>	
+		
+			<div class="row"> <!-- Password Row -->
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="field-4" class="control-label">Password</label>
+						<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="selectedUser.password">
+					</div>
+				</div>
+				
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="field-5" class="control-label">Confirm Password</label>
+						<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
+					</div>	
+				</div>
 			</div>
-		</div>
-	
-		<div class="row"> <!-- User type Row -->
-			<div class="col-md-12">
-				<div class="form-group no-margin">
-					<label for="field-7" class="control-label">Type of User</label>
-					</br>
-					<label>{{selectedUserIndex}}</label>
-					<br>
-					<div class="col-sm-4">
-						<input type="checkbox" id="admin" ng-model="userCtrl.userPosition" ng-checked=""> Administrator
-					</div>
-					<div class="col-sm-4">
-						<input type="checkbox" id="engineer" ng-model="isType" ng-checked="checkType()"> Engineer
-					</div>
-					<div class="col-sm-4">
-						<input type="checkbox" id="technician" ng-model="isType" ng-checked="checkType()"> Technician
-					</div>
-				</div>	
-			</div>
-		</div>
 
-	</div> <!-- End modal body -->
-	
-	<!-- Modal footer -->
-	<div class="modal-footer">
-		<button type="button" class="btn btn-white" ng-click="close();">Close</button>
-		<button type="button" class="btn btn-info" ng-click="dismiss();">Save</button>
-	</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group no-margin">
+						<label for="field-7" class="control-label">Type of User</label>
+						</br>
+						<div class="col-sm-4" ng-repeat="item in employeeTypes">
+							<input type="checkbox" value="{{item}}" ng-checked="typesSelected.indexOf(item) > -1" ng-click="toggleSelection(item)"> {{item}}
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div> <!-- End modal body -->
+		
+		<!-- Modal footer -->
+		<div class="modal-footer">
+			<button type="button" class="btn btn-white" ng-click="close();">Close</button>
+			<button type="button" class="btn btn-info" ng-click="close();updateUser();" ng-disabled="(typesSelected.length < 1)">Save</button>
+		</div>
+	</form>
 </script>
+

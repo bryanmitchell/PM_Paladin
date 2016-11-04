@@ -102,6 +102,30 @@ module.exports = function(cp){
 			dbconn.createTool(cp, req, res);
 		});
 
+	router.route('/updateline')
+		.post(function(req, res){
+			console.log("router.route(/updateline)");
+			dbconn.updateLine(cp, req, res);
+		});
+
+	router.route('/updateworkstation')
+		.post(function(req, res){
+			console.log("router.route(/updateworkstation)");
+			dbconn.updateWorkstation(cp, req, res);
+		});
+
+	router.route('/updatetool')
+		.post(function(req, res){
+			console.log("router.route(/updatetool)");
+			dbconn.updateTool(cp, req, res);
+		});
+
+	router.route('/updateemployee')
+		.post(function(req, res){
+			console.log("router.route(/updateemployee)");
+			dbconn.updateEmployee(cp, req, res);
+		});
+
 	/**
 	EMAIL ROUTES
 	**/
