@@ -148,7 +148,7 @@ exports.getEmployeePassword = function(cp, req, res){
 			AND e1.passwordHash = '{1}'
 		)
 		THEN CAST(1 AS BIT)
-		ELSE CAST(0 AS BIT), typeList.types 
+		ELSE CAST(0 AS BIT) END, typeList.types 
 		FROM Employee e 
 		INNER JOIN (
 			SELECT DISTINCT st2.sso AS [sso],

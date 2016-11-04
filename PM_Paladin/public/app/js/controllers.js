@@ -199,64 +199,73 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
 		$rootScope.isLoggedIn		  = false;
+		$rootScope.userPosition		  = '';
 
 		$scope.logInUser = {
 			'sso': '',
 			'password': ''
 		};
 
-		$scope.getUserInfo = function (isValid) {
+		$scope.validateLogIn = function () {
+			console.log("entre");
+			console.log($scope.logInUser);
 
-			if (isValid) {
-				$http.post('../../api/getEmployeePassword', $scope.logInUser) 
-					.success(function(data, status) {
-						console.log("Log In");
-						$scope.dbUserInfo = data;
-						console.log($scope.dbUserInfo);
-					})
-					.error(function(data, status) {
-						console.log("Error");
+			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
+			.success(function(data, status) {
+				console.log("Log In");
+				$rootScope.isLoggedIn = true;
+				console.log(data[0].types);
+				$rootScope.userPosition = data[0].types;
+				console.log(data);
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
 
-					});
+		};
+
+
+		$scope.showDelete = function (menuItemTitle) {
+			// if (menuItemTitle == 'User Management') {
+			// 	return true;
+			// }
+			// return true;
+			console.log($rootScope.userPosition);
+			// console.log($isLoggedIn);
+
+			switch(menuItemTitle){
+				case 'Dashboard':
+					return true;
+				case 'Equipment Management':
+					if ($rootScope.userPosition == 'Administrator') {
+						return true;
+					}
+					else if ($rootScope.userPosition == 'Engineer') {
+						return true;
+					}
+					else if ($rootScope.userPosition == 'Technician') {
+						return true;
+					}
+					return false;
+				case 'User Management':
+					if ($rootScope.userPosition == 'Administrator') {
+						return true;
+					}
+					return false;
+				case 'Maintenance Confirmation':
+					if ($rootScope.userPosition == 'Technician'){
+						return true;
+					}
+					return false;
+				case 'Maintenance Approval':
+					if ($rootScope.userPosition == 'Engineer'){
+						return true;
+					}
+					return false;
 			}
 		};
 
-		// $scope.validateForm = function () {
-					
-		// };
-
-
-		// $scope.showDelete = function (menuItemTitle) {
-		// 	// if (menuItemTitle == 'User Management') {
-		// 	// 	return true;
-		// 	// }
-		// 	return true;
-
-		// 	// switch(menuItemTitle){
-		// 	// 	case 'Dashboard':
-		// 	// 		return true;
-		// 	// 	case 'Equipment Management':
-		// 	// 		if ($rootScope.userPosition == 'Administrator' | 'Engineer' | 'Technician') {
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'User Management':
-		// 	// 		if ($rootScope.userPosition == 'Administrator') {
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'Maintenance Confirmation':
-		// 	// 		if ($rootScope.userPosition == 'Technician'){
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// 	case 'Maintenance Approval':
-		// 	// 		if ($rootScope.userPosition == 'Engineer'){
-		// 	// 			return true;
-		// 	// 		}
-		// 	// 		return false;
-		// 	// }
-		// };
+			
 		
 		// Open Simple Modal
 		$scope.openModal = function(modal_id, modal_size, modal_backdrop)
