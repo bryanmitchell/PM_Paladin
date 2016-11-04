@@ -32,7 +32,8 @@ function runQuery(query, cp, res) {
 	});
 };
 
-function runPostQuery(query, cp, callbackList) {
+function runPostQuery(query, cp) {
+	console.log('in dbconn.runPostQuery()');
 	var request = new sql.Request(cp);
 	request.query(query, function(err, recordset){
 		if(err){
@@ -44,11 +45,17 @@ function runPostQuery(query, cp, callbackList) {
 	});
 };
 
+
+
 // Displayed in User Management
 exports.getEmployees = function(cp, res){
 	console.log("Getting all employees...");
 	runQuery(`
-		SELECT e.sso, e.firstName, e.lastName, e.email, typeList.types 
+		SELECT e.sso as [sso]
+			,e.firstName AS [firstName]
+			,e.lastName AS [lastName]
+			,e.email AS [email]
+			,typeList.types AS [types]
 		FROM Employee e 
 		INNER JOIN (
 			SELECT DISTINCT st2.sso AS [sso],
@@ -138,60 +145,86 @@ exports.getApprovalTasks = function(cp, res, empSso){
 exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	var pwd = req.body.password;
-
+	var query = `
+SELECT 
+	CASE WHEN EXISTS (
+		SELECT *
+		FROM Employee e1 
+		WHERE e1.sso = ${sso} 
+		AND e1.passwordHash = '${bcrypt.hashSync(pwd, salt)}'
+	)
+	THEN CAST(1 AS BIT)
+	ELSE CAST(0 AS BIT) END
+	,typeList.types 
+FROM Employee e 
+INNER JOIN (
+	SELECT DISTINCT st2.sso AS [sso],
+		STUFF((SELECT ',' + st1.employeeType AS [text()]
+			FROM EmployeeType st1
+			WHERE st1.sso = st2.sso
+			FOR XML PATH('')
+			), 1, 1, '' )
+		AS [types]
+	FROM EmployeeType st2
+) [typeList] 
+ON e.sso = typeList.sso 
+WHERE e.sso = ${sso};
+`;
 	// Return Boolean (user exists, password works) and position string
-	runQuery(`
-		SELECT CASE WHEN EXISTS (
-			SELECT *
-			FROM Employee e1 
-			WHERE e1.sso = {0} 
-			AND e1.passwordHash = '{1}'
-		)
-		THEN CAST(1 AS BIT)
-		ELSE CAST(0 AS BIT), typeList.types 
-		FROM Employee e 
-		INNER JOIN (
-			SELECT DISTINCT st2.sso AS [sso],
-				STUFF((SELECT ',' + st1.employeeType AS [text()]
-					FROM EmployeeType st1
-					WHERE st1.sso = st2.sso
-					FOR XML PATH('')
-					), 1, 1, '' )
-				AS [types]
-			FROM EmployeeType st2
-		) [typeList] 
-		ON e.sso = typeList.sso;
-		`.format(sso, bcrypt.hashSync(pwd, salt)), cp, res);
+	runQuery(query, cp, res);
 };
 
 exports.getLines = function(cp, res){
 	runQuery(`
-		SELECT pl.lineId AS [lineID], pl.lineName AS [lineName]
+		SELECT pl.lineId AS [lineID]
+			,pl.lineName AS [lineName]
+			,pl.supervisorFirstName AS [supervisorFirstName]
+			,pl.supervisorLastName AS [supervisorLastName]
+			,pl.supervisorEmail AS [supervisorEmail]
 		FROM ProductionLine AS pl;
 		`, cp, res);
 };
 
 exports.getWorkstations = function(cp, res){
 	runQuery(`
-		SELECT ws.workstationId AS [wsID], ws.workstationName AS [wsName], pl.lineId AS [lineID]
+		SELECT ws.workstationId AS [wsID]
+			,ws.workstationName AS [wsName]
+			,CONVERT(INT, ws.greenLightOpcTag) AS [greenLightOpcTag]
+			,CONVERT(INT, ws.yellowLightOpcTag) AS [yellowLightOpcTag]
+			,CONVERT(INT, ws.redLightOpcTag) AS [redLightOpcTag]
+			,pl.lineId AS [lineID]
+			,wat.employeeSso AS [employeeSso]
 		FROM Workstation AS ws 
 		INNER JOIN WorkstationInLine AS wsl 
 		ON ws.workstationId = wsl.workstationId 
 		INNER JOIN ProductionLine AS pl 
-		ON wsl.lineId = pl.lineId;
+		ON wsl.lineId = pl.lineId
+		INNER JOIN WorkstationAssignedTo as wat
+		ON ws.workstationId = wat.workstationId;
 		`, cp, res);
 };
 
 exports.getTools = function(cp, res){
 	runQuery(`
-		SELECT ws.workstationId AS [wsID], t.toolId AS [toolID], t.toolName AS [toolName] 
+		SELECT tws.workstationId AS [wsID]
+			,tat.employeeSso AS [employeeSso]
+			,t.toolId AS [toolID]
+			,t.toolName AS [toolName] 
+			,t.toolType AS [toolType] 
+			,CONVERT(INT, t.rfidAddress) AS [rfidAddress]
+			,CONVERT(INT, t.opcTag) AS [opcTag]
+			,CONVERT(INT, t.ioAddress) AS [ioAddress]
 		FROM Tool as t 
 		INNER JOIN ToolInWorkstation AS tws 
 		ON t.toolId = tws.toolId 
-		INNER JOIN Workstation AS ws 
-		ON tws.workstationId = ws.workstationId;
+		INNER JOIN ToolAssignedTo AS tat
+		ON t.toolId = tat.toolId;
 		`, cp, res);
 };
+
+
+
+
 
 exports.createEmployee = function(cp, req, res){
 	var r = req.body;
@@ -202,8 +235,6 @@ exports.createEmployee = function(cp, req, res){
 			({0},'{1}','{2}','{3}','{4}');
 		`.format(r.sso, r.firstName, r.lastName, r.email, bcrypt.hashSync(r.password, salt)), cp);
 	for (i = 0; i < r.employeeType.length; i++){
-		console.log("for loop: "+i);
-		console.log(r.employeeType[i]);
 		runPostQuery(`
 			INSERT INTO EmployeeType ([sso],[employeeType]) 
 			VALUES ({0},'{1}');
@@ -334,32 +365,100 @@ exports.createTool = function(cp, req, res){
 		else{console.log("Query success!");}
 	});
 
-	// var query2 = `
-	// 	INSERT INTO [dbo].[ToolInWorkstation]
-	// 		([workstationId],[toolId])
-	// 	VALUES
-	// 		({0},{1});`;
+	res.redirect('back');
+};
 
-	// var query3 = `
-	// 	INSERT INTO [dbo].[ToolAssignedTo]
-	// 		([toolId], [employeeSso])
-	// 	VALUES
-	// 		({0}, {1});`;
 
-	// new sql.Request(cp).query(query1, function(err, recordset){
-	// 	if(err){console.log(err);}
-	// 	else{
-	// 		console.log("Query success!");
-	// 		new sql.Request(cp).query(
-	// 			query2.format(1, recordset[0].id), 
-	// 			function(err){if(err){console.log(err);}}
-	// 		);
-	// 		new sql.Request(cp).query(
-	// 			query3.format(recordset[0].id, r.employeeSso), 
-	// 			function(err){if(err){console.log(err);}}
-	// 		);
-	// 	}
-	// });
 
+
+
+exports.updateLine = function(cp, req, res){
+	var r = req.body;
+	runPostQuery(`
+		UPDATE ProductionLine
+		SET lineName = '${r.lineName}'
+			,supervisorFirstName = '${r.supervisorFirstName}'
+			,supervisorLastName = '${r.supervisorLastName}'
+			,supervisorEmail = '${r.supervisorEmail}'
+		WHERE lineId = ${r.lineID};
+		`, cp);
+	res.redirect('back');
+};
+
+exports.updateWorkstation = function(cp, req, res){
+	var r = req.body;
+	runPostQuery(`
+		UPDATE Workstation
+		SET workstationName = '${r.wsName}'
+			,greenLightOpcTag = CONVERT(INT, ${r.greenLightOpcTag})
+			,yellowLightOpcTag = CONVERT(INT, ${r.yellowLightOpcTag})
+			,redLightOpcTag = CONVERT(INT, ${r.redLightOpcTag})
+		WHERE workstationId = ${wsID};
+		UPDATE WorkstationAssignedTo
+		SET employeeSso = ${r.employeeSso}
+		WHERE workstationId = ${wsID};
+		`, cp);
+	res.redirect('back');
+};
+
+exports.updateTool = function(cp, req, res){
+	var r = req.body;
+	runPostQuery(`
+		UPDATE Tool
+		SET toolName = '${r.toolName}'
+			,toolType = '${r.toolType}'
+			,rfidAddress = CONVERT(INT, ${r.rfidAddress})
+			,opcTag = CONVERT(INT, ${r.opcTag})
+		WHERE toolId = ${r.toolID};
+		UPDATE ToolAssignedTo
+		SET employeeSso = ${r.employeeSso}
+		WHERE toolId = ${r.toolID};
+		`, cp);
+	res.redirect('back');
+};
+
+exports.updateEmployee = function(cp, req, res){
+	var r = req.body;
+	var types = r.types.split(',');
+	runPostQuery(`
+		UPDATE Employee
+		SET firstName = '${r.firstName}'
+			,lastName = '${r.lastName}'
+			,email = '${r.email}'
+			,passwordHash = '${bcrypt.hashSync(r.password, salt)}'
+		WHERE sso = ${r.sso};
+		`, cp);
+
+	var query2 = `
+		BEGIN TRANSACTION;
+		BEGIN TRY
+		DELETE FROM EmployeeType
+		WHERE sso = ${r.sso}
+		`;
+	for (var i=0; i<types.length; i++){
+		console.log('in for');
+		query2 += `
+			INSERT INTO EmployeeType ([sso],[employeeType]) 
+			VALUES (${r.sso}, '${types[i]}')`;
+		if (i==types.length-1){query2+=`;\n`;}
+		else{query2+=`\n`;}
+	}
+	query2 += `
+		END TRY
+		BEGIN CATCH
+			SELECT 
+				ERROR_NUMBER() AS ErrorNumber
+				,ERROR_SEVERITY() AS ErrorSeverity
+				,ERROR_STATE() AS ErrorState
+				,ERROR_PROCEDURE() AS ErrorProcedure
+				,ERROR_LINE() AS ErrorLine
+				,ERROR_MESSAGE() AS ErrorMessage;
+
+			IF @@TRANCOUNT > 0
+				ROLLBACK TRANSACTION;
+		END CATCH;
+		IF @@TRANCOUNT > 0 
+			COMMIT TRANSACTION;`;
+	runPostQuery(query2, cp);
 	res.redirect('back');
 };

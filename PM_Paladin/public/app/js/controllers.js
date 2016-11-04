@@ -243,6 +243,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce)
 
 	});
 
+
+
 app.controller('DashboardCtrl', function($scope)
 	{
 		$scope.upcomingTools = [{
@@ -362,7 +364,9 @@ app.controller('MaintApprCtrl', function($scope, $http)
 		};
 	});
 
-app.controller('EquipmentMgmtCtrl', function($scope, $q, $http) 
+
+
+app.controller('EquipmentMgmtCtrl', function($scope, $q, $http, $modal) 
 	{
 		$http.get('../../api/lines') 
 			.success(function(data, status) {
@@ -395,20 +399,72 @@ app.controller('EquipmentMgmtCtrl', function($scope, $q, $http)
 		$scope.selectedLine = null;  // initialize our variable to null
 		$scope.selectedWS = null;  // initialize our variable to null
 		$scope.selectedTool = null;  // initialize our variable to null
+		$scope.updateModal = null; //assign function to it according to what is selected
+
+		$scope.updateLineModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: 'modal-line-update',
+				controller: 'LineUpdateCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				resolve: {
+					selectedLine: function(){
+						for(var i=0; i<$scope.lines.length; i++){
+							if($scope.lines[i].lineID == $scope.selectedLine){
+								return $scope.lines[i];
+							}}}
+				}
+			});
+		};
+
+		$scope.updateWorkstationModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: 'modal-ws-update',
+				controller: 'WSUpdateCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				resolve: {
+					selectedWS: function(){
+						for(var i=0; i<$scope.workstations.length; i++){
+							if($scope.workstations[i].wsID == $scope.selectedWS){
+								return $scope.workstations[i];
+							}}}
+				}
+			});
+		};
+
+		$scope.updateToolModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: 'modal-tool-update',
+				controller: 'ToolUpdateCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				resolve: {
+					selectedTool: function(){
+						for(var i=0; i<$scope.tools.length; i++){
+							if($scope.tools[i].toolID == $scope.selectedTool){
+								return $scope.tools[i];
+							}}}
+				}
+			});
+		};
 
 		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedLine = index;
 			$scope.selectedWS = null;  //para evitar que se guarde la seleccion de ws
 			$scope.selectedTool = null;
+			$scope.updateModal = $scope.updateLineModal;
 		};
 		
 		$scope.setClickedWS = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedWS = index;
 			$scope.selectedTool = null;
+			$scope.updateModal = $scope.updateWorkstationModal;
 		};
 
 		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedTool = index;
+			$scope.updateModal = $scope.updateToolModal;
 		};
 
 	});
@@ -474,10 +530,82 @@ app.controller('EquipmentCreateCtrl', function($scope, $http)
 		};
 	});
 
+app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedLine', function($scope, $http, $modalInstance, selectedLine)
+	{
+		$scope.lineInfo = selectedLine;
+
+		$scope.updateLine = function () {
+			//Request
+			console.log("Called updateLine");
+			$http.post('../../api/updateline', $scope.lineInfo) 
+			.success(function(data, status) {
+				console.log("updateLine ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller updateLine Error");
+			});
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS', function($scope, $http, $modalInstance, selectedWS)
+	{
+		$scope.workstationInfo = selectedWS;
+		console.log($scope.workstationInfo);
+
+		$scope.updateWorkstation = function () {
+			//Request
+			console.log("Called updateWorkstation");
+			$http.post('../../api/updateworkstation', $scope.workstationInfo) 
+			.success(function(data, status) {
+				console.log("updateWorkstation ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller updateWorkstation Error");
+			});
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedTool', function($scope, $http, $modalInstance, selectedTool)
+	{
+		$scope.toolInfo = selectedTool;
+		console.log($scope.toolInfo);
+
+		$scope.updateTool = function () {
+			//Request
+			console.log("Called updateTool");
+			$http.post('../../api/updatetool', $scope.toolInfo) 
+			.success(function(data, status) {
+				console.log("updateTool ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller updateTool Error");
+			});
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+
+
+
 app.controller('UserMgmtCtrl', function($scope, $http, $modal) 
 	{	
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
-		$scope.selection = [];
+		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10]; // To be replaced with a read from Luis's SSO file
+		$scope.selection = []; // Binded to selected user roles in create user modal
 		$scope.userInfo = {
 			'sso': '',
 			'firstName': '',
@@ -485,10 +613,10 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			'email': '',
 			'password': '',
 			'employeeType': $scope.selection
-		};
-		$scope.selectedUser = {};
-		$scope.modalInstance = {};
-		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10];
+		}; // Binded to Create User Modal fields
+		$scope.selectedUser = {}; // User (obtained from DB) to pass to Update User modal
+		
+		$scope.users = {}; // Just a declaration
 
 		$scope.getEmployees = function(){
 			$http.get('../../api/employees')
@@ -512,9 +640,12 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			}
 		};
 
-		$scope.checkSelectedUser = function (userIndex) {
-			$scope.selectedUser = $scope.users[userIndex];
-			console.log($scope.selectedUser);
+		$scope.checkSelectedUser = function (sso) {
+			for(var i=0; i<$scope.users.length; i++){
+				if($scope.users[i].sso == sso){
+					$scope.selectedUser = $scope.users[i];
+				}
+			}
 		};
 
 		$scope.createEmployee = function () {
@@ -547,7 +678,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			});
 		};
 
-		$scope.myOpenModal = function(modal_id, modal_size, modal_backdrop){
+		$scope.updateUserModal = function(modal_id, modal_size, modal_backdrop){
 			console.log("myOpenModal");
 			$scope.modalInstance = $modal.open({
 				templateUrl: modal_id,
@@ -561,13 +692,43 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 		};
 	});
 
-app.controller('UpdateUserModalCtrl', function($scope, $modalInstance, selectedUser)
+app.controller('UpdateUserModalCtrl', ['$scope', '$http', '$modalInstance', 'selectedUser', function($scope, $http, $modalInstance, selectedUser)
 	{
 		console.log("UpdateUserModalCtrl");
 		$scope.selectedUser = selectedUser;
+		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+		$scope.typesSelected = $scope.selectedUser.types.split(',');
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.typesSelected.indexOf(item);
+
+			if (index > -1) {
+				$scope.typesSelected.splice(index, 1);
+			}
+			else {
+				$scope.typesSelected.push(item);
+			}
+		};
+
+		$scope.checkType = function(type){
+			return ($scope.types.indexOf(type) > -1);
+		};
+
+		$scope.updateUser = function () {
+			//Request
+			console.log("Called updateUser");
+			$scope.selectedUser.types = $scope.typesSelected.join();
+			$http.post('../../api/updateemployee', $scope.selectedUser) 
+			.success(function(data, status) {
+				console.log("updateUser ok");
+			})
+			.error(function(data, status) {
+				console.log("Controller updateUser Error");
+			});
+		};
 
 		$scope.close = function(){
 			$modalInstance.close();
 		};
 
-	});
+	}]);
