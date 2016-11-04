@@ -224,14 +224,21 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 		};
 
+		$scope.showLogoutButton =function () {
+			if ($rootScope.isLoggedIn == true) {
+				return true;
+			}
+			return false;
+		}
+
 
 		$scope.showDelete = function (menuItemTitle) {
 			// if (menuItemTitle == 'User Management') {
 			// 	return true;
 			// }
 			// return true;
-			console.log($rootScope.userPosition);
-			// console.log($isLoggedIn);
+			// console.log($rootScope.userPosition);
+			console.log($rootScope.isLoggedIn);
 
 			switch(menuItemTitle){
 				case 'Dashboard':
