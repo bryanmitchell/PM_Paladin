@@ -4,35 +4,40 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<div class="row">
-					<div class="btn-group">
+					<div class="col-md-6">
 						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="openModal('modal-3', null, 'static');">
 							Create User
+						</button>
+						<button type="button" class="btn btn-purple" ng-click="getEmployees();">
+							<span class="fa-rotate-right"></span>
 						</button>
 					</div>
 				</div>
 				<br>
 				<br>
-				<div class="col-md-12">
-				<table class="table table-bordered table-striped table-condensed table-hover">
-					<thead>
-						<tr>
-							<th>Employee Name</th>
-							<th>Position</th>
-							<th> </th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="user in users">
-							<td>{{user.firstName}} {{user.lastName}}</td>
-							<td>{{user.types}}</td>
-							<td>
-								<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');">Update</button>
-								<button type="button" class="btn btn-red" on-click="">Delete</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				</div> <!--end col-md-12-->
+				<div class="row">
+					<div class="col-md-12">
+					<table class="table table-bordered table-striped table-condensed table-hover">
+						<thead>
+							<tr>
+								<th>Employee Name</th>
+								<th>Position</th>
+								<th> </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="user in users">
+								<td>{{user.firstName}} {{user.lastName}}</td>
+								<td>{{user.types}}</td>
+								<td>
+									<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');">Update</button>
+									<button type="button" class="btn btn-red" on-click="">Delete</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					</div> <!--end col-md-12-->
+				</div>
 			</div> <!--end panel-body-->
 		</div> <!--end panel-->
 	</div> <!--end col-md-12-->
@@ -173,16 +178,20 @@
 		<div class="modal-body">
 			<div class="row"> <!-- Name Row -->
 				<div class="col-md-6">
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
 						<label for="field-1" class="control-label">Name</label>
-						<input type="text" class="form-control" id="field-1" placeholder="First Name" ng-model="selectedUser.firstName" />
+
+						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="selectedUser.firstName" ng-pattern="/^\w+\D$/" required />
+
+						<p ng-show="updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
 					</div>
 				</div>
 				
 				<div class="col-md-6">
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine }">
 						<label for="field-2" class="control-label">Last Name</label>
-						<input type="text" class="form-control" id="field-2" placeholder="Last Name" ng-model="selectedUser.lastName">
+						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="selectedUser.lastName" ng-pattern="/^\w+\D$/" required>
+						<p ng-show="updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
 					</div>
 				</div>
 			</div>
@@ -190,10 +199,12 @@
 			<div class="row"> <!-- Email Row -->
 				<div class="col-md-12">
 					
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.email.$invalid && !updateUserForm.email.$pristine }">
 						<label for="field-3" class="control-label">Email Address</label>
 						
-						<input type="email" class="form-control" id="field-3" placeholder="Email" ng-model="selectedUser.email">
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="selectedUser.email" required>
+
+						<p ng-show="updateUserForm.email.$invalid && !updateUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	
 					
 				</div>
@@ -201,16 +212,18 @@
 		
 			<div class="row"> <!-- Password Row -->
 				<div class="col-md-6">
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.password.$invalid && !updateUserForm.password.$pristine }">
 						<label for="field-4" class="control-label">Password</label>
-						<input type="password" class="form-control" id="field-4" placeholder="8-25 Characters" ng-model="selectedUser.password">
+						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="selectedUser.password" ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+						<p ng-show="updateUserForm.password.$error.pattern" class="help-block">Password must contain at least one number, one upper and lower case letter, and one special character.</p>
 					</div>
 				</div>
 				
 				<div class="col-md-6">
-					<div class="form-group">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.confirmPassword.$invalid && !updateUserForm.confirmPassword.$pristine }">
 						<label for="field-5" class="control-label">Confirm Password</label>
-						<input type="password" class="form-control" id="field-5" placeholder="Re-type Password" ng-model="confirmPassword">
+						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="selectedUser.password" required>
+						<p ng-show="updateUserForm.confirmPassword.$error.passwordVerify" class="help-block">Must match password in previous field.</p>
 					</div>	
 				</div>
 			</div>
@@ -218,11 +231,11 @@
 
 			<div class="row">
 				<div class="col-md-12">
-					<div class="form-group no-margin">
+					<div class="form-group no-margin" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
 						<label for="field-7" class="control-label">Type of User</label>
 						</br>
 						<div class="col-sm-4" ng-repeat="item in employeeTypes">
-							<input type="checkbox" value="{{item}}" ng-checked="typesSelected.indexOf(item) > -1" ng-click="toggleSelection(item)"> {{item}}
+							<input type="checkbox" value="{{item}}" name="type" ng-checked="typesSelected.indexOf(item) > -1" ng-click="toggleSelection(item)" required> {{item}}
 						</div>
 					</div>	
 				</div>

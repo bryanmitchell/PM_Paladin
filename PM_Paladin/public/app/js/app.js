@@ -17,8 +17,23 @@ var app = angular.module('xenon-app', [
 	'FBAngular'
 ]);
 
-app.run(function()
+app.run(['$rootScope', '$state', function($rootScope, $state, $location)
 {
+	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+	   
+	    if ($rootScope.isLoggedIn == false) {
+	    	$state.go('app.dashboard');
+	    }
+	    else {
+	    	//Aqui va el codigo que tu tienes en el showDelete del UIModalsTopCtrl
+	    	if ($rootScope.userPosition !== 'Administrator') {
+	    		$state.go('app.dashboard');
+	    	}
+	    }
+
+ 	});
+
+
 	// Page Loading Overlay
 	public_vars.$pageLoadingOverlay = jQuery('.page-loading-overlay');
 
@@ -26,7 +41,7 @@ app.run(function()
 	{
 		public_vars.$pageLoadingOverlay.addClass('loaded');
 	})
-});
+}]);
 
 
 app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASSETS){

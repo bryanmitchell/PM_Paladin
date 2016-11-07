@@ -410,4 +410,4 @@ angular.module('xenon.factory', []).
 				return arr;
 			}
 		};
-});
+	});
