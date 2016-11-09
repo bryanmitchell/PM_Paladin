@@ -22,7 +22,7 @@
 	</div>
 	
 	<div class="modal-body" ng-controller="UIModalsTopCtrl">
-		<form role="form" name="logInForm" novalidate>
+		<form role="form" name="logInForm" ng-submit="logInForm.$valid && validateLogIn()" novalidate>
 			<div class="form-group" ng-class="{ 'has-error': logInForm.sso.$error.required && !logInForm.sso.$pristine }">
 
 				<!-- SSO -->
@@ -39,9 +39,9 @@
 				<!-- <p ng-show="logInForm.password.$invalid" class="help-block">Enter a valid SSO.</p> -->
 			</div>	
 			<br>
-			<div class="text-right btn-toolbar">
-				<button class="btn-white btn" ng-click="currentModal.close();">Close</button>
-				<button class="btn-info btn" ng-click="currentModal.dismiss(); validateLogIn();" ng-disabled="logInForm.$invalid">Log In</button> 
+
+			<div class="modal-footer">
+				<button type="submit" class="btn-info btn" ng-click="currentModal.dismiss();" ng-disabled="logInForm.$invalid">Log In</button> 
 			</div>	
 		</form>
 	</div>

@@ -269,11 +269,8 @@
 
 						<!-- Engineer in charge -->
 						<label for="field-3" class="control-label">Engineer in Charge</label>
-						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" required>
+						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" ng-options="(user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Engineer'}" required>
 						  <option value="">--- Select from list ---</option>
-						  <option value=1>1</option>
-						  <option value=2>2</option>
-						  <option value=3>3</option>
 						</select>				
 					</div>
 				</div>
@@ -394,11 +391,8 @@
 				</div>
 
 				<div class="col-md-1">
-					<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="technician" required>
+					<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="technician" ng-options="(user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Technician'}" required>
 						<option value="">--- Select from list ---</option>
-						<option value=1>Saab</option>
-						<option value=2>Opel</option>
-						<option value=3>Audi</option>
 					</select>				
 				</div>	
 			</div>

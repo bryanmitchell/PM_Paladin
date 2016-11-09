@@ -201,6 +201,9 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 		};
 
+		$rootScope.userSSO = $scope.logInUser.password;
+
+
 		$scope.showLogoutButton =function () {
 			if ($rootScope.isLoggedIn == true) {
 				return true;
@@ -406,6 +409,8 @@ app.controller('EquipmentMgmtCtrl', function($scope, $q, $http, $modal)
 				console.log("Error");
 			});
 
+
+
 		$scope.date = new Date();
 		console.log($scope.date);
 
@@ -508,6 +513,19 @@ app.controller('EquipmentCreateCtrl', function($scope, $http)
 			'ioAddress': '',
 			'employeeSso': ''
 		};
+
+		$scope.users = {}; // Just a declaration
+		$scope.userInCharge = {};
+
+		$http.get('../../api/employees')
+			.success(function (data) {
+				console.log("empleados");
+				$scope.users = data;
+				//$scope.userInCharge = $scope.users.firstName + $scope.users.lastName;
+				//console.log($scope.userInCharge);
+			}).error(function (data, status) {
+				alert();
+			});	
 
 		$scope.createLine = function () {
 			//Request
