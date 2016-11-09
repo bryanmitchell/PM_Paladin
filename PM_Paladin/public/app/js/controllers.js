@@ -2,30 +2,6 @@
 
 var app = angular.module('xenon.controllers', []);
 
-app.controller('LoginCtrl', function($scope, $rootScope)
-	{
-		$rootScope.isLoginPage        = true;
-		$rootScope.isLightLoginPage   = false;
-		$rootScope.isLockscreenPage   = false;
-		$rootScope.isMainPage         = false;
-	});
-
-app.controller('LoginLightCtrl', function($scope, $rootScope)
-	{
-		$rootScope.isLoginPage        = true;
-		$rootScope.isLightLoginPage   = true;
-		$rootScope.isLockscreenPage   = false;
-		$rootScope.isMainPage         = false;
-	});
-
-app.controller('LockscreenCtrl', function($scope, $rootScope)
-	{
-		$rootScope.isLoginPage        = false;
-		$rootScope.isLightLoginPage   = false;
-		$rootScope.isLockscreenPage   = true;
-		$rootScope.isMainPage         = false;
-	});
-
 app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $layoutToggles, $pageLoadingBar, Fullscreen)
 	{
 		$rootScope.isLoginPage        = false;
@@ -191,7 +167,7 @@ app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $time
 		ps_init(); // perfect scrollbar for sidebar
 	});
 
-app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http)
+app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http, $location)
 	{
 		// Used to be done as a function in app.js state('app')
 		$rootScope.isLoginPage        = false;
@@ -213,6 +189,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 			$http.post('../../api/login', $scope.logInUser) 
 			.success(function(data, status) {
 				console.log("Log In");
+				console.log(data);
 				$rootScope.isLoggedIn = true;
 				console.log(data[0].types);
 				$rootScope.userPosition = data[0].types.split(',');
@@ -223,6 +200,20 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 			});
 
 		};
+
+		$scope.showLogoutButton =function () {
+			if ($rootScope.isLoggedIn == true) {
+				return true;
+			}
+			return false;
+		}
+
+		$scope.logout = function () {
+			$rootScope.isLoggedIn = false;
+			$rootScope.userPosition = '';
+			$scope.showLogoutButton();
+			$location.path('app/dashboard').replace();
+		}
 
 
 		$scope.showDelete = function (menuItemTitle) {
@@ -283,12 +274,16 @@ app.controller('DashboardCtrl', function($scope)
 
 app.controller('MaintConfCtrl', function($scope, $http) 
 	{
-		$http.post('../../api/confirmtasks', {'Sso': 1})
-		.success(function (data) {
-			$scope.tasks = data;
-		}).error(function (data, status) {
-			alert();
-		});
+		$scope.getConfirmTasks = function () {
+			$http.post('../../api/confirmtasks', {'sso': 1})
+			.success(function (data) {
+				$scope.tasks = data;
+			}).error(function (data, status) {
+				alert();
+			});
+		};	
+		
+		$scope.getConfirmTasks();	
 
 		$scope.selection = [];
 
@@ -340,12 +335,17 @@ app.controller('MaintConfCtrl', function($scope, $http)
 app.controller('MaintApprCtrl', function($scope, $http) 
 	{
 		$scope.selection = [];
-		$http.post('../../api/approvetasks', {'Sso': 1})
-		.success(function (data) {
-			$scope.tasks = data;
-		}).error(function (data, status) {
-			alert();
-		});
+
+		$scope.getApproveTasks = function () {
+			$http.get('../../api/approvetasks', {'sso': 1})
+			.success(function (data) {
+				$scope.tasks = data;
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+		
+		$scope.getApproveTasks();
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -677,6 +677,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			.error(function(data, status) {
 				console.log("Error");
 			});
+			$scope.getEmployees();
 		}
 
 		$scope.sendEmail = function () {

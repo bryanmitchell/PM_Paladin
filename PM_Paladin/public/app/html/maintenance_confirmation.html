@@ -11,7 +11,6 @@
 				<div class="row">
 
 					<div class="col-sm-6">
-						{{tasks}}
 						<table class="table table-bordered table-striped table-condensed table-hover">
 							<thead>
 								<tr>
@@ -42,7 +41,11 @@
 					<div class="col-sm-6">
 						<button type="button" class="btn btn-warning" ng-click="sendEmail('partial'); uncheckBoxes();">Partially Confirm</button>
 						<button type="submit" class="btn btn-success" ng-click="sendEmail('full'); uncheckBoxes();">Fully Confirm</button>
+						<button type="submit" class="btn btn-purple pull-right" ng-click="getConfirmTasks();">
+							<span class="fa-rotate-right"></span>
+						</button>
 					</div>
+				</div>
 			</div>
 			
 		</div>

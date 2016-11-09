@@ -1,5 +1,6 @@
 angular.module('xenon.directives', []).
 
+	//Verify confirm password matches password
 	directive('passwordVerify', function () {
 		return {
         require: "ngModel",
