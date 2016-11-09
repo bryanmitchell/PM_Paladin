@@ -60,7 +60,7 @@ exports.getEmployees = function(cp, res){
 		FROM Employee e 
 		INNER JOIN (
 			SELECT DISTINCT st2.Sso AS [Sso],
-				STUFF((SELECT ',' + st1.EmployeeRole AS [text()]
+				STUFF((SELECT ',' + st1.EmpRole AS [text()]
 					FROM EmployeeRole st1
 					WHERE st1.sso = st2.sso
 					FOR XML PATH('')
@@ -150,19 +150,11 @@ exports.getApprovalTasks = function(cp, req, res){
 exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	var pwd = req.body.password;
-
+	console.log(bcrypt.hashSync(pwd, salt));
 	var query = `
-		SELECT 
-			-- Boolean for user exists and password correct
-			CASE WHEN EXISTS (
-				SELECT *
-				FROM Employee e1 
-				WHERE e1.Sso = ${sso} 
-				AND e1.PasswordHash = '${bcrypt.hashSync(pwd, salt)}'
-			)
-			THEN CAST(1 AS BIT)
-			ELSE CAST(0 AS BIT) END AS [success]
-			,typeList.types 
+		SELECT e.Sso AS [sso]
+			,e.PasswordHash AS [hash]
+			,typeList.types AS [types]
 		FROM Employee e 
 		INNER JOIN (
 			-- SSO and stringified list of types
@@ -178,7 +170,17 @@ exports.getEmployeePassword = function(cp, req, res){
 		ON e.Sso = typeList.Sso 
 		WHERE e.Sso = ${sso};`;
 	// Return Boolean (user exists, password works) and position string
-	runQuery(query, cp, res);
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query success!");
+			res.send({
+				'success': bcrypt.compareSync(pwd, recordset[0].hash),
+				'types': recordset[0].types,
+			});
+		}
+	});
+	// runQuery(query, cp, res);
 };
 
 exports.getLines = function(cp, res){
@@ -215,7 +217,7 @@ exports.getWorkstations = function(cp, res){
 // TODO Assumes tool assigned to ONE person
 exports.getTools = function(cp, res){
 	runQuery(`
-		SELECT tws.workstationID AS [wsID]
+		SELECT t.WorkstationID AS [wsID]
 			,t.ToolID AS [toolID]
 			,t.ToolName AS [toolName] 
 			,t.ToolType AS [toolType] 
@@ -537,5 +539,59 @@ exports.deleteEmployee = function(cp, req, res){
 			console.log(err);
 		}
 		else{console.log("Query success!");}
+	});
+};
+
+
+
+
+
+exports.setPartialConfirm = function(cp, req, res){
+	var r = req.body;
+	var query = `
+		UPDATE [dbo].[Task]
+		SET [TaskStatus] = 'ConfirmPartial'
+		WHERE TaskID IN (${tasks.toString()})
+	`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setPartialConfirm' success!");}
+	});
+};
+
+exports.setFullConfirm = function(cp, req, res){
+	var r = req.body;
+	var query = `
+		UPDATE [dbo].[Task]
+		SET [TaskStatus] = 'ApprovePending'
+		WHERE TaskID IN (${tasks.toString()})
+	`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setFullConfirm' success!");}
+	});	
+};
+
+exports.setApprove = function(cp, req, res){
+	var r = req.body;
+	var query = `
+		UPDATE [dbo].[Task]
+		SET [TaskStatus] = 'OnTime'
+			,[LastCompleted] = GETDATE()
+		WHERE TaskID IN (${tasks.toString()});
+		
+		UPDATE [dbo].[TaskLog]
+		SET [DateFinished] = SETDATE()
+		WHERE LogID IN 
+			SELECT [tsk].[LastLog]
+			FROM [dbo].[Task] AS [tsk]
+			WHERE [tsk].[TaskID] IN (${tasks.toString()})
+	`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setApprove' success!");}
 	});
 };

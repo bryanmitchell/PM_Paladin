@@ -1,4 +1,4 @@
-module.exports = function(cp, passport){
+module.exports = function(cp){
 	var express = require('express');
 	var router = express.Router();
 
@@ -28,32 +28,32 @@ module.exports = function(cp, passport){
 		});
 	};
 
-	var isLoggedIn = function(req, res, next) {
-		if (req.isAuthenticated())
-			return next(); // if user authenticated in the session, carry on
-		res.redirect('/'); // if they aren't redirect them to the home page
-	};
-	
-	router.route('/login')
-		.post(passport.authenticate('local-login', {
-				successRedirect : '/', // redirect to the secure profile section
-				failureRedirect : '/', // redirect back to the signup page if there is an error
-				failureFlash : true // allow flash messages
-			}),
-			function(req, res){
-				if (req.body.remember) {
-					req.session.cookie.maxAge = 1000 * 60 * 3;
-				} else {
-					req.session.cookie.expires = false;
-				}
-				res.redirect('/');
-			});
+	// var isLoggedIn = function(req, res, next) {
+	// 	if (req.isAuthenticated())
+	// 		return next(); // if user authenticated in the session, carry on
+	// 	res.redirect('/'); // if they aren't redirect them to the home page
+	// };
 
-	router.route('/logout')
-		.get(function(req, res) {
-			req.logout();
-			res.redirect('/');
-		});
+	// router.route('/login')
+	// 	.post(passport.authenticate('local-login', {
+	// 			successRedirect : '/', // redirect to the secure profile section
+	// 			failureRedirect : '/', // redirect back to the signup page if there is an error
+	// 			failureFlash : true // allow flash messages
+	// 		}),
+	// 		function(req, res){
+	// 			if (req.body.remember) {
+	// 				req.session.cookie.maxAge = 1000 * 60 * 3;
+	// 			} else {
+	// 				req.session.cookie.expires = false;
+	// 			}
+	// 			res.redirect('/');
+	// 		});
+
+	// router.route('/logout')
+	// 	.get(function(req, res) {
+	// 		req.logout();
+	// 		res.redirect('/');
+	// 	});
 
 	// Getting Users for User Management
 	router.route('/employees')
@@ -71,7 +71,7 @@ module.exports = function(cp, passport){
 
 	// Getting tasks that require approval
 	router.route('/approvetasks')
-		.get(function(req, res){
+		.post(function(req, res){
 			console.log("router.route(/approvetasks)");
 			dbconn.getApprovalTasks(cp, req, res);
 		});
@@ -153,30 +153,47 @@ module.exports = function(cp, passport){
 			dbconn.updateEmployee(cp, req, res);
 		});
 
+	router.route('/confirmpartial')
+		.post(function(req, res){
+			console.log("router.route(/confirmpartial)");
+			dbconn.setPartialConfirm(cp, req, res);
+		});
+
+	router.route('/confirmfull')
+		.post(function(req, res){
+			console.log("router.route(/confirmfull)");
+			dbconn.setFullConfirm(cp, req, res);
+		});
+
+	router.route('/approve')
+		.post(function(req, res){
+			console.log("router.route(/approve)");
+			dbconn.setApprove(cp, req, res);
+		});
 	/**
 	EMAIL ROUTES
 	**/
 
 	//Partial Confirmation Email
-	router.route('/partial')
+	router.route('/emailpartial')
 		.post(function(req, res){
 			sendEmail(emailgen.partiallyConfirmedEmail(req), res);
 		});
 
 	//Full Confirmation Email
-	router.route('/full')
+	router.route('/emailfull')
 		.post(function(req, res){
 			sendEmail(emailgen.fullyConfirmedEmail(req), res);
 		});
 
 	//Maintenance Approval Email
-	router.route('/approve')
+	router.route('/emailapprove')
 		.post(function(req, res){
 			sendEmail(emailgen.approvedEmail(req), res);
 		});
 
 	//New User Email
-	router.route('/newUser')
+	router.route('/emailnewuser')
 		.post(function(req, res){
 			sendEmail(emailgen.newUserEmail(req), res);
 		});

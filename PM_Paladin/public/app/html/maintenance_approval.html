@@ -3,14 +3,12 @@
 <!-- Table Styles -->
 <div class="row">
 	<div class="col-md-12">
-	
 		<div class="panel panel-default">
-
 			<div class="panel-body">
-			
+				
+				<!-- TABLE -->
 				<div class="row">
-
-					<div class="col-sm-6">
+					<div class="col-sm-8">
 						<table class="table table-bordered table-striped table-condensed table-hover">
 							<thead>
 								<tr>
@@ -34,19 +32,19 @@
 								</tr>
 							</tbody>
 						</table>
-					
 					</div>
 				</div>
+
+				<!-- BUTTONS -->
 				<div class="row">
 					<div class="col-sm-6">
-						<button type="button" class="btn btn-success" ng-click="sendEmail() uncheckBoxes();">Approve</button>
+						<button type="button" class="btn btn-success" ng-click="approveTasks(); sendEmail(); uncheckBoxes();" ng-disabled="selection.length==0">Approve</button>
 						<button type="submit" class="btn btn-purple pull-right" ng-click="getApproveTasks();">
-							<span class="fa-rotate-right"></span>
+							<span class="fa-rotate-right"></span> <!-- REFRESH -->
 						</button>
 					</div>
+				</div>
 			</div>
-			
 		</div>
-		
 	</div>
 </div>

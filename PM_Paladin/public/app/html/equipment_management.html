@@ -133,9 +133,21 @@
 						<label for="field-1" class="control-label">Line Name</label>
 						<select style="width: 150px;" name="lineName" ng-model="lineInfo.lineName" required>
 						  <option value="">--- Select from list ---</option>
-						  <option value="saab">Saabdjdbnjdwjdnjwdkwebjwbefjkebw kjc dkbewkbfjkewbcejkwbkj</option>
+						  <option value="saab">Saab</option>
 						  <option value="opel">Opel</option>
 						  <option value="audi">Audi</option>
+						</select>				
+					</div>		
+				</div>
+			</div>
+
+			<!-- REMOTE IO ADDRESS -->
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group" ng-class="{ 'has-error': lineForm.remoteIoAddress.$pristine }">
+						<label for="field-1" class="control-label">Remote IO Address</label>
+						<select style="width: 150px;" name="remoteIoAddress" ng-model="lineInfo.remoteIoAddresses" ng-options="address for address in remoteIoAddresses" required>
+							<option value="" disabled selected>--- Select from list ---</option>
 						</select>				
 					</div>		
 				</div>

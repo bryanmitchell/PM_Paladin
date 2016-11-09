@@ -12,9 +12,9 @@ var session = require('express-session')
 
 require('dotenv').config();
 
-var passport = require('passport');
-var flash    = require('connect-flash');
-require('./routes/passport')(cp, passport); // pass passport for configuration
+// var passport = require('passport');
+// var flash    = require('connect-flash');
+// require('./routes/passport')(cp, passport); // pass passport for configuration
 
 
 /**
@@ -59,16 +59,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({ secret: process.env.SECRET } )); // session secret
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+// app.use(session({ secret: process.env.SECRET } )); // session secret
+// app.use(passport.initialize());
+// app.use(passport.session()); // persistent login sessions
+// app.use(flash()); // use connect-flash for flash messages stored in session
 
 /**
  * Set routers to URIs
  */
 var index = require('./routes/index');
-var api = require('./routes/api')(cp,passport);
+var api = require('./routes/api')(cp);
 app.use('/', index);
 app.use('/api', api);
 

@@ -18,21 +18,21 @@ var app = angular.module('xenon-app', [
 ]);
 
 
-app.run(['$rootScope', '$state', function($rootScope, $state, $location)
+app.run(['$rootScope', '$state', '$location', '$window', function($rootScope, $state, $location, $window)
 	{
 		$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-		   
-		    if ($rootScope.isLoggedIn == false) {
-		    	$state.go('app.dashboard');
-		    }
-		    else {
-		    	//Aqui va el codigo que tu tienes en el showDelete del UIModalsTopCtrl
-		    	if ($rootScope.userPosition !== 'Administrator') {
-		    		$state.go('app.dashboard');
-		    	}
-		    }
-
-	 	});
+			if (!$rootScope.isLoggedIn) {
+				$state.go('app.dashboard');
+			}
+			else {
+				var isAdmin = $rootScope.userPosition.indexOf('Administrator') > -1;
+				var isEng = $rootScope.userPosition.indexOf('Engineer') > -1;
+				var isTech = $rootScope.userPosition.indexOf('Technician') > -1;
+				if (!isAdmin) {
+					$state.go('app.dashboard');
+				}
+			}
+		});
 
 		// Page Loading Overlay
 		public_vars.$pageLoadingOverlay = jQuery('.page-loading-overlay');

@@ -183,25 +183,18 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		};
 
 		$scope.validateLogIn = function () {
-			console.log("entre");
-			console.log($scope.logInUser);
-
-			$http.post('../../api/login', $scope.logInUser) 
+			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
 			.success(function(data, status) {
-				console.log("Log In");
-				console.log(data);
-				$rootScope.isLoggedIn = true;
-				console.log(data[0].types);
-				$rootScope.userPosition = data[0].types.split(',');
-				console.log(data);
+				$rootScope.isLoggedIn = data.success;
+				if($rootScope.isLoggedIn){
+					$rootScope.userPosition = data.types.split(',');
+					$rootScope.userSSO = $scope.logInUser.sso;
+				}
 			})
 			.error(function(data, status) {
 				console.log("Error");
 			});
-
 		};
-
-		$rootScope.userSSO = $scope.logInUser.password;
 
 
 		$scope.showLogoutButton =function () {
@@ -275,10 +268,10 @@ app.controller('DashboardCtrl', function($scope)
 		}];
 	});
 
-app.controller('MaintConfCtrl', function($scope, $http) 
+app.controller('MaintConfCtrl', function($scope, $rootScope, $http) 
 	{
 		$scope.getConfirmTasks = function () {
-			$http.post('../../api/confirmtasks', {'sso': 1})
+			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
 				$scope.tasks = data;
 			}).error(function (data, status) {
@@ -307,13 +300,31 @@ app.controller('MaintConfCtrl', function($scope, $http)
 			})
 		};
 
+		$scope.confirmFull = function(){
+			$http.post('../../api/confirmfull', $scope.selection)
+			.success(function (data) {
+				console.log('confirmFull');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
+		$scope.confirmPartial = function(){
+			$http.post('../../api/confirmpartial', $scope.selection)
+			.success(function (data) {
+				console.log('confirmPartial');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
 		$scope.sendEmail = function (type) {
 			console.log("TEST");
 			//Request
 			if (type == "partial") {
 				console.log("Partial");
 				
-				$http.post('../../api/partial', $scope.selection) 
+				$http.post('../../api/emailpartial', $scope.selection) 
 				.success(function(data, status) {
 					console.log("Sent ok");
 				})
@@ -324,7 +335,7 @@ app.controller('MaintConfCtrl', function($scope, $http)
 			else {
 				console.log("Full");
 				
-				$http.post('../../api/full', $scope.selection) 
+				$http.post('../../api/emailfull', $scope.selection) 
 				.success(function(data, status) {
 					console.log("Sent ok");
 				})
@@ -335,12 +346,12 @@ app.controller('MaintConfCtrl', function($scope, $http)
 		};
 	});
 
-app.controller('MaintApprCtrl', function($scope, $http) 
+app.controller('MaintApprCtrl', function($scope, $rootScope, $http) 
 	{
 		$scope.selection = [];
 
 		$scope.getApproveTasks = function () {
-			$http.get('../../api/approvetasks', {'sso': 1})
+			$http.post('../../api/approvetasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
 				$scope.tasks = data;
 			}).error(function (data, status) {
@@ -367,11 +378,19 @@ app.controller('MaintApprCtrl', function($scope, $http)
 			})
 		};
 
+		$scope.approveTasks = function(){
+			$http.post('../../api/approve', $scope.selection)
+			.success(function (data) {
+				console.log('approveTasks');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
 		$scope.sendEmail = function () {
-			
 			console.log("sendEmail from controller.js");
 			//Request
-			$http.post('../../api/approve', $scope.selection) 
+			$http.post('../../api/emailapprove', $scope.selection) 
 			.success(function(data, status) {
 				console.log("Sent ok");
 			})
@@ -492,10 +511,12 @@ app.controller('EquipmentCreateCtrl', function($scope, $http)
 	{
 		$scope.lineInfo = {
 			'lineName': '',
+			'remoteIoAddress': '',
 			'supervisorFirstName': '',
 			'supervisorLastName': '',
 			'supervisorEmail': ''
 		};
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
 		$scope.workstationInfo = {
 			'workstationName': '',
@@ -587,7 +608,6 @@ app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selected
 app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS', function($scope, $http, $modalInstance, selectedWS)
 	{
 		$scope.workstationInfo = selectedWS;
-		console.log($scope.workstationInfo);
 
 		$scope.updateWorkstation = function () {
 			//Request
@@ -610,7 +630,6 @@ app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS
 app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedTool', function($scope, $http, $modalInstance, selectedTool)
 	{
 		$scope.toolInfo = selectedTool;
-		console.log($scope.toolInfo);
 
 		$scope.updateTool = function () {
 			//Request
@@ -682,7 +701,6 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 		};
 
 		$scope.createEmployee = function () {
-			console.log($scope.userInfo);
 			console.log("createEmployee from controller.js")
 
 			//Request
@@ -699,11 +717,10 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 		}
 
 		$scope.sendEmail = function () {
-			console.log($scope.userInfo);
 			console.log("sendEmail from controller.js");
 			
 			//Request
-			$http.post('../../api/newUser', $scope.userInfo) 
+			$http.post('../../api/emailnewuser', $scope.userInfo) 
 			.success(function(data, status) {
 				console.log("Sent ok");
 			})
