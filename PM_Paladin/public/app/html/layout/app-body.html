@@ -1,27 +1,20 @@
+<!-- SIDEBAR MENU -->
 <div class="sidebar-menu" ng-if="layoutOptions.sidebar.isVisible" ng-class="{'collapsed': layoutOptions.sidebar.isCollapsed, 'toggle-others': layoutOptions.sidebar.toggleOthers, 'fixed': layoutOptions.sidebar.isFixed && layoutOptions.container.isBoxed == false}">
-
 	<div class="sidebar-menu-inner">
-
 		<sidebar-logo ng-if="layoutOptions.horizontalMenu.isVisible == false"></sidebar-logo>
-
 		<sidebar-profile ng-if="layoutOptions.sidebar.userProfile"></sidebar-profile>
-
 		<sidebar-menu></sidebar-menu>
-
 	</div>
-
 </div>
 
+<!-- BODY -->
 <div class="main-content">
-
-	<user-info-navbar ng-show="layoutOptions.horizontalMenu.isVisible == false" ng-click="openModal('modal-2', 'sm');"></user-info-navbar>
-
+	<user-info-navbar ng-show="layoutOptions.horizontalMenu.isVisible == false"></user-info-navbar>
 	<ui-view class="main-content-view"></ui-view>
-
 	<site-footer></site-footer>
-
 </div>
 
+<!-- LOGIN MODAL -->
 <script type="text/ng-template" id="modal-2">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
@@ -30,37 +23,26 @@
 	
 	<div class="modal-body" ng-controller="UIModalsTopCtrl">
 		<form role="form" name="logInForm" novalidate>
-
 			<div class="form-group" ng-class="{ 'has-error': logInForm.sso.$error.required && !logInForm.sso.$pristine }">
 
 				<!-- SSO -->
 				<label for="field-1" class="control-label">SSO</label>
-				
 				<input type="text" name="sso" class="form-control" ng-model="logInUser.sso" placeholder="SSO" required>
 
 				<!-- si el query tirar de sso not found <p ng-show="logInForm.sso.$invalid" class="help-block">Enter a valid SSO.</p> -->
 			</div>
-
 			</br>
-
 			<div class="form-group" ng-class="{ 'has-error' : logInForm.password.$invalid && !logInForm.password.$pristine }">
-
 				<!-- Password -->
 				<label for="field-1" class="control-label">Password</label>
-				
 				<input type="password" name="password" class="form-control" ng-model="logInUser.password" placeholder="Password" required>
-
 				<!-- <p ng-show="logInForm.password.$invalid" class="help-block">Enter a valid SSO.</p> -->
 			</div>	
-
 			<br>
-
 			<div class="text-right btn-toolbar">
 				<button class="btn-white btn" ng-click="currentModal.close();">Close</button>
-
 				<button class="btn-info btn" ng-click="currentModal.dismiss(); validateLogIn();" ng-disabled="logInForm.$invalid">Log In</button> 
 			</div>	
 		</form>
 	</div>
-	
 </script>

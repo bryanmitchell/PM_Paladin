@@ -199,7 +199,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
 		$rootScope.isLoggedIn		  = false;
-		$rootScope.userPosition		  = '';
+		$rootScope.userPosition		  = [];
 
 		$scope.logInUser = {
 			'sso': '',
@@ -210,12 +210,12 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 			console.log("entre");
 			console.log($scope.logInUser);
 
-			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
+			$http.post('../../api/login', $scope.logInUser) 
 			.success(function(data, status) {
 				console.log("Log In");
 				$rootScope.isLoggedIn = true;
 				console.log(data[0].types);
-				$rootScope.userPosition = data[0].types;
+				$rootScope.userPosition = data[0].types.split(',');
 				console.log(data);
 			})
 			.error(function(data, status) {
@@ -226,42 +226,20 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 
 		$scope.showDelete = function (menuItemTitle) {
-			// if (menuItemTitle == 'User Management') {
-			// 	return true;
-			// }
-			// return true;
-			console.log($rootScope.userPosition);
-			// console.log($isLoggedIn);
-
+			var isAdmin = $rootScope.userPosition.indexOf('Administrator') > -1;
+			var isEng = $rootScope.userPosition.indexOf('Engineer') > -1;
+			var isTech = $rootScope.userPosition.indexOf('Technician') > -1;
 			switch(menuItemTitle){
 				case 'Dashboard':
 					return true;
 				case 'Equipment Management':
-					if ($rootScope.userPosition == 'Administrator') {
-						return true;
-					}
-					else if ($rootScope.userPosition == 'Engineer') {
-						return true;
-					}
-					else if ($rootScope.userPosition == 'Technician') {
-						return true;
-					}
-					return false;
+					return isAdmin || isEng || isTech;
 				case 'User Management':
-					if ($rootScope.userPosition == 'Administrator') {
-						return true;
-					}
-					return false;
+					return isAdmin;
 				case 'Maintenance Confirmation':
-					if ($rootScope.userPosition == 'Technician'){
-						return true;
-					}
-					return false;
+					return isTech;
 				case 'Maintenance Approval':
-					if ($rootScope.userPosition == 'Engineer'){
-						return true;
-					}
-					return false;
+					return isEng;
 			}
 		};
 
@@ -305,7 +283,7 @@ app.controller('DashboardCtrl', function($scope)
 
 app.controller('MaintConfCtrl', function($scope, $http) 
 	{
-		$http.get('../../api/confirmtasks')
+		$http.post('../../api/confirmtasks', {'Sso': 1})
 		.success(function (data) {
 			$scope.tasks = data;
 		}).error(function (data, status) {
@@ -362,7 +340,7 @@ app.controller('MaintConfCtrl', function($scope, $http)
 app.controller('MaintApprCtrl', function($scope, $http) 
 	{
 		$scope.selection = [];
-		$http.get('../../api/approvetasks')
+		$http.post('../../api/approvetasks', {'Sso': 1})
 		.success(function (data) {
 			$scope.tasks = data;
 		}).error(function (data, status) {

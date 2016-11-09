@@ -8,28 +8,26 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
+var session = require('express-session')
+
+require('dotenv').config();
+
+var passport = require('passport');
+var flash    = require('connect-flash');
+require('./routes/passport')(cp, passport); // pass passport for configuration
 
 
 /**
  * Create a connection pool to MS SQL Server database 
  */
 var sql = require('mssql');
-require('dotenv').config();
 var sqlConfig = {
-  user: process.env.SQL_USER,  
-  password: process.env.SQL_PASSWORD,  
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
   server: process.env.SQL_SERVER,
   database: process.env.SQL_DB
 };
-// var cp = new sql.Connection(sqlConfig);
-// cp.connect(function(err){
-//   if (err){
-//     console.log("Connection to db failed..."); 
-//     console.log(err);
-//   } else {
-//     console.log("Connection to db success!");
-//   }
-// });
+
 var cp = new sql.Connection(sqlConfig, function(err){
   if (err){
     console.log("Connection to db failed..."); 
@@ -40,13 +38,6 @@ var cp = new sql.Connection(sqlConfig, function(err){
     cp.connect();
   }
 });
-
-
-/**
- * Get routers 
- */
-var index = require('./routes/index');
-var api = require('./routes/api')(cp);
 
 /**
  * Create Express app
@@ -59,19 +50,25 @@ var app = express();
  */
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); // set up ejs for templating
 
 // middleware
 app.use(logger('dev'));
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser()); // read cookies (needed for auth)
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({ secret: process.env.SECRET } )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 
 /**
  * Set routers to URIs
  */
+var index = require('./routes/index');
+var api = require('./routes/api')(cp,passport);
 app.use('/', index);
 app.use('/api', api);
 

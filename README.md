@@ -39,6 +39,9 @@ C:\Users\You\PM_Paladin\PM_Paladin> npm install -g browserify
 C:\Users\You\PM_Paladin\PM_Paladin> npm install dotenv --save
 C:\Users\You\PM_Paladin\PM_Paladin> npm install mssql
 C:\Users\You\PM_Paladin\PM_Paladin> npm install bcryptjs
+C:\Users\You\PM_Paladin\PM_Paladin> npm install connect-flash --save
+C:\Users\You\PM_Paladin\PM_Paladin> npm install express-session --save
+npm install passport --save
 ```
 
 ## To start your server:

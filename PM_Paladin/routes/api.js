@@ -1,4 +1,4 @@
-module.exports = function(cp){
+module.exports = function(cp, passport){
 	var express = require('express');
 	var router = express.Router();
 
@@ -6,7 +6,7 @@ module.exports = function(cp){
 	var salt = bcrypt.genSaltSync(10);
 
 	var emailgen = require('./emailgen');
-	var dbconn = require('./dbconn');
+	var dbconn = require('./dbconn2');
 
 	require('dotenv').config();
 	var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
@@ -27,7 +27,34 @@ module.exports = function(cp){
 			return res.sendStatus(200);
 		});
 	};
+
+	var isLoggedIn = function(req, res, next) {
+		if (req.isAuthenticated())
+			return next(); // if user authenticated in the session, carry on
+		res.redirect('/'); // if they aren't redirect them to the home page
+	};
 	
+	router.route('/login')
+		.post(passport.authenticate('local-login', {
+				successRedirect : '/', // redirect to the secure profile section
+				failureRedirect : '/', // redirect back to the signup page if there is an error
+				failureFlash : true // allow flash messages
+			}),
+			function(req, res){
+				if (req.body.remember) {
+					req.session.cookie.maxAge = 1000 * 60 * 3;
+				} else {
+					req.session.cookie.expires = false;
+				}
+				res.redirect('/');
+			});
+
+	router.route('/logout')
+		.get(function(req, res) {
+			req.logout();
+			res.redirect('/');
+		});
+
 	// Getting Users for User Management
 	router.route('/employees')
 		.get(function(req, res){
@@ -37,16 +64,16 @@ module.exports = function(cp){
 
 	// Getting Tasks that require confirmation (partial or full)
 	router.route('/confirmtasks')
-		.get(function(req, res){
+		.post(function(req, res){
 			console.log("router.route(/confirmtasks)");
-			dbconn.getConfirmationTasks(cp, res, 2);
+			dbconn.getConfirmationTasks(cp, req, res);
 		});
 
 	// Getting tasks that require approval
 	router.route('/approvetasks')
 		.get(function(req, res){
 			console.log("router.route(/approvetasks)");
-			dbconn.getApprovalTasks(cp, res, 1);
+			dbconn.getApprovalTasks(cp, req, res);
 		});
 
 	// Getting tools and their workstations and lines

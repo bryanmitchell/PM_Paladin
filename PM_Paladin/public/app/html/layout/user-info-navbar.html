@@ -4,7 +4,8 @@
 	<ul class="user-info-menu right-links list-inline list-unstyled">
 
 		<form class="navbar-form navbar-left">
-			<button type="submit" class="btn btn-info">Log In</button>
+			<button type="submit" class="btn btn-info" ng-click="openModal('modal-2', 'sm');" ng-hide="$rootScope.isLoggedIn">Log In</button>
+			<button type="submit" class="btn btn-info" ng-show="$rootScope.isLoggedIn">Log Out</button>
 		</form>
 
 	</ul>

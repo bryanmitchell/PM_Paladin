@@ -145,30 +145,31 @@ exports.getApprovalTasks = function(cp, res, empSso){
 exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	var pwd = req.body.password;
+	console.log(sso+pwd);
 	var query = `
-SELECT 
-	CASE WHEN EXISTS (
-		SELECT *
-		FROM Employee e1 
-		WHERE e1.sso = ${sso} 
-		AND e1.passwordHash = '${bcrypt.hashSync(pwd, salt)}'
-	)
-	THEN CAST(1 AS BIT)
-	ELSE CAST(0 AS BIT) END
-	,typeList.types 
-FROM Employee e 
-INNER JOIN (
-	SELECT DISTINCT st2.sso AS [sso],
-		STUFF((SELECT ',' + st1.employeeType AS [text()]
-			FROM EmployeeType st1
-			WHERE st1.sso = st2.sso
-			FOR XML PATH('')
-			), 1, 1, '' )
-		AS [types]
-	FROM EmployeeType st2
-) [typeList] 
-ON e.sso = typeList.sso 
-WHERE e.sso = ${sso};
+		SELECT 
+			CASE WHEN EXISTS (
+				SELECT *
+				FROM Employee e1 
+				WHERE e1.sso = ${sso} 
+				AND e1.passwordHash = '${bcrypt.hashSync(pwd, salt)}'
+			)
+			THEN CAST(1 AS BIT)
+			ELSE CAST(0 AS BIT) END AS [success]
+			,typeList.types 
+		FROM Employee e 
+		INNER JOIN (
+			SELECT DISTINCT st2.sso AS [sso],
+				STUFF((SELECT ',' + st1.employeeType AS [text()]
+					FROM EmployeeType st1
+					WHERE st1.sso = st2.sso
+					FOR XML PATH('')
+					), 1, 1, '' )
+				AS [types]
+			FROM EmployeeType st2
+		) [typeList] 
+		ON e.sso = typeList.sso 
+		WHERE e.sso = ${sso};
 `;
 	// Return Boolean (user exists, password works) and position string
 	runQuery(query, cp, res);
@@ -461,4 +462,26 @@ exports.updateEmployee = function(cp, req, res){
 			COMMIT TRANSACTION;`;
 	runPostQuery(query2, cp);
 	res.redirect('back');
+};
+
+
+
+exports.deleteLine = function(cp, req, res){
+
+};
+
+exports.deleteWorkstation = function(cp, req, res){
+	
+};
+
+exports.deleteTool = function(cp, req, res){
+	
+};
+
+exports.deleteEmployee = function(cp, req, res){
+	// if user in ToolAssignedTo, return error
+	// if user in WSAssignedTo, return error
+	
+	// Delete his roles, 
+
 };

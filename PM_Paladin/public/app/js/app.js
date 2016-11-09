@@ -17,8 +17,16 @@ var app = angular.module('xenon-app', [
 	'FBAngular'
 ]);
 
+// app.run(function($rootScope, $state)
 app.run(function()
 {
+	// $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+ //      if (toState.authenticate && !AuthService.isAuthenticated()){
+ //        // User isn’t authenticated
+ //        $state.transitionTo("login");
+ //        event.preventDefault(); 
+ //      }
+ //    });
 	// Page Loading Overlay
 	public_vars.$pageLoadingOverlay = jQuery('.page-loading-overlay');
 
@@ -60,24 +68,28 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			url: '/equipment_management',
 			templateUrl: appHelper.templatePath('equipment_management'),
 			controller: 'EquipmentMgmtCtrl',
+			authenticate: true
 		}).
 
 		state('app.user_management', {
 			url: '/user_management',
 			templateUrl: appHelper.templatePath('user_management'),
 			controller: 'UserMgmtCtrl',
+			authenticate: true
 		}).
 
 		state('app.maintenance_confirmation', {
 			url: '/maintenance_confirmation',
 			templateUrl: appHelper.templatePath('maintenance_confirmation'),
 			controller: 'MaintConfCtrl',
+			authenticate: true
 		}).
 
 		state('app.maintenance_approval', {
 			url: '/maintenance_approval',
 			templateUrl: appHelper.templatePath('maintenance_approval'),
 			controller: 'MaintApprCtrl',
+			authenticate: true
 		}).
 
 		// Logins and Lockscreen
@@ -122,6 +134,8 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 
 
 });
+
+// app.service('', function)
 
 
 app.constant('ASSETS', {
