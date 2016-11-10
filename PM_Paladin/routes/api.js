@@ -170,6 +170,38 @@ module.exports = function(cp){
 			console.log("router.route(/approve)");
 			dbconn.setApprove(cp, req, res);
 		});
+
+	router.route('/settoolactive')
+		.post(function(req, res){
+			console.log("router.route(/settoolactive)");
+			dbconn.setToolActive(cp, req, res);
+		});
+
+	router.route('/settoolinactive')
+		.post(function(req, res){
+			console.log("router.route(/settoolinactive)");
+			dbconn.setToolInactive(cp, req, res);
+		});
+
+	router.route('/gettooldates')
+		.get(function(req, res){
+			console.log("router.route(/gettooldates)");
+			dbconn.getToolDates(cp, res);
+		});
+
+	router.route('/getbarchartinfo')
+		.get(function(req, res){
+			console.log("router.route(/getbarchartinfo)");
+			dbconn.getBarChartInfo(cp, res);
+		});
+
+	router.route('/getpiechartinfo')
+		.get(function(req, res){
+			console.log("router.route(/getpiechartinfo)");
+			dbconn.getPieChartInfo(cp, res);
+		});
+
+
 	/**
 	EMAIL ROUTES
 	**/

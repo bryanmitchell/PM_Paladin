@@ -176,6 +176,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$rootScope.isMainPage         = true;
 		$rootScope.isLoggedIn		  = false;
 		$rootScope.userPosition		  = [];
+		$rootScope.buttonDisabled = false;
+		$rootScope.currentPageTitle = 'Dashboard';
 
 		$scope.logInUser = {
 			'sso': '',
@@ -246,8 +248,11 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 
 
-app.controller('DashboardCtrl', function($scope)
+app.controller('DashboardCtrl', function($scope, $rootScope)
 	{
+
+		$rootScope.currentPageTitle = 'Dashboard';
+
 		$scope.upcomingTools = [{
 			toolID: '1393',
 			toolName: 'Tool_1',
@@ -402,8 +407,11 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 
 
 
-app.controller('EquipmentMgmtCtrl', function($scope, $q, $http, $modal) 
+app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, $timeout) 
 	{
+
+		$rootScope.currentPageTitle = 'Equipment Management';
+
 		$http.get('../../api/lines') 
 			.success(function(data, status) {
 				$scope.lines = data;
@@ -503,6 +511,13 @@ app.controller('EquipmentMgmtCtrl', function($scope, $q, $http, $modal)
 		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedTool = index;
 			$scope.updateModal = $scope.updateToolModal;
+		};
+
+		$rootScope.disableButton = function(){
+			$rootScope.buttonDisabled=true;
+			$timeout(function(){
+				$rootScope.buttonDisabled=false;
+			},5000);
 		};
 
 	});

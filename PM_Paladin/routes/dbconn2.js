@@ -595,3 +595,85 @@ exports.setApprove = function(cp, req, res){
 		else{console.log("Query 'setApprove' success!");}
 	});
 };
+
+
+
+
+exports.setToolActive = function(cp,req,res){
+	var r = req.body;
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 1
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setActive' success!");}
+	});
+};
+
+exports.setToolInactive = function(cp,req,res){
+	var r = req.body;
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 0
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setInactive' success!");}
+	});
+};
+
+exports.getToolDates = function(cp,res){
+	var r = req.body;
+	var query=`
+	SELECT t.ToolID AS [toolID]
+		,t.ToolName AS [toolName]
+		,ws.WorkstationName AS [workstationName]
+		,pl.LineName AS [lineName]
+		,e.FirstName AS [firstName]
+		,e.LastName AS [lastName]
+		,dates.Dates AS [dates]
+	FROM Tool AS t
+	INNER JOIN Workstation AS ws
+	ON t.WorkstationID = ws.WorkstationID
+	INNER JOIN ProductionLine AS pl
+	ON ws.LineID = pl.LineID
+	INNER JOIN ToolAssignedTo AS tat
+	ON t.ToolID = tat.ToolID
+	INNER JOIN Employee AS e
+	ON tat.Sso = e.Sso
+	INNER JOIN (SELECT tsk.ToolID AS [ToolID], MAX(DATEADD(days,tsk.FrequencyDays,tsk.LastCompleted)) AS [Dates]
+		FROM Task AS tsk
+		GROUP BY tsk.ToolID) AS [dates]
+	ON dates.ToolID = t.ToolID`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'getUpcomingTools' success!");}
+	});
+};
+
+exports.getBarChartInfo = function(cp,res){
+	// Approved OnTime and PastDue during the last two weeks
+	var query=`
+	SELECT log.OnTime AS [onTime], COUNT(*)
+	FROM TaskLog AS [log]
+	WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
+	GROUP BY log.OnTime`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'getBarChartInfo' success!");}
+	});
+};
+
+exports.getPieChartInfo = function(cp,res){
+	// how many tasks TODAY are OnTime, Upcoming (14 days), PastDue
+	var query=`
+	SELECT tsk.TaskStatus AS [status], COUNT(*)
+	FROM Task AS tsk
+	GROUP BY tsk.TaskStatus`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'getPieChartInfo' success!");}
+	});
+};
+// 12096E5 (2 weeks in seconds)
