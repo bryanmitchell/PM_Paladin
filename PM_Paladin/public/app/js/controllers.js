@@ -248,33 +248,67 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 
 
-app.controller('DashboardCtrl', function($scope, $rootScope)
+app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 	{
 
 		$rootScope.currentPageTitle = 'Dashboard';
 
-		$scope.upcomingTools = [{
-			toolID: '1393',
-			toolName: 'Tool_1',
-			personInCharge: 'Isadora Duncan',
-			days: '14'
-		},
-		{
-			toolID: '2394',
-			toolName: 'Tool_2',
-			personInCharge: 'Juan Pachanga',
-			days: '7'
-		},
-		{
-			toolID: '3395',
-			toolName: 'Tool_3',
-			personInCharge: 'Pablo Pueblo',
-			days: '1'
-		}];
+		$http.get('../../api/gettooldates')
+			.success(function (data) {
+				$scope.upcomingTools = data;
+				console.log(data);
+			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/getpiechartinfo')
+			.success(function (data) {
+				$scope.pieChart = data;
+				console.log($scope.pieChart);
+				$scope.labelsPie = getLabels();
+  				$scope.dataPie = getCounts();
+  				console.log($scope.labelsPie);
+				console.log($scope.dataPie);
+
+  			}).error(function (data, status) {
+				alert();
+			});
+
+		var getCounts = function(){
+			var result = [];
+			for(var i=0; i<$scope.pieChart.length; i++){
+				result.push($scope.pieChart[i].count);
+			}
+			// console.log(result);
+			return result;
+		};
+		var getLabels = function(){
+			var result = [];
+			for(var i=0; i<$scope.pieChart.length; i++){
+				result.push($scope.pieChart[i].status);
+			}
+			// console.log(result);
+			return result;
+		};
+
+		$scope.labelsBar = ['2006', '2007', '2008', '2009', '2010', '2011', '2012']; 
+		$scope.seriesBar = ['Series A', 'Series B']; 
+		$scope.dataBar = [ 
+			[65, 59, 80, 81, 56, 55, 40], 
+			[28, 48, 40, 19, 86, 27, 90] 
+		]; 
+
+		// $scope.labelsPie = getLabels();
+  // 		$scope.dataPie = getCounts();
+
+		
+		
 	});
 
 app.controller('MaintConfCtrl', function($scope, $rootScope, $http) 
 	{
+		$rootScope.currentPageTitle = 'Maintenance Confirmation';
+
 		$scope.getConfirmTasks = function () {
 			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
@@ -353,6 +387,8 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 
 app.controller('MaintApprCtrl', function($scope, $rootScope, $http) 
 	{
+		$rootScope.currentPageTitle = 'Maintenance Approval';
+
 		$scope.selection = [];
 
 		$scope.getApproveTasks = function () {
@@ -524,6 +560,8 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 
 app.controller('EquipmentCreateCtrl', function($scope, $http)
 	{
+		$rootScope.currentPageTitle = 'Equipment Management';
+
 		$scope.lineInfo = {
 			'lineName': '',
 			'remoteIoAddress': '',
@@ -600,6 +638,9 @@ app.controller('EquipmentCreateCtrl', function($scope, $http)
 
 app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedLine', function($scope, $http, $modalInstance, selectedLine)
 	{
+		
+		$rootScope.currentPageTitle = 'Equipment Management';
+		
 		$scope.lineInfo = selectedLine;
 
 		$scope.updateLine = function () {
@@ -622,6 +663,8 @@ app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selected
 
 app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS', function($scope, $http, $modalInstance, selectedWS)
 	{
+		$rootScope.currentPageTitle = 'Equipment Management';
+
 		$scope.workstationInfo = selectedWS;
 
 		$scope.updateWorkstation = function () {
@@ -644,6 +687,8 @@ app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS
 
 app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedTool', function($scope, $http, $modalInstance, selectedTool)
 	{
+		$rootScope.currentPageTitle = 'Equipment Management';
+
 		$scope.toolInfo = selectedTool;
 
 		$scope.updateTool = function () {
@@ -669,6 +714,8 @@ app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selected
 
 app.controller('UserMgmtCtrl', function($scope, $http, $modal) 
 	{	
+		$rootScope.currentPageTitle = 'User Management';
+
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
 		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10]; // To be replaced with a read from Luis's SSO file
 		$scope.selection = []; // Binded to selected user roles in create user modal
@@ -760,6 +807,8 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 
 app.controller('UpdateUserModalCtrl', ['$scope', '$http', '$modalInstance', 'selectedUser', function($scope, $http, $modalInstance, selectedUser)
 	{
+		$rootScope.currentPageTitle = 'User Management';
+
 		console.log("UpdateUserModalCtrl");
 		$scope.selectedUser = selectedUser;
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];

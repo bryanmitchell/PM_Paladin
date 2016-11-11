@@ -39,20 +39,20 @@ C:\Users\You\PM_Paladin\PM_Paladin> npm install -g browserify
 C:\Users\You\PM_Paladin\PM_Paladin> npm install dotenv --save
 C:\Users\You\PM_Paladin\PM_Paladin> npm install mssql
 C:\Users\You\PM_Paladin\PM_Paladin> npm install bcryptjs
-C:\Users\You\PM_Paladin\PM_Paladin> npm install connect-flash --save
-C:\Users\You\PM_Paladin\PM_Paladin> npm install express-session --save
-npm install passport --save
+C:\Users\You\PM_Paladin\PM_Paladin> npm install angular-chartist.js chartist angular --save
 ```
 
 ## To start your server:
-`C:\Users\You\PM_Paladin\PM_Paladin> nodemon app`
-Or if you don't care about server auto-restart upon file changes:
-`C:\Users\You\PM_Paladin\PM_Paladin> nodemon app`
+`C:\Users\You\PM_Paladin\PM_Paladin> nodemon bin/www`
 and leave running forever... :)
 
 Note that if you make BIG changes to the files, turn nodemon off or your computer WILL lag.
 
 Remember to set your ./public/app/.env file with:
-SENDGRID_USERNAME = your_username
-SENDGRID_PASSWORD = your_password
-TO = your.email@gmail.com
+SENDGRID_API_KEY=your_api_key
+SQL_USER=your_ssms_user
+SQL_PASSWORD=your_ssms_pwd
+SQL_SERVER=your_ssms_server
+SQL_DB=your_ssms_db
+SECRET=your_secret
+SALT=your_salt_int

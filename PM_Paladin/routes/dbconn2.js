@@ -624,7 +624,6 @@ exports.setToolInactive = function(cp,req,res){
 };
 
 exports.getToolDates = function(cp,res){
-	var r = req.body;
 	var query=`
 	SELECT t.ToolID AS [toolID]
 		,t.ToolName AS [toolName]
@@ -632,7 +631,7 @@ exports.getToolDates = function(cp,res){
 		,pl.LineName AS [lineName]
 		,e.FirstName AS [firstName]
 		,e.LastName AS [lastName]
-		,dates.Dates AS [dates]
+		,dates.Dates AS [date]
 	FROM Tool AS t
 	INNER JOIN Workstation AS ws
 	ON t.WorkstationID = ws.WorkstationID
@@ -642,13 +641,19 @@ exports.getToolDates = function(cp,res){
 	ON t.ToolID = tat.ToolID
 	INNER JOIN Employee AS e
 	ON tat.Sso = e.Sso
-	INNER JOIN (SELECT tsk.ToolID AS [ToolID], MAX(DATEADD(days,tsk.FrequencyDays,tsk.LastCompleted)) AS [Dates]
+	INNER JOIN (
+		SELECT tsk.ToolID AS [ToolID]
+			,DATEDIFF(day, GETDATE(), MAX(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
 		FROM Task AS tsk
 		GROUP BY tsk.ToolID) AS [dates]
 	ON dates.ToolID = t.ToolID`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'getUpcomingTools' success!");}
+		else{
+			console.log("Query 'getUpcomingTools' success!");
+			console.dir(recordset);
+			res.send(recordset);
+		}
 	});
 };
 
@@ -661,19 +666,25 @@ exports.getBarChartInfo = function(cp,res){
 	GROUP BY log.OnTime`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'getBarChartInfo' success!");}
+		else{
+			console.log("Query 'getBarChartInfo' success!");
+			res.send(recordset);
+		}
 	});
 };
 
 exports.getPieChartInfo = function(cp,res){
 	// how many tasks TODAY are OnTime, Upcoming (14 days), PastDue
 	var query=`
-	SELECT tsk.TaskStatus AS [status], COUNT(*)
+	SELECT tsk.TaskStatus AS [status], COUNT(*) AS [count]
 	FROM Task AS tsk
 	GROUP BY tsk.TaskStatus`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'getPieChartInfo' success!");}
+		else{
+			console.log("Query 'getPieChartInfo' success!");
+			res.send(recordset);
+		}
 	});
 };
 // 12096E5 (2 weeks in seconds)

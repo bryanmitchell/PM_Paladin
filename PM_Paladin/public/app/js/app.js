@@ -2,6 +2,7 @@
 
 var app = angular.module('xenon-app', [
 	'ngCookies',
+	'chart.js',
 
 	'ui.router',
 	'ui.bootstrap',
