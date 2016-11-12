@@ -256,7 +256,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/gettooldates')
 			.success(function (data) {
 				$scope.upcomingTools = data;
-				console.log(data);
+				// console.log(data);
 			}).error(function (data, status) {
 				alert();
 			});
@@ -264,11 +264,20 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/getpiechartinfo')
 			.success(function (data) {
 				$scope.pieChart = data;
-				console.log($scope.pieChart);
+				// console.log($scope.pieChart);
 				$scope.labelsPie = getLabels();
   				$scope.dataPie = getCounts();
   				console.log($scope.labelsPie);
-				console.log($scope.dataPie);
+				// console.log($scope.dataPie);
+
+  			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/getbarchartinfo')
+			.success(function (data) {
+				$scope.barChart = data;
+				console.log($scope.barChart);
 
   			}).error(function (data, status) {
 				alert();
@@ -279,7 +288,6 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			for(var i=0; i<$scope.pieChart.length; i++){
 				result.push($scope.pieChart[i].count);
 			}
-			// console.log(result);
 			return result;
 		};
 		var getLabels = function(){
@@ -287,7 +295,6 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			for(var i=0; i<$scope.pieChart.length; i++){
 				result.push($scope.pieChart[i].status);
 			}
-			// console.log(result);
 			return result;
 		};
 
@@ -298,8 +305,11 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			[28, 48, 40, 19, 86, 27, 90] 
 		]; 
 
-		// $scope.labelsPie = getLabels();
-  // 		$scope.dataPie = getCounts();
+		$scope.pieColors=['#1f9314', '#bc1a1a', '#f3ff1e'];
+		$scope.barColors= ['#1f9314', '#bc1a1a'];
+		$scope.options = {
+			legend: {display:true}
+		};
 
 		
 		
