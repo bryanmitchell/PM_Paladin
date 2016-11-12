@@ -263,12 +263,19 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 
 		$http.get('../../api/getpiechartinfo')
 			.success(function (data) {
-				$scope.pieChart = data;
-				console.log($scope.pieChart);
-				$scope.labelsPie = getLabels();
-  				$scope.dataPie = getCounts();
-  				console.log($scope.labelsPie);
-				console.log($scope.dataPie);
+				// $scope.pieChart = data;
+				// console.log($scope.pieChart);
+				// $scope.labelsPie = getLabels();
+  		// 		$scope.dataPie = getCounts();
+  		// 		console.log($scope.labelsPie);
+				// console.log($scope.dataPie);
+
+  			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/getbarchartinfo')
+			.success(function (data) {
 
   			}).error(function (data, status) {
 				alert();
