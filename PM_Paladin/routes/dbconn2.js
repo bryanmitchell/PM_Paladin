@@ -660,14 +660,17 @@ exports.getToolDates = function(cp,res){
 exports.getBarChartInfo = function(cp,res){
 	// Approved OnTime and PastDue during the last two weeks
 	var query=`
-	SELECT log.OnTime AS [onTime], COUNT(*)
+	SELECT CONVERT(VARCHAR(10), log.DateFinished, 112) AS [date]
+		,log.OnTime AS [onTime]
+		,COUNT(*) AS [count]
 	FROM TaskLog AS [log]
 	WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
-	GROUP BY log.OnTime`;
+	GROUP BY CONVERT(VARCHAR(10), log.DateFinished, 112), log.OnTime`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getBarChartInfo' success!");
+			console.dir(recordset);
 			res.send(recordset);
 		}
 	});
@@ -676,13 +679,27 @@ exports.getBarChartInfo = function(cp,res){
 exports.getPieChartInfo = function(cp,res){
 	// how many tasks TODAY are OnTime, Upcoming (14 days), PastDue
 	var query=`
-	SELECT tsk.TaskStatus AS [status], COUNT(*) AS [count]
-	FROM Task AS tsk
-	GROUP BY tsk.TaskStatus`;
+	SELECT t.status AS [status]
+		,COUNT(*) AS [count]
+	FROM (
+		SELECT CASE 
+			WHEN (TaskStatus = 'PastDue')
+				THEN 'PastDue' 
+			WHEN (TaskStatus = 'OnTime' 
+				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) BETWEEN 0 AND 14) 
+				THEN 'Upcoming'
+			WHEN (TaskStatus = 'OnTime' 
+				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) > 14) 
+				THEN 'OnTime'
+			ELSE 'Other'
+			END AS [status]
+		FROM Task) AS [t]
+	GROUP BY t.status`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getPieChartInfo' success!");
+			console.dir(recordset);
 			res.send(recordset);
 		}
 	});
