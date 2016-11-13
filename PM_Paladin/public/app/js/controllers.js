@@ -278,8 +278,9 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/getbarchartinfo')
 			.success(function (data) {
 				$scope.barChart = data;
-				console.log($scope.barChart);
-
+				// console.log($scope.barChart);
+				$scope.labelsBar = getBarDates();
+				$scope.dataBar = getBarCounts();
   			}).error(function (data, status) {
 				alert();
 			});
@@ -299,22 +300,46 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			return result;
 		};
 		var getBarCounts = function () {
-			var dates = [];
+			var counts = [];
+			var onTime = [];
+			var pastDue = [];
 
+			for (var i = 0; i < $scope.barChart.length; i++) {
+				onTime.push($scope.barChart[i].OnTimeCount);
+				pastDue.push($scope.barChart[i].PastDueCount);
+			}
+			counts.push(onTime);
+			counts.push(pastDue);
+			console.log(onTime);
+			console.log(pastDue);
+			console.log(counts);
+			return counts;
+
+
+		};
+		var getBarDates = function () {
+			var dates = [];
+			var monthNames = [ "", "Jan", "Feb", "Mar",
+				"Apr", "May", "Jun", "Jul",
+				"Aug", "Sep", "Oct",
+				"Nov", "Dec"
+			];
+			for (var i = 0; i < $scope.barChart.length; i++) {
+				var currentDate = $scope.barChart[i].Date;
+				var month = monthNames[currentDate.substring(4,6)];
+				var day = currentDate.substring(6,8);
+				var formattedDate = month + " " + day;
+				dates.push(formattedDate);
+			}
+			console.log(dates);
+			return dates;
 		}
 
-		$scope.labelsBar = ['2006', '2007', '2008', '2009', '2010', '2011', '2012']; 
-		$scope.seriesBar = ['Series A', 'Series B']; 
-		$scope.dataBar = [ 
-			[65, 59, 80, 81, 56, 55, 40], 
-			[28, 48, 40, 19, 86, 27, 90] 
-		]; 
-
+		$scope.seriesBar = ['On Time', 'Past Due']; 
 		$scope.pieColors=['#1f9314', '#bc1a1a', '#fdb45c'];
 		$scope.barColors= ['#1f9314', '#bc1a1a'];
 		$scope.options = {
 			legend: {display:true},
-			showAllTooltips: true
 		};
 
 		
