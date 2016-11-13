@@ -19,6 +19,7 @@
 					<table class="table table-bordered table-striped table-condensed">
 						<thead>
 							<tr>
+								<th>SSO</th>
 								<th>Employee Name</th>
 								<th>Position</th>
 								<th> </th>
@@ -26,6 +27,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="user in users">
+								<td>{{user.sso}}</td>
 								<td>{{user.firstName}} {{user.lastName}}</td>
 								<td>{{user.types}}</td>
 								<td>

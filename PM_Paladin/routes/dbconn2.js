@@ -48,105 +48,9 @@ function runPostQuery(query, cp) {
 
 
 
-// Displayed in User Management
-exports.getEmployees = function(cp, res){
-	console.log("Getting all employees...");
-	runQuery(`
-		SELECT e.Sso as [sso]
-			,e.FirstName AS [firstName]
-			,e.LastName AS [lastName]
-			,e.Email AS [email]
-			,typeList.types AS [types]
-		FROM Employee e 
-		INNER JOIN (
-			SELECT DISTINCT st2.Sso AS [Sso],
-				STUFF((SELECT ',' + st1.EmpRole AS [text()]
-					FROM EmployeeRole st1
-					WHERE st1.sso = st2.sso
-					FOR XML PATH('')
-					), 1, 1, '' )
-				AS [types]
-			FROM EmployeeRole st2
-		) [typeList] 
-		ON e.Sso = typeList.Sso;
-		`, cp, res);
-};
-
-// Task list displayed in Maintenance Confirmation
-exports.getConfirmationTasks = function(cp, req, res){
-	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
-	console.log("Getting confirmation tasks...");
-	runQuery(`
-		SELECT tsk.TaskID AS [Task], 
-			tsk.TaskDescription AS [Desc], 
-			t.ToolName AS [Tool], 
-			ws.WorkstationName AS [WS], 
-			pl.LineName AS [Line],
-			eng.FirstName AS [EngFName], 
-			eng.LastName AS [EngLName], 
-			eng.Email AS [EngEmail], 
-			tec.FirstName AS [TecFName], 
-			tec.LastName AS [TecLName], 
-			REPLACE(CAST(CASE 
-				WHEN tsk.TaskStatus = 'ConfirmPartial' THEN 'Y' 
-				ELSE 'N' 
-				END AS CHAR),' ', '') AS [Partial] 
-		FROM Task as tsk 
-		INNER JOIN Tool as t 
-		ON tsk.ToolID = t.ToolID 
-		INNER JOIN Workstation AS ws 
-		ON t.WorkstationID = ws.WorkstationID 
-		INNER JOIN ProductionLine AS pl 
-		ON ws.LineID = pl.LineID 
-		INNER JOIN ToolAssignedTo AS tat 
-		ON t.ToolID = tat.ToolID 
-		INNER JOIN Employee AS tec 
-		ON tat.Sso = tec.Sso 
-		INNER JOIN WorkstationAssignedTo AS wat 
-		ON ws.WorkstationID = wat.WorkstationID 
-		INNER JOIN Employee AS eng 
-		ON wat.Sso = eng.Sso 
-		WHERE (tsk.TaskStatus = 'ConfirmPending' OR tsk.TaskStatus = 'ConfirmPartial') 
-		AND tec.sso = ${req.body.sso};
-		`, cp, res);
-};
-
-// Task list displayed in Maintenance Approval
-exports.getApprovalTasks = function(cp, req, res){
-	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
-	console.log("Getting approval tasks...");
-	runQuery(`
-		SELECT tsk.TaskID AS [Task], 
-			tsk.TaskDescription AS [Desc], t.toolName AS [Tool], 
-			ws.WorkstationName AS [WS], 
-			pl.LineName AS [Line], 
-			eng.FirstName AS [EngFName], 
-			eng.LastName AS [EngLName], 
-			tec.FirstName AS [TecFName], 
-			tec.LastName AS [TecLName], 
-			pl.SupervisorFirstName AS [LineSupervisorFName], 
-			pl.SupervisorLastName AS [LineSupervisorLName], 
-			pl.SupervisorEmail AS [LineSupervisorEmail]
-		FROM Task as tsk 
-		INNER JOIN Tool as t 
-		ON tsk.ToolID = t.ToolID 
-		INNER JOIN Workstation AS ws 
-		ON t.WorkstationID = ws.WorkstationID 
-		INNER JOIN ProductionLine AS pl 
-		ON ws.LineID = pl.LineID 
-		INNER JOIN WorkstationAssignedTo AS wat 
-		ON ws.WorkstationID = wat.WorkstationID 
-		INNER JOIN Employee AS eng 
-		ON wat.Sso = eng.Sso 
-		INNER JOIN ToolAssignedTo AS tat
-		ON tat.ToolID = t.ToolID
-		INNER JOIN Employee AS tec
-		ON tat.Sso = tec.Sso
-		WHERE tsk.TaskStatus = 'ApprovePending' 
-		AND eng.Sso = ${req.body.sso};
-		`, cp, res);
-};
-
+/**
+DASHBOARD
+**/
 exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	var pwd = req.body.password;
@@ -183,6 +87,131 @@ exports.getEmployeePassword = function(cp, req, res){
 	// runQuery(query, cp, res);
 };
 
+exports.getToolDates = function(cp,res){
+	var query=`
+	SELECT t.ToolID AS [toolID]
+		,t.ToolName AS [toolName]
+		,ws.WorkstationName AS [workstationName]
+		,pl.LineName AS [lineName]
+		,e.FirstName AS [firstName]
+		,e.LastName AS [lastName]
+		,dates.Dates AS [date]
+	FROM Tool AS t
+	INNER JOIN Workstation AS ws
+	ON t.WorkstationID = ws.WorkstationID
+	INNER JOIN ProductionLine AS pl
+	ON ws.LineID = pl.LineID
+	INNER JOIN ToolAssignedTo AS tat
+	ON t.ToolID = tat.ToolID
+	INNER JOIN Employee AS e
+	ON tat.Sso = e.Sso
+	INNER JOIN (
+		SELECT tsk.ToolID AS [ToolID]
+			,DATEDIFF(day, GETDATE(), MIN(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
+		FROM Task AS tsk
+		GROUP BY tsk.ToolID) AS [dates]
+	ON dates.ToolID = t.ToolID`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query 'getUpcomingTools' success!");
+			console.dir(recordset);
+			res.send(recordset);
+		}
+	});
+};
+
+exports.getBarChartInfo = function(cp,res){
+	// Approved OnTime and PastDue during the last two weeks
+	// var query=`
+	// SELECT CONVERT(VARCHAR(10), log.DateFinished, 112) AS [date]
+	// 	,log.OnTime AS [onTime]
+	// 	,COUNT(*) AS [count]
+	// FROM TaskLog AS [log]
+	// WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
+	// GROUP BY CONVERT(VARCHAR(10), log.DateFinished, 112), log.OnTime`;
+	var query =`
+		DECLARE @startDate DATETIME
+		DECLARE @endDate DATETIME
+
+		SET @startDate = DATEADD(d,-14,GETDATE())
+		SET @endDate = GETDATE();
+
+		WITH dates(Date) AS 
+		(
+			SELECT @startdate as Date
+			UNION ALL
+			SELECT DATEADD(d,1,[Date])
+			FROM dates 
+			WHERE DATE < @enddate
+		)
+
+		SELECT CONVERT(VARCHAR(10), dates.Date, 112) AS [Date], 
+			ISNULL(OnTimeLogs.OnTimeCount, 0) AS [OnTimeCount], 
+			ISNULL(PastDueLogs.PastDueCount, 0) AS [PastDueCount]
+		FROM dates
+		LEFT OUTER JOIN (
+			SELECT CONVERT(VARCHAR(10), log2.DateFinished, 112) AS OnTimeDates, COUNT(*) AS OnTimeCount
+			FROM TaskLog AS log2
+			WHERE log2.OnTime = 'True'
+			GROUP BY CONVERT(VARCHAR(10), log2.DateFinished, 112)
+		) AS OnTimeLogs
+		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), OnTimeLogs.OnTimeDates, 112)
+		LEFT OUTER JOIN (
+			SELECT CONVERT(VARCHAR(10), log3.DateFinished, 112) AS PastDueDates, COUNT(*) AS PastDueCount
+			FROM TaskLog AS log3
+			WHERE log3.OnTime = 'False'
+			GROUP BY CONVERT(VARCHAR(10), log3.DateFinished, 112)
+		) AS PastDueLogs
+		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), PastDueLogs.PastDueDates, 112)
+		OPTION (MAXRECURSION 0)
+	`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query 'getBarChartInfo' success!");
+			console.dir(recordset);
+			res.send(recordset);
+		}
+	});
+};
+
+exports.getPieChartInfo = function(cp,res){
+	// how many tasks TODAY are OnTime, Upcoming (14 days), PastDue
+	var query=`
+	SELECT t.status AS [status]
+		,COUNT(*) AS [count]
+	FROM (
+		SELECT CASE 
+			WHEN (TaskStatus = 'PastDue')
+				THEN 'PastDue' 
+			WHEN (TaskStatus = 'OnTime' 
+				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) BETWEEN 0 AND 14) 
+				THEN 'Upcoming'
+			WHEN (TaskStatus = 'OnTime' 
+				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) > 14) 
+				THEN 'OnTime'
+			ELSE 'Other'
+			END AS [status]
+		FROM Task) AS [t]
+	GROUP BY t.status`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query 'getPieChartInfo' success!");
+			console.dir(recordset);
+			res.send(recordset);
+		}
+	});
+};
+
+
+
+
+/**
+EQUIPMENT MANAGEMENT
+**/
+/* READ */
 exports.getLines = function(cp, res){
 	runQuery(`
 		SELECT pl.LineId AS [lineID]
@@ -195,7 +224,6 @@ exports.getLines = function(cp, res){
 		`, cp, res);
 };
 
-// TODO Assumes WS assgined to ONE person
 exports.getWorkstations = function(cp, res){
 	runQuery(`
 		SELECT ws.workstationID AS [wsID]
@@ -212,9 +240,8 @@ exports.getWorkstations = function(cp, res){
 		INNER JOIN WorkstationAssignedTo as wat
 		ON ws.WorkstationID = wat.WorkstationID;
 		`, cp, res);
-};
+}; // TODO Assumes WS assgined to ONE person
 
-// TODO Assumes tool assigned to ONE person
 exports.getTools = function(cp, res){
 	runQuery(`
 		SELECT t.WorkstationID AS [wsID]
@@ -229,28 +256,10 @@ exports.getTools = function(cp, res){
 		INNER JOIN ToolAssignedTo AS tat
 		ON t.ToolID = tat.ToolID;
 		`, cp, res);
-};
+}; // TODO Assumes tool assigned to ONE person
 
 
-
-
-exports.createEmployee = function(cp, req, res){
-	var r = req.body;
-	runPostQuery(`
-		INSERT INTO Employee
-			([Sso],[FirstName],[LastName],[Email],[PasswordHash])
-		VALUES
-			(${r.sso},'${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
-		`, cp);
-	for (i = 0; i < r.employeeType.length; i++){
-		runPostQuery(`
-			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
-			VALUES (${r.sso},'${r.employeeType[i]}');
-			`, cp);
-	}
-	res.redirect('back');
-};
-
+/* CREATE */
 exports.createLine = function(cp, req, res){
 	var r = req.body;
 	runPostQuery(`
@@ -379,9 +388,7 @@ exports.createTool = function(cp, req, res){
 };
 
 
-
-
-
+/* UPDATE */
 exports.updateLine = function(cp, req, res){
 	var r = req.body;
 	runPostQuery(`
@@ -433,54 +440,32 @@ exports.updateTool = function(cp, req, res){
 	res.redirect('back');
 };
 
-exports.updateEmployee = function(cp, req, res){
+exports.setToolActive = function(cp,req,res){
 	var r = req.body;
-	var types = r.types.split(',');
-	runPostQuery(`
-		UPDATE Employee
-		SET FirstName = '${r.firstName}'
-			,LastName = '${r.lastName}'
-			,Email = '${r.email}'
-			,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
-		WHERE Sso = ${r.sso};
-		`, cp);
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 1
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setActive' success!");}
+	});
+};
 
-	var query2 = `
-		BEGIN TRANSACTION;
-		BEGIN TRY
-		DELETE FROM EmployeeType
-		WHERE Sso = ${r.sso}
-		`;
-	for (var i=0; i<types.length; i++){
-		console.log('in for');
-		query2 += `
-			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
-			VALUES (${r.sso}, '${types[i]}')`;
-		if (i==types.length-1){query2+=`;\n`;}
-		else{query2+=`\n`;}
-	}
-	query2 += `
-		END TRY
-		BEGIN CATCH
-			SELECT 
-				ERROR_NUMBER() AS ErrorNumber
-				,ERROR_SEVERITY() AS ErrorSeverity
-				,ERROR_STATE() AS ErrorState
-				,ERROR_PROCEDURE() AS ErrorProcedure
-				,ERROR_LINE() AS ErrorLine
-				,ERROR_MESSAGE() AS ErrorMessage;
-
-			IF @@TRANCOUNT > 0
-				ROLLBACK TRANSACTION;
-		END CATCH;
-		IF @@TRANCOUNT > 0 
-			COMMIT TRANSACTION;`;
-	runPostQuery(query2, cp);
-	res.redirect('back');
+exports.setToolInactive = function(cp,req,res){
+	var r = req.body;
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 0
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setInactive' success!");}
+	});
 };
 
 
-
+/* DELETE */
 exports.deleteLine = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -531,6 +516,99 @@ exports.deleteTool = function(cp, req, res){
 	});
 };
 
+
+
+
+/**
+USER MANAGEMENT
+**/
+exports.getEmployees = function(cp, res){
+	console.log("Getting all employees...");
+	runQuery(`
+		SELECT e.Sso as [sso]
+			,e.FirstName AS [firstName]
+			,e.LastName AS [lastName]
+			,e.Email AS [email]
+			,typeList.types AS [types]
+		FROM Employee e 
+		INNER JOIN (
+			SELECT DISTINCT st2.Sso AS [Sso],
+				STUFF((SELECT ',' + st1.EmpRole AS [text()]
+					FROM EmployeeRole st1
+					WHERE st1.sso = st2.sso
+					FOR XML PATH('')
+					), 1, 1, '' )
+				AS [types]
+			FROM EmployeeRole st2
+		) [typeList] 
+		ON e.Sso = typeList.Sso;
+		`, cp, res);
+};
+
+exports.createEmployee = function(cp, req, res){
+	var r = req.body;
+	query = `
+		INSERT INTO Employee
+			([Sso],[FirstName],[LastName],[Email],[PasswordHash])
+		VALUES
+			(${r.sso},'${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
+		`
+	for (i = 0; i < r.employeeType.length; i++){
+		query +=`
+			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
+			VALUES (${r.sso},'${r.employeeType[i]}');
+		`;
+	}
+	runPostQuery(query, cp);
+	res.redirect('back');
+}; //TODO FIX
+
+exports.updateEmployee = function(cp, req, res){
+	var r = req.body;
+	var types = r.types.split(',');
+	runPostQuery(`
+		UPDATE Employee
+		SET FirstName = '${r.firstName}'
+			,LastName = '${r.lastName}'
+			,Email = '${r.email}'
+			,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
+		WHERE Sso = ${r.sso};
+		`, cp);
+
+	var query2 = `
+		BEGIN TRANSACTION;
+		BEGIN TRY
+		DELETE FROM EmployeeType
+		WHERE Sso = ${r.sso}
+		`;
+	for (var i=0; i<types.length; i++){
+		console.log('in for');
+		query2 += `
+			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
+			VALUES (${r.sso}, '${types[i]}')`;
+		if (i==types.length-1){query2+=`;\n`;}
+		else{query2+=`\n`;}
+	}
+	query2 += `
+		END TRY
+		BEGIN CATCH
+			SELECT 
+				ERROR_NUMBER() AS ErrorNumber
+				,ERROR_SEVERITY() AS ErrorSeverity
+				,ERROR_STATE() AS ErrorState
+				,ERROR_PROCEDURE() AS ErrorProcedure
+				,ERROR_LINE() AS ErrorLine
+				,ERROR_MESSAGE() AS ErrorMessage;
+
+			IF @@TRANCOUNT > 0
+				ROLLBACK TRANSACTION;
+		END CATCH;
+		IF @@TRANCOUNT > 0 
+			COMMIT TRANSACTION;`;
+	runPostQuery(query2, cp);
+	res.redirect('back');
+};
+
 exports.deleteEmployee = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -551,8 +629,46 @@ exports.deleteEmployee = function(cp, req, res){
 };
 
 
-
-
+/**
+MAINTENANCE CONFIRMATION
+**/
+exports.getConfirmationTasks = function(cp, req, res){
+	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
+	console.log("Getting confirmation tasks...");
+	runQuery(`
+		SELECT tsk.TaskID AS [Task], 
+			tsk.TaskDescription AS [Desc], 
+			t.ToolName AS [Tool], 
+			ws.WorkstationName AS [WS], 
+			pl.LineName AS [Line],
+			eng.FirstName AS [EngFName], 
+			eng.LastName AS [EngLName], 
+			eng.Email AS [EngEmail], 
+			tec.FirstName AS [TecFName], 
+			tec.LastName AS [TecLName], 
+			REPLACE(CAST(CASE 
+				WHEN tsk.TaskStatus = 'ConfirmPartial' THEN 'Y' 
+				ELSE 'N' 
+				END AS CHAR),' ', '') AS [Partial] 
+		FROM Task as tsk 
+		INNER JOIN Tool as t 
+		ON tsk.ToolID = t.ToolID 
+		INNER JOIN Workstation AS ws 
+		ON t.WorkstationID = ws.WorkstationID 
+		INNER JOIN ProductionLine AS pl 
+		ON ws.LineID = pl.LineID 
+		INNER JOIN ToolAssignedTo AS tat 
+		ON t.ToolID = tat.ToolID 
+		INNER JOIN Employee AS tec 
+		ON tat.Sso = tec.Sso 
+		INNER JOIN WorkstationAssignedTo AS wat 
+		ON ws.WorkstationID = wat.WorkstationID 
+		INNER JOIN Employee AS eng 
+		ON wat.Sso = eng.Sso 
+		WHERE (tsk.TaskStatus = 'ConfirmPending' OR tsk.TaskStatus = 'ConfirmPartial') 
+		AND tec.sso = ${req.body.sso};
+		`, cp, res);
+};
 
 exports.setPartialConfirm = function(cp, req, res){
 	var r = req.body;
@@ -582,6 +698,45 @@ exports.setFullConfirm = function(cp, req, res){
 	});	
 };
 
+
+/**
+MAINTENANCE APPROVAL
+**/
+exports.getApprovalTasks = function(cp, req, res){
+	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
+	console.log("Getting approval tasks...");
+	runQuery(`
+		SELECT tsk.TaskID AS [Task], 
+			tsk.TaskDescription AS [Desc], t.toolName AS [Tool], 
+			ws.WorkstationName AS [WS], 
+			pl.LineName AS [Line], 
+			eng.FirstName AS [EngFName], 
+			eng.LastName AS [EngLName], 
+			tec.FirstName AS [TecFName], 
+			tec.LastName AS [TecLName], 
+			pl.SupervisorFirstName AS [LineSupervisorFName], 
+			pl.SupervisorLastName AS [LineSupervisorLName], 
+			pl.SupervisorEmail AS [LineSupervisorEmail]
+		FROM Task as tsk 
+		INNER JOIN Tool as t 
+		ON tsk.ToolID = t.ToolID 
+		INNER JOIN Workstation AS ws 
+		ON t.WorkstationID = ws.WorkstationID 
+		INNER JOIN ProductionLine AS pl 
+		ON ws.LineID = pl.LineID 
+		INNER JOIN WorkstationAssignedTo AS wat 
+		ON ws.WorkstationID = wat.WorkstationID 
+		INNER JOIN Employee AS eng 
+		ON wat.Sso = eng.Sso 
+		INNER JOIN ToolAssignedTo AS tat
+		ON tat.ToolID = t.ToolID
+		INNER JOIN Employee AS tec
+		ON tat.Sso = tec.Sso
+		WHERE tsk.TaskStatus = 'ApprovePending' 
+		AND eng.Sso = ${req.body.sso};
+		`, cp, res);
+};
+
 exports.setApprove = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -603,149 +758,3 @@ exports.setApprove = function(cp, req, res){
 		else{console.log("Query 'setApprove' success!");}
 	});
 };
-
-
-
-
-exports.setToolActive = function(cp,req,res){
-	var r = req.body;
-	var query=`
-	UPDATE [dbo].[Tool]
-	SET [IsActive] = 1
-	WHERE ToolID = ${r.toolID}`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setActive' success!");}
-	});
-};
-
-exports.setToolInactive = function(cp,req,res){
-	var r = req.body;
-	var query=`
-	UPDATE [dbo].[Tool]
-	SET [IsActive] = 0
-	WHERE ToolID = ${r.toolID}`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setInactive' success!");}
-	});
-};
-
-exports.getToolDates = function(cp,res){
-	var query=`
-	SELECT t.ToolID AS [toolID]
-		,t.ToolName AS [toolName]
-		,ws.WorkstationName AS [workstationName]
-		,pl.LineName AS [lineName]
-		,e.FirstName AS [firstName]
-		,e.LastName AS [lastName]
-		,dates.Dates AS [date]
-	FROM Tool AS t
-	INNER JOIN Workstation AS ws
-	ON t.WorkstationID = ws.WorkstationID
-	INNER JOIN ProductionLine AS pl
-	ON ws.LineID = pl.LineID
-	INNER JOIN ToolAssignedTo AS tat
-	ON t.ToolID = tat.ToolID
-	INNER JOIN Employee AS e
-	ON tat.Sso = e.Sso
-	INNER JOIN (
-		SELECT tsk.ToolID AS [ToolID]
-			,DATEDIFF(day, GETDATE(), MIN(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
-		FROM Task AS tsk
-		GROUP BY tsk.ToolID) AS [dates]
-	ON dates.ToolID = t.ToolID`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{
-			console.log("Query 'getUpcomingTools' success!");
-			console.dir(recordset);
-			res.send(recordset);
-		}
-	});
-};
-
-exports.getBarChartInfo = function(cp,res){
-	// Approved OnTime and PastDue during the last two weeks
-	// var query=`
-	// SELECT CONVERT(VARCHAR(10), log.DateFinished, 112) AS [date]
-	// 	,log.OnTime AS [onTime]
-	// 	,COUNT(*) AS [count]
-	// FROM TaskLog AS [log]
-	// WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
-	// GROUP BY CONVERT(VARCHAR(10), log.DateFinished, 112), log.OnTime`;
-	var query =`
-		DECLARE @startDate DATETIME
-		DECLARE @endDate DATETIME
-
-		SET @startDate = DATEADD(d,-14,GETDATE())
-		SET @endDate = GETDATE();
-
-		WITH dates(Date) AS 
-		(
-			SELECT @startdate as Date
-			UNION ALL
-			SELECT DATEADD(d,1,[Date])
-			FROM dates 
-			WHERE DATE < @enddate
-		)
-
-		SELECT CONVERT(VARCHAR(10), dates.Date, 112) AS [Date], 
-			ISNULL(OnTimeLogs.OnTimeCount, 0) AS [OnTimeCount], 
-			ISNULL(PastDueLogs.PastDueCount, 0) AS [PastDueCount]
-		FROM dates
-		LEFT OUTER JOIN (
-			SELECT CONVERT(VARCHAR(10), log2.DateFinished, 112) AS OnTimeDates, COUNT(*) AS OnTimeCount
-			FROM TaskLog AS log2
-			WHERE log2.OnTime = 'True'
-			GROUP BY CONVERT(VARCHAR(10), log2.DateFinished, 112)
-		) AS OnTimeLogs
-		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), OnTimeLogs.OnTimeDates, 112)
-		LEFT OUTER JOIN (
-			SELECT CONVERT(VARCHAR(10), log3.DateFinished, 112) AS PastDueDates, COUNT(*) AS PastDueCount
-			FROM TaskLog AS log3
-			WHERE log3.OnTime = 'False'
-			GROUP BY CONVERT(VARCHAR(10), log3.DateFinished, 112)
-		) AS PastDueLogs
-		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), PastDueLogs.PastDueDates, 112)
-		OPTION (MAXRECURSION 0)
-	`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{
-			console.log("Query 'getBarChartInfo' success!");
-			console.dir(recordset);
-			res.send(recordset);
-		}
-	});
-};
-
-exports.getPieChartInfo = function(cp,res){
-	// how many tasks TODAY are OnTime, Upcoming (14 days), PastDue
-	var query=`
-	SELECT t.status AS [status]
-		,COUNT(*) AS [count]
-	FROM (
-		SELECT CASE 
-			WHEN (TaskStatus = 'PastDue')
-				THEN 'PastDue' 
-			WHEN (TaskStatus = 'OnTime' 
-				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) BETWEEN 0 AND 14) 
-				THEN 'Upcoming'
-			WHEN (TaskStatus = 'OnTime' 
-				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) > 14) 
-				THEN 'OnTime'
-			ELSE 'Other'
-			END AS [status]
-		FROM Task) AS [t]
-	GROUP BY t.status`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{
-			console.log("Query 'getPieChartInfo' success!");
-			console.dir(recordset);
-			res.send(recordset);
-		}
-	});
-};
-// 12096E5 (2 weeks in seconds)

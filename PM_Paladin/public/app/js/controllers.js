@@ -247,8 +247,9 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 	});
 
-
-
+/**
+DASHBOARD
+**/
 app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 	{
 
@@ -346,146 +347,10 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		
 	});
 
-app.controller('MaintConfCtrl', function($scope, $rootScope, $http) 
-	{
-		$rootScope.currentPageTitle = 'Maintenance Confirmation';
 
-		$scope.getConfirmTasks = function () {
-			console.log('called getConfirmTasks')
-			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
-			.success(function (data) {
-				console.dir(data);
-				$scope.tasks = data;
-			}).error(function (data, status) {
-				alert();
-			});
-		};	
-		
-		$scope.getConfirmTasks();	
-
-		$scope.selection = [];
-
-		$scope.toggleSelection = function (item) {
-			var index = $scope.selection.indexOf(item);
-
-			if (index > -1) {
-				$scope.selection.splice(index, 1);
-			}
-			else {
-				$scope.selection.push(item);
-			}
-		};
-
-		$scope.uncheckBoxes = function () {
-			angular.forEach($scope.selection, function (item) {
-				item.Selected = false;
-			})
-		};
-
-		$scope.confirmFull = function(){
-			$http.post('../../api/confirmfull', $scope.selection)
-			.success(function (data) {
-				console.log('confirmFull');
-			}).error(function (data, status) {
-				alert();
-			});
-		};
-
-		$scope.confirmPartial = function(){
-			$http.post('../../api/confirmpartial', $scope.selection)
-			.success(function (data) {
-				console.log('confirmPartial');
-			}).error(function (data, status) {
-				alert();
-			});
-		};
-
-		$scope.sendEmail = function (type) {
-			console.log("TEST");
-			//Request
-			if (type == "partial") {
-				console.log("Partial");
-				
-				$http.post('../../api/emailpartial', $scope.selection) 
-				.success(function(data, status) {
-					console.log("Sent ok");
-				})
-				.error(function(data, status) {
-					console.log("Error");
-				});
-			}
-			else {
-				console.log("Full");
-				
-				$http.post('../../api/emailfull', $scope.selection) 
-				.success(function(data, status) {
-					console.log("Sent ok");
-				})
-				.error(function(data, status) {
-					console.log("Error");
-				});
-			}
-		};
-	});
-
-app.controller('MaintApprCtrl', function($scope, $rootScope, $http) 
-	{
-		$rootScope.currentPageTitle = 'Maintenance Approval';
-
-		$scope.selection = [];
-
-		$scope.getApproveTasks = function () {
-			$http.post('../../api/approvetasks', {'sso': $rootScope.userSSO})
-			.success(function (data) {
-				$scope.tasks = data;
-			}).error(function (data, status) {
-				alert();
-			});
-		};
-		
-		$scope.getApproveTasks();
-
-		$scope.toggleSelection = function (item) {
-			var index = $scope.selection.indexOf(item);
-
-			if (index > -1) {
-				$scope.selection.splice(index, 1);
-			}
-			else {
-				$scope.selection.push(item);
-			}
-		};
-
-		$scope.uncheckBoxes = function () {
-			angular.forEach($scope.selection, function (item) {
-				item.Selected = false;
-			})
-		};
-
-		$scope.approveTasks = function(){
-			$http.post('../../api/approve', $scope.selection)
-			.success(function (data) {
-				console.log('approveTasks');
-			}).error(function (data, status) {
-				alert();
-			});
-		};
-
-		$scope.sendEmail = function () {
-			console.log("sendEmail from controller.js");
-			//Request
-			$http.post('../../api/emailapprove', $scope.selection) 
-			.success(function(data, status) {
-				console.log("Sent ok");
-			})
-			.error(function(data, status) {
-				console.log("Error");
-			});
-		};
-	});
-
-
-
+/**
+EQUIPMENT MANAGEMENT
+**/
 app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, $timeout) 
 	{
 
@@ -656,12 +521,17 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'supervisorEmail': ''
 		};
 		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 
 		$scope.workstationInfo = {
 			'workstationName': '',
-			'greenLightOpcTag': '',
-			'yellowLightOpcTag': '',
-			'redLightOpcTag': '',
+			'greenLightModuleNumber': '',
+			'greenLightPointNumber': '',
+			'yellowLightModuleNumber': '',
+			'yellowLightPointNumber': '',
+			'redLightModuleNumber': '',
+			'redLightPointNumber': '',
 			'employeeSso': ''
 		};
 
@@ -669,8 +539,8 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'toolName': '',
 			'toolType': '',
 			'rfidAddress': '',
-			'opcTag': '',
-			'ioAddress': '',
+			'remoteIoModuleNumber': '',
+			'remoteIoPointNumber': '',
 			'employeeSso': ''
 		};
 
@@ -794,7 +664,9 @@ app.controller('ToolUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstan
 
 	}]);
 
-
+/**
+USER MANAGEMENT
+**/
 app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal) 
 	{	
 		$rootScope.currentPageTitle = 'User Management';
@@ -851,7 +723,7 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 			//Request
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
-				console.log("User created");
+				alert("User created. Please click on the purple button to reflect changes.");
 			})
 			.error(function(data, status) {
 				console.log("Error");
@@ -943,3 +815,149 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		};
 
 	}]);
+
+
+/**
+MAINTENANCE CONFIRMATION
+**/
+app.controller('MaintConfCtrl', function($scope, $rootScope, $http) 
+	{
+		$rootScope.currentPageTitle = 'Maintenance Confirmation';
+
+		$scope.getConfirmTasks = function () {
+			console.log('called getConfirmTasks')
+			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
+			.success(function (data) {
+				console.dir(data);
+				$scope.tasks = data;
+			}).error(function (data, status) {
+				alert();
+			});
+		};	
+		
+		$scope.getConfirmTasks();	
+
+		$scope.selection = [];
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
+		$scope.confirmFull = function(){
+			$http.post('../../api/confirmfull', $scope.selection)
+			.success(function (data) {
+				console.log('confirmFull');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
+		$scope.confirmPartial = function(){
+			$http.post('../../api/confirmpartial', $scope.selection)
+			.success(function (data) {
+				console.log('confirmPartial');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
+		$scope.sendEmail = function (type) {
+			console.log("TEST");
+			//Request
+			if (type == "partial") {
+				console.log("Partial");
+				
+				$http.post('../../api/emailpartial', $scope.selection) 
+				.success(function(data, status) {
+					console.log("Sent ok");
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+			}
+			else {
+				console.log("Full");
+				
+				$http.post('../../api/emailfull', $scope.selection) 
+				.success(function(data, status) {
+					console.log("Sent ok");
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+			}
+		};
+	});
+
+/**
+MAINTENANCE APPROVAL
+**/
+app.controller('MaintApprCtrl', function($scope, $rootScope, $http) 
+	{
+		$rootScope.currentPageTitle = 'Maintenance Approval';
+
+		$scope.selection = [];
+
+		$scope.getApproveTasks = function () {
+			$http.post('../../api/approvetasks', {'sso': $rootScope.userSSO})
+			.success(function (data) {
+				$scope.tasks = data;
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+		
+		$scope.getApproveTasks();
+
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.uncheckBoxes = function () {
+			angular.forEach($scope.selection, function (item) {
+				item.Selected = false;
+			})
+		};
+
+		$scope.approveTasks = function(){
+			$http.post('../../api/approve', $scope.selection)
+			.success(function (data) {
+				console.log('approveTasks');
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
+		$scope.sendEmail = function () {
+			console.log("sendEmail from controller.js");
+			//Request
+			$http.post('../../api/emailapprove', $scope.selection) 
+			.success(function(data, status) {
+				console.log("Sent ok");
+			})
+			.error(function(data, status) {
+				console.log("Error");
+			});
+		};
+	});
+
