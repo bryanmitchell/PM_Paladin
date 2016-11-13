@@ -234,7 +234,6 @@ exports.getTools = function(cp, res){
 
 
 
-
 exports.createEmployee = function(cp, req, res){
 	var r = req.body;
 	runPostQuery(`
@@ -492,8 +491,9 @@ exports.deleteLine = function(cp, req, res){
 		if(err){
 			// Handle if assigned Workstations
 			console.log(err);
+			res.send(err);
 		}
-		else{console.log("Query success!");}
+		else{console.log("Query deleteLine success!");}
 	});
 };
 
@@ -507,8 +507,9 @@ exports.deleteWorkstation = function(cp, req, res){
 		if(err){
 			// handle if assigned Tools
 			console.log(err);
+			res.send(err);
 		}
-		else{console.log("Query success!");}
+		else{console.log("Query deleteWorkstation success!");}
 	});
 };
 
@@ -521,8 +522,12 @@ exports.deleteTool = function(cp, req, res){
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){
 			console.log(err);
+			res.send(err);
 		}
-		else{console.log("Query success!");}
+		else{
+			console.log("Query deleteTool success!");
+			res.send();
+		}
 	});
 };
 
@@ -538,7 +543,10 @@ exports.deleteEmployee = function(cp, req, res){
 			// if user in WSAssignedTo, return error
 			console.log(err);
 		}
-		else{console.log("Query success!");}
+		else{
+			console.log("Query deleteEmployee success!");
+			res.send();
+		}
 	});
 };
 
@@ -643,7 +651,7 @@ exports.getToolDates = function(cp,res){
 	ON tat.Sso = e.Sso
 	INNER JOIN (
 		SELECT tsk.ToolID AS [ToolID]
-			,DATEDIFF(day, GETDATE(), MAX(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
+			,DATEDIFF(day, GETDATE(), MIN(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
 		FROM Task AS tsk
 		GROUP BY tsk.ToolID) AS [dates]
 	ON dates.ToolID = t.ToolID`;
@@ -659,13 +667,49 @@ exports.getToolDates = function(cp,res){
 
 exports.getBarChartInfo = function(cp,res){
 	// Approved OnTime and PastDue during the last two weeks
-	var query=`
-	SELECT CONVERT(VARCHAR(10), log.DateFinished, 112) AS [date]
-		,log.OnTime AS [onTime]
-		,COUNT(*) AS [count]
-	FROM TaskLog AS [log]
-	WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
-	GROUP BY CONVERT(VARCHAR(10), log.DateFinished, 112), log.OnTime`;
+	// var query=`
+	// SELECT CONVERT(VARCHAR(10), log.DateFinished, 112) AS [date]
+	// 	,log.OnTime AS [onTime]
+	// 	,COUNT(*) AS [count]
+	// FROM TaskLog AS [log]
+	// WHERE DATEDIFF(day, log.DateFinished, GETDATE()) <= 14
+	// GROUP BY CONVERT(VARCHAR(10), log.DateFinished, 112), log.OnTime`;
+	var query =`
+		DECLARE @startDate DATETIME
+		DECLARE @endDate DATETIME
+
+		SET @startDate = DATEADD(d,-14,GETDATE())
+		SET @endDate = GETDATE();
+
+		WITH dates(Date) AS 
+		(
+			SELECT @startdate as Date
+			UNION ALL
+			SELECT DATEADD(d,1,[Date])
+			FROM dates 
+			WHERE DATE < @enddate
+		)
+
+		SELECT CONVERT(VARCHAR(10), dates.Date, 112) AS [Date], 
+			ISNULL(OnTimeLogs.OnTimeCount, 0) AS [OnTimeCount], 
+			ISNULL(PastDueLogs.PastDueCount, 0) AS [PastDueCount]
+		FROM dates
+		LEFT OUTER JOIN (
+			SELECT CONVERT(VARCHAR(10), log2.DateFinished, 112) AS OnTimeDates, COUNT(*) AS OnTimeCount
+			FROM TaskLog AS log2
+			WHERE log2.OnTime = 'True'
+			GROUP BY CONVERT(VARCHAR(10), log2.DateFinished, 112)
+		) AS OnTimeLogs
+		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), OnTimeLogs.OnTimeDates, 112)
+		LEFT OUTER JOIN (
+			SELECT CONVERT(VARCHAR(10), log3.DateFinished, 112) AS PastDueDates, COUNT(*) AS PastDueCount
+			FROM TaskLog AS log3
+			WHERE log3.OnTime = 'False'
+			GROUP BY CONVERT(VARCHAR(10), log3.DateFinished, 112)
+		) AS PastDueLogs
+		ON CONVERT(VARCHAR(10), dates.Date, 112) = CONVERT(VARCHAR(10), PastDueLogs.PastDueDates, 112)
+		OPTION (MAXRECURSION 0)
+	`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{

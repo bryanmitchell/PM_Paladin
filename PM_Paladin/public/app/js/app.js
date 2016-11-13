@@ -15,7 +15,7 @@ var app = angular.module('xenon-app', [
 	'xenon.services',
 
 	// Added in v1.3
-	'FBAngular'
+	'FBAngular',
 ]);
 
 

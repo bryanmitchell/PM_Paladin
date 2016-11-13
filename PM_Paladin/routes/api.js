@@ -153,6 +153,29 @@ module.exports = function(cp){
 			dbconn.updateEmployee(cp, req, res);
 		});
 
+	router.route('/deleteemployee')
+		.post(function(req, res){
+			console.log("router.route(/deleteemployee)");
+			dbconn.deleteEmployee(cp, req, res);
+		});
+
+	router.route('/deleteline')
+		.post(function(req, res){
+			console.log("router.route(/deleteline)");
+			dbconn.deleteLine(cp, req, res);
+		});
+
+	router.route('/deleteworkstation')
+		.post(function(req, res){
+			console.log("router.route(/deleteworkstation)");
+			dbconn.deleteWorkstation(cp, req, res);
+		});
+	router.route('/deletetool')
+		.post(function(req, res){
+			console.log("router.route(/deletetool)");
+			dbconn.deleteTool(cp, req, res);
+		});
+
 	router.route('/confirmpartial')
 		.post(function(req, res){
 			console.log("router.route(/confirmpartial)");

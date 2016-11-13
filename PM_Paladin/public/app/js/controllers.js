@@ -178,6 +178,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$rootScope.userPosition		  = [];
 		$rootScope.buttonDisabled = false;
 		$rootScope.currentPageTitle = 'Dashboard';
+		$rootScope.userSSO = null;
 
 		$scope.logInUser = {
 			'sso': '',
@@ -265,9 +266,9 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			.success(function (data) {
 				$scope.pieChart = data;
 				// console.log($scope.pieChart);
-				$scope.labelsPie = getLabels();
-  				$scope.dataPie = getCounts();
-  				console.log($scope.labelsPie);
+				$scope.labelsPie = getPieLabels();
+  				$scope.dataPie = getPieCounts();
+  				// console.log($scope.labelsPie);
 				// console.log($scope.dataPie);
 
   			}).error(function (data, status) {
@@ -283,20 +284,24 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 				alert();
 			});
 
-		var getCounts = function(){
+		var getPieCounts = function(){
 			var result = [];
 			for(var i=0; i<$scope.pieChart.length; i++){
 				result.push($scope.pieChart[i].count);
 			}
 			return result;
 		};
-		var getLabels = function(){
+		var getPieLabels = function(){
 			var result = [];
 			for(var i=0; i<$scope.pieChart.length; i++){
 				result.push($scope.pieChart[i].status);
 			}
 			return result;
 		};
+		var getBarCounts = function () {
+			var dates = [];
+
+		}
 
 		$scope.labelsBar = ['2006', '2007', '2008', '2009', '2010', '2011', '2012']; 
 		$scope.seriesBar = ['Series A', 'Series B']; 
@@ -305,10 +310,11 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			[28, 48, 40, 19, 86, 27, 90] 
 		]; 
 
-		$scope.pieColors=['#1f9314', '#bc1a1a', '#f3ff1e'];
+		$scope.pieColors=['#1f9314', '#bc1a1a', '#fdb45c'];
 		$scope.barColors= ['#1f9314', '#bc1a1a'];
 		$scope.options = {
-			legend: {display:true}
+			legend: {display:true},
+			showAllTooltips: true
 		};
 
 		
@@ -320,8 +326,10 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 		$rootScope.currentPageTitle = 'Maintenance Confirmation';
 
 		$scope.getConfirmTasks = function () {
+			console.log('called getConfirmTasks')
 			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
+				console.dir(data);
 				$scope.tasks = data;
 			}).error(function (data, status) {
 				alert();
@@ -458,40 +466,40 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 
 		$rootScope.currentPageTitle = 'Equipment Management';
 
-		$http.get('../../api/lines') 
-			.success(function(data, status) {
-				$scope.lines = data;
-			})
-			.error(function(data, status) {
-				console.log("Error");
-			});
+		$scope.getEquipmentInfo = function(){
+			$http.get('../../api/lines') 
+				.success(function(data, status) {
+					$scope.lines = data;
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
 
-		$http.get('../../api/workstations') 
-			.success(function(data, status) {
-				$scope.workstations = data;
-			})
-			.error(function(data, status) {
-				console.log("Error");
-			});
+			$http.get('../../api/workstations') 
+				.success(function(data, status) {
+					$scope.workstations = data;
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
 
-		$http.get('../../api/tools') 
-			.success(function(data, status) {
-				$scope.tools = data;
-			})
-			.error(function(data, status) {
-				console.log("Error");
-			});
+			$http.get('../../api/tools') 
+				.success(function(data, status) {
+					console.log(data);
+					$scope.tools = data;
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+		}
 
-
-
-		$scope.date = new Date();
-		console.log($scope.date);
-
+		$scope.getEquipmentInfo();
 
 		$scope.selectedLine = null;  // initialize our variable to null
 		$scope.selectedWS = null;  // initialize our variable to null
 		$scope.selectedTool = null;  // initialize our variable to null
 		$scope.updateModal = null; //assign function to it according to what is selected
+		$scope.deleteEquipment = null;
 
 		$scope.updateLineModal = function(modal_id, modal_size, modal_backdrop){
 			$scope.modalInstance = $modal.open({
@@ -541,22 +549,66 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			});
 		};
 
+		$scope.deleteLine = function(){
+			$http.post('../../api/deleteline', {'lineID': $scope.selectedLine}) 
+			.success(function(data, status) {
+				if(data.name === 'RequestError'){
+					alert('Please reassign or unregister children workstations.');
+				}
+				else{
+					alert("Line unregistered. Please press the purple Refresh button.");
+				}
+			})
+			.error(function(data, status) {
+				alert("Error unregistering line\n"+data);
+			});
+		};
+
+		$scope.deleteWorkstation = function(){
+			$http.post('../../api/deleteworkstation', {'workstationID': $scope.selectedWS}) 
+			.success(function(data, status) {
+				if(data.name === 'RequestError'){
+					alert('Please reassign or unregister children tools.');
+				}
+				else{
+					alert("Workstation unregistered. Please press the purple Refresh button.");
+				}
+			})
+			.error(function(data, status) {
+				alert("Error deleting workstation\n"+data);
+			});
+		};
+
+		$scope.deleteTool = function(){
+			$http.post('../../api/deletetool', {'toolID': $scope.selectedTool}) 
+			.success(function(data, status) {
+				console.log("Tool unregister");
+				alert("Tool unregistered. Please press the purple Refresh button.");
+			})
+			.error(function(data, status) {
+				alert("Error deleting tool\n"+data);
+			});
+		};
+
 		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedLine = index;
 			$scope.selectedWS = null;  //para evitar que se guarde la seleccion de ws
 			$scope.selectedTool = null;
 			$scope.updateModal = $scope.updateLineModal;
+			$scope.deleteEquipment = $scope.deleteLine;
 		};
 		
 		$scope.setClickedWS = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedWS = index;
 			$scope.selectedTool = null;
 			$scope.updateModal = $scope.updateWorkstationModal;
+			$scope.deleteEquipment = $scope.deleteWorkstation;
 		};
 
 		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedTool = index;
 			$scope.updateModal = $scope.updateToolModal;
+			$scope.deleteEquipment = $scope.deleteTool;
 		};
 
 		$rootScope.disableButton = function(){
@@ -565,10 +617,9 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 				$rootScope.buttonDisabled=false;
 			},5000);
 		};
-
 	});
 
-app.controller('EquipmentCreateCtrl', function($scope, $http)
+app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
 
@@ -646,7 +697,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $http)
 		};
 	});
 
-app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedLine', function($scope, $http, $modalInstance, selectedLine)
+app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedLine', function($scope, $rootScope, $http, $modalInstance, selectedLine)
 	{
 		
 		$rootScope.currentPageTitle = 'Equipment Management';
@@ -668,10 +719,9 @@ app.controller('LineUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selected
 		$scope.close = function(){
 			$modalInstance.close();
 		};
-
 	}]);
 
-app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS', function($scope, $http, $modalInstance, selectedWS)
+app.controller('WSUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedWS', function($scope, $rootScope, $http, $modalInstance, selectedWS)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
 
@@ -695,7 +745,7 @@ app.controller('WSUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedWS
 
 	}]);
 
-app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selectedTool', function($scope, $http, $modalInstance, selectedTool)
+app.controller('ToolUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedTool', function($scope, $rootScope, $http, $modalInstance, selectedTool)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
 
@@ -720,9 +770,7 @@ app.controller('ToolUpdateCtrl', ['$scope', '$http', '$modalInstance', 'selected
 	}]);
 
 
-
-
-app.controller('UserMgmtCtrl', function($scope, $http, $modal) 
+app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal) 
 	{	
 		$rootScope.currentPageTitle = 'User Management';
 
@@ -779,14 +827,27 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
 				console.log("User created");
-				// $scope.getEmployees();
-				// $scope.$apply();
 			})
 			.error(function(data, status) {
 				console.log("Error");
 			});
-			$scope.getEmployees();
-		}
+		};
+
+		$scope.deleteEmployee = function () {
+			if ($rootScope.userSSO == $scope.selectedUser.sso){
+				alert("Cannot delete currently logged in user!")
+			} else {
+				//Request
+				$http.post('../../api/deleteemployee', {'sso': $scope.selectedUser.sso}) 
+				.success(function(data, status) {
+					console.log("User deleted");
+					alert("User deleted. Please refresh by clicking the purple button to reflect changes.");
+				})
+				.error(function(data, status) {
+					console.log("Error");
+				});
+			}
+		};
 
 		$scope.sendEmail = function () {
 			console.log("sendEmail from controller.js");
@@ -815,7 +876,7 @@ app.controller('UserMgmtCtrl', function($scope, $http, $modal)
 		};
 	});
 
-app.controller('UpdateUserModalCtrl', ['$scope', '$http', '$modalInstance', 'selectedUser', function($scope, $http, $modalInstance, selectedUser)
+app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedUser', function($scope, $rootScope, $http, $modalInstance, selectedUser)
 	{
 		$rootScope.currentPageTitle = 'User Management';
 

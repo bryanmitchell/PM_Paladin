@@ -16,7 +16,7 @@
 				<br>
 				<div class="row">
 					<div class="col-md-12">
-					<table class="table table-bordered table-striped table-condensed table-hover">
+					<table class="table table-bordered table-striped table-condensed">
 						<thead>
 							<tr>
 								<th>Employee Name</th>
@@ -30,7 +30,7 @@
 								<td>{{user.types}}</td>
 								<td>
 									<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');">Update</button>
-									<button type="button" class="btn btn-red" on-click="">Delete</button>
+									<button type="button" class="btn btn-red" ng-click="checkSelectedUser(user.sso);deleteEmployee()">Delete</button>
 								</td>
 							</tr>
 						</tbody>
@@ -89,8 +89,7 @@
 						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="userInfo.lastName" ng-pattern="/^\w+\D$/" required />
 
 						<p ng-show="createUserForm.lName.$invalid && !createUserForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
-					</div>	
-				
+					</div>
 				</div>
 			</div>
 			
@@ -104,34 +103,32 @@
 
 						<p ng-show="createUserForm.email.$invalid && !createUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	
-					
 				</div>
 			</div>
 		
 			<div class="row">
+				<!-- User Password -->
 				<div class="col-md-6">
-					
-					<!-- User Password -->
 					<div class="form-group" ng-class="{ 'has-error': createUserForm.password.$invalid && !createUserForm.password.$pristine }" required>
 						<label for="field-4" class="control-label">Password</label>
 						
-						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="userInfo.password"  ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required />
-
-						<p ng-show="createUserForm.password.$error.pattern" class="help-block">Password must contain at least one number, one upper and lower case letter, and one special character.</p>
-					</div>	
-					
+						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="userInfo.password" ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required />
+					</div>
 				</div>
 				
+				<!-- User Confirm Password -->
 				<div class="col-md-6">
-					
-					<!-- User Confirm Password -->
 					<div class="form-group" ng-class="{ 'has-error': createUserForm.confirmPassword.$invalid && !createUserForm.confirmPassword.$pristine }" required>
 						<label for="field-5" class="control-label">Confirm Password</label>
 						
 						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="userInfo.password" required />
 
-						<p ng-show="createUserForm.confirmPassword.$error.passwordVerify" class="help-block">Must match password in previous field.</p>
+						<p ng-show="createUserForm.confirmPassword.$error" class="help-block">Must match password in previous field.</p>
 					</div>	
+				</div>
+
+				<div class="col-md-12">
+					<p style="color:#a94442;" ng-show="createUserForm.password.$error.pattern" class="help-block">Password must be between 8 and 25 characters long, contain at least one number, one upper and lower case letter, and one special character.</p>
 				</div>	
 			</div>
 			

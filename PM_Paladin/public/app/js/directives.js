@@ -3,35 +3,53 @@ angular.module('xenon.directives', []).
 	//Verify confirm password matches password
 	directive('passwordVerify', function () {
 		return {
-        require: "ngModel",
-        scope: {
-            passwordVerify: '='
-        },
-        link: function(scope, element, attrs, ctrl) {
-            scope.$watch(function() {
-                var combined;
-                
-                if (scope.passwordVerify || ctrl.$viewValue) {
-                   combined = scope.passwordVerify + '_' + ctrl.$viewValue; 
-                }                    
-                return combined;
-            }, function(value) {
-                if (value) {
-                    ctrl.$parsers.unshift(function(viewValue) {
-                        var origin = scope.passwordVerify;
-                        if (origin !== viewValue) {
-                            ctrl.$setValidity("passwordVerify", false);
-                            return undefined;
-                        } else {
-                            ctrl.$setValidity("passwordVerify", true);
-                            return viewValue;
-                        }
-                    });
-                }
-            });
-        }
-    };
+			require: "ngModel",
+			scope: {
+				passwordVerify: '='
+			},
+			link: function(scope, element, attrs, ctrl) {
+				scope.$watch(function() {
+					var combined;
+					
+					if (scope.passwordVerify || ctrl.$viewValue) {
+					   combined = scope.passwordVerify + '_' + ctrl.$viewValue; 
+					} 
+					return combined;
+				}, function(value) {
+					if (value) {
+						ctrl.$parsers.unshift(function(viewValue) {
+							var origin = scope.passwordVerify;
+							if (origin !== viewValue) {
+								ctrl.$setValidity("passwordVerify", false);
+								return undefined;
+							} else {
+								ctrl.$setValidity("passwordVerify", true);
+								return viewValue;
+							}
+						});
+					}
+				});
+			}
+		};
 	}).
+	// directive('compareTo', function() {
+	// 	return {
+	// 		require: "ngModel",
+	// 		scope: {
+	// 			otherModelValue: "=compareTo"
+	// 		},
+	// 		link: function(scope, element, attributes, ngModel) {
+				 
+	// 			ngModel.$validators.compareTo = function(modelValue) {
+	// 				return modelValue == scope.otherModelValue;
+	// 			};
+	 
+	// 			scope.$watch("otherModelValue", function() {
+	// 				ngModel.$validate();
+	// 			});
+	// 		}
+	// 	};
+	// }).
 
 	// Layout Related Directives
 	directive('horizontalMenu', function(){
@@ -515,8 +533,8 @@ angular.module('xenon.directives', []).
 				// Validation
 				var checkFormWizardValidaion = function(tab, navigation, index)
 					{
-			  			if($this.hasClass('validate'))
-			  			{
+						if($this.hasClass('validate'))
+						{
 							var $valid = $this.valid();
 
 							if( ! $valid)
@@ -526,7 +544,7 @@ angular.module('xenon.directives', []).
 							}
 						}
 
-				  		return true;
+						return true;
 					};
 
 
@@ -539,24 +557,24 @@ angular.module('xenon.directives', []).
 
 				$this.bootstrapWizard({
 					tabClass: "",
-			  		onTabShow: function($tab, $navigation, index)
-			  		{
-			  			var pct = $tabs.eq(index).position().left / $tabs.parent().width() * 100;
+					onTabShow: function($tab, $navigation, index)
+					{
+						var pct = $tabs.eq(index).position().left / $tabs.parent().width() * 100;
 
-			  			$tabs.removeClass('completed').slice(0, index).addClass('completed');
-			  			$progress.css({width: pct + '%'});
-			  		},
+						$tabs.removeClass('completed').slice(0, index).addClass('completed');
+						$progress.css({width: pct + '%'});
+					},
 
-			  		onNext: checkFormWizardValidaion,
-			  		onTabClick: checkFormWizardValidaion
-			  	});
+					onNext: checkFormWizardValidaion,
+					onTabClick: checkFormWizardValidaion
+				});
 
-			  	$this.data('bootstrapWizard').show( _index );
+				$this.data('bootstrapWizard').show( _index );
 
-			  	$this.find('.pager a').on('click', function(ev)
-			  	{
-				  	ev.preventDefault();
-			  	});
+				$this.find('.pager a').on('click', function(ev)
+				{
+					ev.preventDefault();
+				});
 			}
 		}
 	}).
