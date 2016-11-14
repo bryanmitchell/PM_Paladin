@@ -191,7 +191,7 @@
 
 						<label for="field-3" class="control-label">Supervisor Email Address</label>
 
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="lineInfo.supervisorEmail" required>
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="lineInfo.supervisorEmail" required ng-pattern="/.+@.+\..+/">
 
 						<p ng-show="lineForm.email.$invalid && !lineForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>
@@ -288,11 +288,10 @@
 			
 			<br>
 
+			<!-- Engineer in charge -->
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group" ng-class="{ 'has-error': wsForm.wsPerson.$invalid && wsForm.wsPerson.$pristine }">
-
-						<!-- Engineer in charge -->
 						<label for="field-3" class="control-label">Engineer in Charge</label>
 						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" ng-options="user.sso as (user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Engineer'}" required>
 						  <option value="">--- Select from list ---</option>
@@ -456,7 +455,7 @@
 				<div class="col-md-12">
 					<div class="form-group" ng-class="{ 'has-error': updateLineForm.email.$invalid && updateLineForm.email.$pristine }">
 						<label for="field-3" class="control-label">Supervisor Email Address</label>
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="lineInfo.supervisorEmail" required>
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="lineInfo.supervisorEmail" required ng-pattern="/.+@.+\..+/">
 						<p ng-show="updateLineForm.email.$invalid && !updateLineForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>
 				</div>
@@ -483,12 +482,7 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label for="field-1" class="control-label">Workstation Name</label>
-					<select style="width: 150px;" ng-model="workstationInfo.wsName">
-					  <option value="NO ONE">--- Select from list ---</option>
-					  <option value="Saab">Saab</option>
-					  <option value="Opel">Opel</option>
-					  <option value="Audi">Audi</option>
-					</select>				
+					<h5>{{workstationInfo.wsName}}</h5>
 				</div>		
 			</div>
 		</div>
@@ -499,56 +493,62 @@
 			<h4>Stack Light OPC Addresses</h4>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">Green</label>
-					<select style="width: 150px;" ng-model="workstationInfo.greenLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>	
-				</div>	
-			</div>
-			
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Yellow</label>
-					<select style="width: 150px;" ng-model="workstationInfo.yellowLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>				
+		<!-- ADDRESSES -->
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsGreenModule.$invalid && wsForm.wsGreenModule.$pristine }">
+						<label for="field-1" class="control-label">Green Module Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.GreenLightModuleNumber" name="wsGreenModule" required ng-options="module for module in moduleNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsGreenPoint.$invalid && wsForm.wsGreenPoint.$pristine }">
+						<label for="field-1" class="control-label">Green Point Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.GreenLightPointNumber" name="wsGreenPoint" required ng-options="point for point in pointNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
 				</div>
-			</div>
+				
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsYellowModule.$invalid && wsForm.wsYellowModule.$pristine }">
+						<label for="field-1" class="control-label">Yellow Module Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.yellowLightModuleNumber" name="wsYellowModule" required ng-options="module for module in moduleNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsYellowPoint.$invalid && wsForm.wsYellowPoint.$pristine }">
+						<label for="field-1" class="control-label">Yellow Point Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.yellowLightPointNumber" name="wsYellowPoint" required ng-options="point for point in pointNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
+				</div>
 
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">Red</label>
-					<select style="width: 150px;" ng-model="workstationInfo.redLightOpcTag">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
-					</select>				
-				</div>	
-			</div>
-		</div>
+				<div class="col-md-4">
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsRedModule.$invalid && wsForm.wsRedModule.$pristine }">
+						<label for="field-1" class="control-label">Red Module Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.redLightModuleNumber" name="wsRedModule" required ng-options="module for module in moduleNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
+					<div class="form-group" ng-class="{ 'has-error': wsForm.wsRedPoint.$invalid && wsForm.wsRedPoint.$pristine }">
+						<label for="field-1" class="control-label">Red Point Number</label>
+						<select style="width: 150px;" ng-model="workstationInfo.redLightPointNumber" name="wsRedPoint" required ng-options="point for point in pointNumbers">
+						  <option value="">--- Select from list ---</option>
+						</select>	
+					</div>
+				</div>
 		
 		<br>
 
 		<!-- Engineer in charge -->
 		<div class="row">
 			<div class="col-md-12">
-				<div class="form-group">
+				<div class="form-group" ng-class="{ 'has-error': wsForm.wsPerson.$invalid && wsForm.wsPerson.$pristine }">
 					<label for="field-3" class="control-label">Engineer in Charge</label>
-					<select style="width: 150px;" ng-model="workstationInfo.employeeSso">
-					  <option value=0>--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
+					<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" ng-options="user.sso as (user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Engineer'}" required>
+					  <option value="">--- Select from list ---</option>
 					</select>				
 				</div>
 			</div>
@@ -578,13 +578,7 @@
 			</div>
 					
 			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.toolName">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value="saab">Saab</option>
-				  <option value="opel">Opel</option>
-				  <option value="audi">Audi</option>
-				</select>
-
+				<h5>{{toolInfo.toolName}}</h4>
 			</div>		
 		</div>
 
@@ -605,75 +599,62 @@
 			</div>		
 		</div>
 
-		<!-- RFID TAG -->
-		<div class="row">
+		<!-- MODULE NUMBER -->
+		<div class="row form-group" ng-class="{ 'has-error': toolForm.module.$invalid && toolForm.module.$pristine }">
 			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-1" class="control-label">RFID Tag</label>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.rfidAddress">
-				  <option value="volvo">--- Select from list ---</option>
-				  <option value=1>1</option>
-				  <option value=2>2</option>
-				  <option value=3>3</option>
-				</select>	
-			</div>	
-		</div>				
-
-		<!-- OPC TAG -->
-		<div class="row">
-			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">OPC Tag</label>
+				<div>
+					<label for="field-2" class="control-label">Module Number</label>
 				</div>
 			</div>
 
 			<div class="col-md-4">	
-				<select style="width: 150px;" ng-model="toolInfo.opcTag">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>1</option>
-					<option value=2>2</option>
-					<option value=3>3</option>
+				<select style="width: 150px;" ng-model="toolInfo.RemoteIoModuleNumber" name="module" required ng-options="module for module in moduleNumbers">
+					<option value="">--- Select from list ---</option>
 				</select>				
 			</div>	
 		</div>
 
-		<!-- IO ADDRESS -->
-		<div class="row">
+		<!-- POINT NUMBER -->
+		<div class="row form-group" ng-class="{ 'has-error': toolForm.point.$invalid && toolForm.point.$pristine }">
 			<div class="col-md-4">
-				<div class="form-group">
-					<label for="field-2" class="control-label">I/O Address</label>
+				<div>
+					<label for="field-2" class="control-label">Point Number</label>
 				</div>
 			</div>	
 
 			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.ioAddress">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>1</option>
-					<option value=2>2</option>
-					<option value=3>3</option>
+				<select style="width: 150px;" ng-model="toolInfo.RemoteIoPointNumber" name="point" required ng-options="point for point in pointNumbers">
+					<option value="">--- Select from list ---</option>
 				</select>				
+			</div>	
+		</div>
+
+		<!-- RFID TAG -->
+		<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
+			<div class="col-md-4">
+				<div>
+					<label for="field-1" class="control-label">RFID Tag</label>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add for add in rfidAddresses">
+				  <option value="">--- Select from list ---</option>
+				</select>	
 			</div>	
 		</div>
 
 		<!-- TECHNICIAN IN CHARGE -->
 		<div class="row">
 			<div class="col-md-4">
-				<div class="form-group">
+				<div class="form-group" ng-class="{ 'has-error': toolForm.toolPerson.$invalid && toolForm.toolPerson.$pristine }">
 					<label for="field-3" class="control-label">Technician in Charge</label>
 				</div>
 			</div>
-
-			<div class="col-md-1">
-				<select style="width: 150px;" ng-model="toolInfo.employeeSso">
-					<option value="volvo">--- Select from list ---</option>
-					<option value=1>Saab</option>
-					<option value=2>Opel</option>
-					<option value=3>Audi</option>
+			<div class="col-md-4">
+				<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="toolPerson" ng-options="user.sso as (user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Technician'}" required>
+					<option value="">--- Select from list ---</option>
 				</select>				
-			</div>	
+			</div>
 		</div>
 
 		<!-- SAVE BUTTON -->

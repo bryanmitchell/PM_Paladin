@@ -33,15 +33,17 @@ function runQuery(query, cp, res) {
 	});
 };
 
-function runPostQuery(query, cp) {
+function runPostQuery(query, cp, res) {
 	console.log('in dbconn.runPostQuery()');
 	var request = new sql.Request(cp);
 	request.query(query, function(err, recordset){
 		if(err){
 			console.log("Query failed: " + query); 
 			console.log(err);
+			res.send(err);
 		} else {
 			console.log("Query success!");
+			res.send();
 		}
 	});
 };
@@ -225,8 +227,8 @@ exports.getLines = function(cp, res){
 
 exports.getWorkstations = function(cp, res){
 	runQuery(`
-		SELECT ws.workstationID AS [wsID]
-			,ws.workstationName AS [wsName]
+		SELECT ws.WorkstationID AS [wsID]
+			,ws.WorkstationName AS [wsName]
 			,ws.GreenLightModuleNumber AS [GreenLightModuleNumber]
 			,ws.GreenLightPointNumber AS [GreenLightPointNumber]
 			,ws.YellowLightModuleNumber AS [yellowLightModuleNumber]
@@ -266,8 +268,7 @@ exports.createLine = function(cp, req, res){
 			([LineName], [SupervisorFirstName], [SupervisorLastName], [SupervisorEmail])
 		VALUES
 			('${r.lineName}', '${r.supervisorFirstName}', '${r.supervisorLastName}', '${r.supervisorEmail}');
-		`, cp);
-	res.redirect('back');
+		`, cp, res);
 };
 
 exports.createWorkstation = function(cp, req, res){
@@ -390,54 +391,79 @@ exports.createTool = function(cp, req, res){
 /* UPDATE */
 exports.updateLine = function(cp, req, res){
 	var r = req.body;
-	runPostQuery(`
+	var query = `
 		UPDATE ProductionLine
 		SET LineName = '${r.lineName}'
 			,SupervisorFirstName = '${r.supervisorFirstName}'
 			,SupervisorLastName = '${r.supervisorLastName}'
 			,SupervisorEmail = '${r.supervisorEmail}'
 		WHERE LineID = ${r.lineID};
-		`, cp);
-	res.redirect('back');
-};
+		`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){
+			console.log(err);
+			res.send(err);
+		}
+		else{
+			console.log("Query 'updateWorkstation' success!");
+			res.send();
+		}
+	});
+}; // Change when RunPostQuery is changed
 
 exports.updateWorkstation = function(cp, req, res){
 	var r = req.body;
-	runPostQuery(`
+	var query = `
 		UPDATE Workstation
-		SET workstationName = '${r.wsName}'
-			,GreenLightModuleNumber = CONVERT(INT, ${r.greenLightModuleNumber})
-			,GreenLightPointNumber = CONVERT(INT, ${r.greenLightPointNumber})
-			,YellowLightModuleNumber = CONVERT(INT, ${r.yellowLightModuleNumber})
-			,YellowLightPointNumber = CONVERT(INT, ${r.yellowLightPointNumber})
-			,RedLightModuleNumber = CONVERT(INT, ${r.redLightModuleNumber})
-			,RedLightPointNumber = CONVERT(INT, ${r.redLightPointNumber})
-		WHERE workstationId = ${wsID};
+		SET GreenLightModuleNumber = ${r.GreenLightModuleNumber}
+			,GreenLightPointNumber = ${r.GreenLightPointNumber}
+			,YellowLightModuleNumber = ${r.yellowLightModuleNumber}
+			,YellowLightPointNumber = ${r.yellowLightPointNumber}
+			,RedLightModuleNumber = ${r.redLightModuleNumber}
+			,RedLightPointNumber = ${r.redLightPointNumber}
+		WHERE workstationId = ${r.wsID};
 
 		UPDATE WorkstationAssignedTo
 		SET Sso = ${r.employeeSso}
-		WHERE WorkstationID = ${wsID};
-		`, cp);
-	res.redirect('back');
-};
+		WHERE WorkstationID = ${r.wsID};
+		`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){
+			console.log(err);
+			res.send(err);
+		}
+		else{
+			console.log("Query 'updateWorkstation' success!");
+			res.send();
+		}
+	});
+}; //change when RunPostQuery is changed
 
 exports.updateTool = function(cp, req, res){
 	var r = req.body;
-	runPostQuery(`
+	var query = `
 		UPDATE Tool
-		SET ToolName = '${r.toolName}'
-			,ToolType = '${r.toolType}'
-			,RfidAddress = CONVERT(INT, ${r.rfidAddress})
-			,RemoteIoModuleNumber = CONVERT(INT, ${r.remoteIoModuleNumber})
-			,RemoteIoPointNumber = CONVERT(INT, ${r.remoteIoPointNumber})
+		SET ToolType = '${r.toolType}'
+			,RfidAddress = ${r.rfidAddress}
+			,RemoteIoModuleNumber = ${r.RemoteIoModuleNumber}
+			,RemoteIoPointNumber = ${r.RemoteIoPointNumber}
 		WHERE ToolID = ${r.toolID};
 
 		UPDATE ToolAssignedTo
 		SET Sso = ${r.employeeSso}
 		WHERE ToolID = ${r.toolID};
-		`, cp);
-	res.redirect('back');
-};
+		`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){
+			console.log(err);
+			res.send(err);
+		}
+		else{
+			console.log("Query 'updateTool' success!");
+			res.send();
+		}
+	});
+}; //change when RunPostQuery is changed
 
 exports.setToolActive = function(cp,req,res){
 	var r = req.body;
@@ -558,21 +584,29 @@ exports.createEmployee = function(cp, req, res){
 			VALUES (${r.sso},'${r.employeeType[i]}');
 		`;
 	}
-	runPostQuery(query, cp);
-	res.redirect('back');
+	runPostQuery(query, cp, res);
 }; //TODO FIX
 
 exports.updateEmployee = function(cp, req, res){
 	var r = req.body;
 	var types = r.types.split(',');
-	runPostQuery(`
+	var query = `
 		UPDATE Employee
 		SET FirstName = '${r.firstName}'
 			,LastName = '${r.lastName}'
 			,Email = '${r.email}'
 			,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
 		WHERE Sso = ${r.sso};
-		`, cp);
+		`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){
+			console.log(err);
+			res.send(err);
+		}
+		else{
+			console.log("Query updateEmployee (1/2) success!");
+		}
+	});
 
 	var query2 = `
 		BEGIN TRANSACTION;
@@ -604,8 +638,7 @@ exports.updateEmployee = function(cp, req, res){
 		END CATCH;
 		IF @@TRANCOUNT > 0 
 			COMMIT TRANSACTION;`;
-	runPostQuery(query2, cp);
-	res.redirect('back');
+	runPostQuery(query2, cp, res);
 };
 
 exports.deleteEmployee = function(cp, req, res){

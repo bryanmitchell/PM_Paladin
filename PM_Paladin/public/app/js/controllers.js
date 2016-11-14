@@ -654,8 +654,17 @@ app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstan
 app.controller('WSUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedWS', function($scope, $rootScope, $http, $modalInstance, selectedWS)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 
 		$scope.workstationInfo = selectedWS;
+		$scope.users = {};
+		$http.get('../../api/employees')
+			.success(function (data) {
+				$scope.users = data;
+			}).error(function (data, status) {
+				alert();
+			});
 
 		$scope.updateWorkstation = function () {
 			//Request
@@ -678,8 +687,17 @@ app.controller('WSUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance
 app.controller('ToolUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedTool', function($scope, $rootScope, $http, $modalInstance, selectedTool)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
-
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
+		$scope.rfidAddresses = [0,1,2,3,4,5,6,7,8,9];
 		$scope.toolInfo = selectedTool;
+		$scope.users = {};
+		$http.get('../../api/employees')
+			.success(function (data) {
+				$scope.users = data;
+			}).error(function (data, status) {
+				alert();
+			});
 
 		$scope.updateTool = function () {
 			//Request
