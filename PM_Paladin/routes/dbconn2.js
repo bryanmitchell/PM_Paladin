@@ -290,7 +290,7 @@ exports.createWorkstation = function(cp, req, res){
 			,[RedLightModuleNumber]
 			,[RedLightPointNumber])
 		VALUES
-			(${r.lineID}
+			(${1}
 			,'${r.workstationName}'
 			,${1}
 			,${0}
@@ -349,7 +349,7 @@ exports.createTool = function(cp, req, res){
 				,[YearBought]
 				,[OriginalCostDollars])
 			VALUES
-				(${r.workstationID}
+				(${1}
 				,'${r.toolName}'
 				,'${r.toolType}'
 				,${r.remoteIoModuleNumber}
