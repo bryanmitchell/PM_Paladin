@@ -24,156 +24,15 @@ module.exports = function(cp){
 			return res.sendStatus(200);
 		});
 	};
-	
-	// Getting Users for User Management
-	router.route('/employees')
-		.get(function(req, res){
-			console.log("router.route(/employees)");
-			dbconn.getEmployees(cp, res);
-		});
 
-	// Getting Tasks that require confirmation (partial or full)
-	router.route('/confirmtasks')
-		.post(function(req, res){
-			console.log("router.route(/confirmtasks)");
-			dbconn.getConfirmationTasks(cp, req, res);
-		});
-
-	// Getting tasks that require approval
-	router.route('/approvetasks')
-		.post(function(req, res){
-			console.log("router.route(/approvetasks)");
-			dbconn.getApprovalTasks(cp, req, res);
-		});
-
-	// Getting tools and their workstations and lines
-	router.route('/tools')
-		.get(function(req, res){
-			console.log("router.route(/tools)");
-			dbconn.getTools(cp, res);
-		});
-
-	// Getting workstations and their lines
-	router.route('/workstations')
-		.get(function(req, res){
-			console.log("router.route(/workstations)");
-			dbconn.getWorkstations(cp, res);
-		});
-
-	// Getting lines
-	router.route('/lines')
-		.get(function(req, res){
-			console.log("router.route(/lines)");
-			dbconn.getLines(cp, res);
-		});
-
-	// Creating Employees
-	router.route('/createemployee')
-		.post(function(req, res){
-			console.log("router.route(/createemployee)");
-			dbconn.createEmployee(cp, req, res);
-		});
-
+	/**
+	DASHBOARD
+	**/
 	// Get Log In Employee
 	router.route('/getEmployeePassword')
 		.post(function(req, res){
 			console.log("router.route(/getEmployeePassword)");
 			dbconn.getEmployeePassword(cp, req, res);
-		});
-
-	router.route('/createline')
-		.post(function(req, res){
-			console.log("router.route(/createline)");
-			dbconn.createLine(cp, req, res);
-		});
-
-	router.route('/createworkstation')
-		.post(function(req, res){
-			console.log("router.route(/createworkstation)");
-			dbconn.createWorkstation(cp, req, res);
-		});
-
-	router.route('/createtool')
-		.post(function(req, res){
-			console.log("router.route(/createtool)");
-			dbconn.createTool(cp, req, res);
-		});
-
-	router.route('/updateline')
-		.post(function(req, res){
-			console.log("router.route(/updateline)");
-			dbconn.updateLine(cp, req, res);
-		});
-
-	router.route('/updateworkstation')
-		.post(function(req, res){
-			console.log("router.route(/updateworkstation)");
-			dbconn.updateWorkstation(cp, req, res);
-		});
-
-	router.route('/updatetool')
-		.post(function(req, res){
-			console.log("router.route(/updatetool)");
-			dbconn.updateTool(cp, req, res);
-		});
-
-	router.route('/updateemployee')
-		.post(function(req, res){
-			console.log("router.route(/updateemployee)");
-			dbconn.updateEmployee(cp, req, res);
-		});
-
-	router.route('/deleteemployee')
-		.post(function(req, res){
-			console.log("router.route(/deleteemployee)");
-			dbconn.deleteEmployee(cp, req, res);
-		});
-
-	router.route('/deleteline')
-		.post(function(req, res){
-			console.log("router.route(/deleteline)");
-			dbconn.deleteLine(cp, req, res);
-		});
-
-	router.route('/deleteworkstation')
-		.post(function(req, res){
-			console.log("router.route(/deleteworkstation)");
-			dbconn.deleteWorkstation(cp, req, res);
-		});
-	router.route('/deletetool')
-		.post(function(req, res){
-			console.log("router.route(/deletetool)");
-			dbconn.deleteTool(cp, req, res);
-		});
-
-	router.route('/confirmpartial')
-		.post(function(req, res){
-			console.log("router.route(/confirmpartial)");
-			dbconn.setPartialConfirm(cp, req, res);
-		});
-
-	router.route('/confirmfull')
-		.post(function(req, res){
-			console.log("router.route(/confirmfull)");
-			dbconn.setFullConfirm(cp, req, res);
-		});
-
-	router.route('/approve')
-		.post(function(req, res){
-			console.log("router.route(/approve)");
-			dbconn.setApprove(cp, req, res);
-		});
-
-	router.route('/settoolactive')
-		.post(function(req, res){
-			console.log("router.route(/settoolactive)");
-			dbconn.setToolActive(cp, req, res);
-		});
-
-	router.route('/settoolinactive')
-		.post(function(req, res){
-			console.log("router.route(/settoolinactive)");
-			dbconn.setToolInactive(cp, req, res);
 		});
 
 	router.route('/gettooldates')
@@ -195,10 +54,183 @@ module.exports = function(cp){
 		});
 
 
+
+
+	/**
+	EQUIPMENT MANAGEMENT
+	**/
+	// GET
+	router.route('/tools')
+		.get(function(req, res){
+			console.log("router.route(/tools)");
+			dbconn.getTools(cp, res);
+		});
+
+	router.route('/workstations')
+		.get(function(req, res){
+			console.log("router.route(/workstations)");
+			dbconn.getWorkstations(cp, res);
+		});
+
+	router.route('/lines')
+		.get(function(req, res){
+			console.log("router.route(/lines)");
+			dbconn.getLines(cp, res);
+		});
+	
+	// CREATE
+	router.route('/createline')
+		.post(function(req, res){
+			console.log("router.route(/createline)");
+			dbconn.createLine(cp, req, res);
+		});
+
+	router.route('/createworkstation')
+		.post(function(req, res){
+			console.log("router.route(/createworkstation)");
+			dbconn.createWorkstation(cp, req, res);
+		});
+
+	router.route('/createtool')
+		.post(function(req, res){
+			console.log("router.route(/createtool)");
+			dbconn.createTool(cp, req, res);
+		});
+
+	// UPDATE
+	router.route('/updateline')
+		.post(function(req, res){
+			console.log("router.route(/updateline)");
+			dbconn.updateLine(cp, req, res);
+		});
+
+	router.route('/updateworkstation')
+		.post(function(req, res){
+			console.log("router.route(/updateworkstation)");
+			dbconn.updateWorkstation(cp, req, res);
+		});
+
+	router.route('/updatetool')
+		.post(function(req, res){
+			console.log("router.route(/updatetool)");
+			dbconn.updateTool(cp, req, res);
+		});
+
+	// DELETE
+	router.route('/deleteline')
+		.post(function(req, res){
+			console.log("router.route(/deleteline)");
+			dbconn.deleteLine(cp, req, res);
+		});
+
+	router.route('/deleteworkstation')
+		.post(function(req, res){
+			console.log("router.route(/deleteworkstation)");
+			dbconn.deleteWorkstation(cp, req, res);
+		});
+	router.route('/deletetool')
+		.post(function(req, res){
+			console.log("router.route(/deletetool)");
+			dbconn.deleteTool(cp, req, res);
+		});
+
+	// TOOL OPERATION
+	router.route('/settoolactive')
+		.post(function(req, res){
+			console.log("router.route(/settoolactive)");
+			dbconn.setToolActive(cp, req, res);
+		});
+
+	router.route('/settoolinactive')
+		.post(function(req, res){
+			console.log("router.route(/settoolinactive)");
+			dbconn.setToolInactive(cp, req, res);
+		});
+
+
+
+
+
+	/**
+	USER MANAGEMENT
+	**/
+	// Creating Employees
+	router.route('/createemployee')
+		.post(function(req, res){
+			console.log("router.route(/createemployee)");
+			dbconn.createEmployee(cp, req, res);
+		});
+
+	// Getting Users
+	router.route('/employees')
+		.get(function(req, res){
+			console.log("router.route(/employees)");
+			dbconn.getEmployees(cp, res);
+		});
+
+	router.route('/updateemployee')
+		.post(function(req, res){
+			console.log("router.route(/updateemployee)");
+			dbconn.updateEmployee(cp, req, res);
+		});
+
+	router.route('/deleteemployee')
+		.post(function(req, res){
+			console.log("router.route(/deleteemployee)");
+			dbconn.deleteEmployee(cp, req, res);
+		});
+
+
+
+
+	/**
+	MAINTENANCE CONFIRMATION
+	**/
+	// Getting Tasks that require confirmation (partial or full)
+	router.route('/confirmtasks')
+		.post(function(req, res){
+			console.log("router.route(/confirmtasks)");
+			dbconn.getConfirmationTasks(cp, req, res);
+		});
+
+	router.route('/confirmpartial')
+		.post(function(req, res){
+			console.log("router.route(/confirmpartial)");
+			dbconn.setPartialConfirm(cp, req, res);
+		});
+
+	router.route('/confirmfull')
+		.post(function(req, res){
+			console.log("router.route(/confirmfull)");
+			dbconn.setFullConfirm(cp, req, res);
+		});
+
+
+
+
+
+	/**
+	MAINTENANCE APPROVAL
+	**/
+	// Getting tasks that require approval
+	router.route('/approvetasks')
+		.post(function(req, res){
+			console.log("router.route(/approvetasks)");
+			dbconn.getApprovalTasks(cp, req, res);
+		});
+
+	router.route('/approve')
+		.post(function(req, res){
+			console.log("router.route(/approve)");
+			dbconn.setApprove(cp, req, res);
+		});
+
+
+
+
 	/**
 	EMAIL ROUTES
 	**/
-
 	//Partial Confirmation Email
 	router.route('/emailpartial')
 		.post(function(req, res){
