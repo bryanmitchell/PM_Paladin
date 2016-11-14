@@ -24,9 +24,9 @@ exports.partiallyConfirmedEmail = function(req){
 	var index = 0;
 	var toolIDs = [];
 	var technicianName = "";
-	for (var key in req.body) {
-		if (req.body.hasOwnProperty(key)) {
-			item = req.body[key];
+	for (var key in req.body.task) {
+		if (req.body.task.hasOwnProperty(key)) {
+			item = req.body.task[key];
 			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
 			technicianName = item.TecFName + " " + item.TecLName;
 			console.log(toolIDs);
@@ -35,7 +35,7 @@ exports.partiallyConfirmedEmail = function(req){
 	};
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		"bryan.bmf@gmail.com", 
+		req.body.engineerEmail, 
 		"[PM Paladin] Tasks have been partially confirmed by technician " + technicianName + ".",
 		content_1 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
 		);
@@ -49,9 +49,9 @@ exports.fullyConfirmedEmail = function(req){
 	var index = 0;
 	var toolIDs = [];
 	var technicianName = "";
-	for (var key in req.body) {
-		if (req.body.hasOwnProperty(key)) {
-			item = req.body[key];
+	for (var key in req.body.task) {
+		if (req.body.task.hasOwnProperty(key)) {
+			item = req.body.task[key];
 			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
 			technicianName = item.TecFName + " " + item.TecLName;
 			console.log(toolIDs);
@@ -61,7 +61,7 @@ exports.fullyConfirmedEmail = function(req){
 
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		"bryan.bmf@gmail.com", 
+		req.body.engineerEmail, 
 		"[PM Paladin] Tasks have been fully confirmed by technician " + technicianName + ".",
 		content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>" + "<br>" + content_3
 		);
@@ -74,19 +74,19 @@ exports.approvedEmail = function(req){
 	var index = 0;
 	var toolIDs = [];
 	var engineerName = "";
-	for (var key in req.body) {
-		if (req.body.hasOwnProperty(key)) {
-			item = req.body[key];
+	for (var key in req.body.task) {
+		if (req.body.task.hasOwnProperty(key)) {
+			item = req.body.task[key];
 			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
 			engineerName = item.EngFName + " " + item.EngLName;
-			console.log(toolIDs);
+			// console.log(supervisorEmail);
 			index++;
 		}
 	};
 
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		"bryan.bmf@gmail.com", 
+		req.body.supervisorEmail, 
 		"[PM Paladin] Tasks have been approved by engineer " + engineerName + ".",
 		content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
 		);

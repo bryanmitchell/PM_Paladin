@@ -188,14 +188,20 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$scope.validateLogIn = function () {
 			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
 			.success(function(data, status) {
+				console.log(data);
+				console.log(status);
 				$rootScope.isLoggedIn = data.success;
 				if($rootScope.isLoggedIn){
 					$rootScope.userPosition = data.types.split(',');
 					$rootScope.userSSO = $scope.logInUser.sso;
 				}
+				else{
+					alert("Invalid password. \nPlease try again.");
+				}
 			})
 			.error(function(data, status) {
 				console.log("Error");
+				alert("Invalid SSO. \nPlease try again.");
 			});
 		};
 
@@ -311,9 +317,9 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 			}
 			counts.push(onTime);
 			counts.push(pastDue);
-			console.log(onTime);
-			console.log(pastDue);
-			console.log(counts);
+			// console.log(onTime);
+			// console.log(pastDue);
+			// console.log(counts);
 			return counts;
 
 
@@ -332,16 +338,46 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 				var formattedDate = month + " " + day;
 				dates.push(formattedDate);
 			}
-			console.log(dates);
+			// console.log(dates);
 			return dates;
 		}
 
 		$scope.seriesBar = ['On Time', 'Past Due']; 
 		$scope.pieColors=['#1f9314', '#bc1a1a', '#fdb45c'];
 		$scope.barColors= ['#1f9314', '#bc1a1a'];
-		$scope.options = {
-			legend: {display:true},
+		$scope.barOptions = {
+			legend: {
+				display:true,
+				position: 'bottom'
+			},
+			title: {
+				display: true,
+				text: 'Statistics For Past 14 Days'
+			},
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero: true,
+						stepSize: 5,
+						userCallback: function (label, index, labels) {
+							if (Math.floor(label) === label) {
+								return label;
+							}
+						},
+					}
+				}],
+			},
 		};
+		$scope.pieOptions = {
+			legend: {
+				display:true,
+				position: 'bottom'
+			},
+			title: {
+				display: true,
+				text: 'Tasks By Status'
+			},
+		}
 
 		
 		
@@ -827,7 +863,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			console.log('called getConfirmTasks')
 			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
-				console.dir(data);
+				console.log(data);
 				$scope.tasks = data;
 			}).error(function (data, status) {
 				alert();
@@ -879,7 +915,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			if (type == "partial") {
 				console.log("Partial");
 				
-				$http.post('../../api/emailpartial', $scope.selection) 
+				$http.post('../../api/emailpartial', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
 				.success(function(data, status) {
 					console.log("Sent ok");
 				})
@@ -890,7 +926,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			else {
 				console.log("Full");
 				
-				$http.post('../../api/emailfull', $scope.selection) 
+				$http.post('../../api/emailfull', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
 				.success(function(data, status) {
 					console.log("Sent ok");
 				})
@@ -914,6 +950,8 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 			$http.post('../../api/approvetasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
 				$scope.tasks = data;
+				console.log(data);
+				console.log(data[0].LineSupervisorEmail);
 			}).error(function (data, status) {
 				alert();
 			});
@@ -938,19 +976,10 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 			})
 		};
 
-		$scope.approveTasks = function(){
-			$http.post('../../api/approve', $scope.selection)
-			.success(function (data) {
-				console.log('approveTasks');
-			}).error(function (data, status) {
-				alert();
-			});
-		};
-
 		$scope.sendEmail = function () {
 			console.log("sendEmail from controller.js");
 			//Request
-			$http.post('../../api/emailapprove', $scope.selection) 
+			$http.post('../../api/emailapprove', {'supervisorEmail': $scope.tasks[0].LineSupervisorEmail, 'task': $scope.selection}) 
 			.success(function(data, status) {
 				console.log("Sent ok");
 			})
@@ -958,5 +987,17 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 				console.log("Error");
 			});
 		};
+
+		$scope.approveTasks = function(){
+			$http.post('../../api/approve', $scope.selection)
+			.success(function (data) {
+				console.log('approveTasks');
+				console.log(data);
+			}).error(function (data, status) {
+				alert();
+			});
+		};
+
+		
 	});
 

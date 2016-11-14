@@ -6,7 +6,7 @@
 
 				<!-- TABLE -->
 				<div class="row">
-					<div class="col-sm-9">
+					<div class="col-md-9">
 						<table class="table table-bordered table-striped table-condensed">
 							<thead>
 								<tr>
@@ -36,9 +36,9 @@
 
 				<!-- BUTTONS -->
 				<div class="row">
-					<div class="col-sm-6">
-						<button type="button" class="btn btn-warning" ng-click="confirmPartial(); sendEmail('partial'); uncheckBoxes();" ng-disabled="selection.length==0">Partially Confirm</button>
-						<button type="submit" class="btn btn-success" ng-click="confirmFull(); sendEmail('full'); uncheckBoxes();" ng-disabled="selection.length==0">Fully Confirm</button>
+					<div class="col-md-9">
+						<button type="button" class="btn btn-warning pull-right" ng-click="confirmPartial(); sendEmail('partial'); uncheckBoxes();" ng-disabled="selection.length==0">Partially Confirm</button>
+						<button type="submit" class="btn btn-success pull-right" ng-click="confirmFull(); sendEmail('full'); uncheckBoxes();" ng-disabled="selection.length==0">Fully Confirm</button>
 						<button type="submit" class="btn btn-purple pull-right" ng-click="getConfirmTasks();">
 							<span class="fa-rotate-right"></span> <!-- REFRESH -->
 						</button>
