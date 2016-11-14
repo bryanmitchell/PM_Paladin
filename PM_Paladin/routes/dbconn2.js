@@ -77,14 +77,13 @@ exports.getEmployeePassword = function(cp, req, res){
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
-			console.log("Query success!");
+			console.log("Query getEmployeePassword success!");
 			res.send({
-				'success': bcrypt.compareSync(pwd, recordset[0].hash),
-				'types': recordset[0].types,
+				'success': recordset.length !== 0 && bcrypt.compareSync(pwd, recordset[0].hash),
+				'types': (recordset[0] && recordset[0].types) || '',
 			});
 		}
 	});
-	// runQuery(query, cp, res);
 };
 
 exports.getToolDates = function(cp,res){
@@ -183,15 +182,15 @@ exports.getPieChartInfo = function(cp,res){
 		,COUNT(*) AS [count]
 	FROM (
 		SELECT CASE 
-			WHEN (TaskStatus = 'PastDue')
+			WHEN (TaskStatus = 'Past Due')
 				THEN 'PastDue' 
 			WHEN (TaskStatus = 'OnTime' 
 				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) BETWEEN 0 AND 14) 
 				THEN 'Upcoming'
 			WHEN (TaskStatus = 'OnTime' 
 				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) > 14) 
-				THEN 'OnTime'
-			ELSE 'Other'
+				THEN 'On Time'
+			ELSE 'In Progress'
 			END AS [status]
 		FROM Task) AS [t]
 	GROUP BY t.status`;
@@ -291,8 +290,8 @@ exports.createWorkstation = function(cp, req, res){
 			,[RedLightModuleNumber]
 			,[RedLightPointNumber])
 		VALUES
-			(${1}
-			,${r.workstationName}
+			(${r.lineID}
+			,'${r.workstationName}'
 			,${1}
 			,${0}
 			,${0}
@@ -303,8 +302,8 @@ exports.createWorkstation = function(cp, req, res){
 			,${r.redLightModuleNumber}
 			,${r.redLightPointNumber});
 		SELECT @wsid = SCOPE_IDENTITY();
-		INSERT INTO [dbo].[WorkstationAssignedTo] ([workstationId], [employeeSso])
-		VALUES (@wsId, ${r.sso});
+		INSERT INTO [dbo].[WorkstationAssignedTo] ([WorkstationID], [Sso])
+		VALUES (@wsId, ${r.employeeSso});
 		END TRY
 		BEGIN CATCH
 			SELECT 
@@ -339,30 +338,30 @@ exports.createTool = function(cp, req, res){
 		BEGIN TRANSACTION;
 		BEGIN TRY
 			INSERT INTO [dbo].[Tool]
-			   ([WorkstationID]
-			   ,[ToolName]
-			   ,[ToolType]
-			   ,[RemoteIoModuleNumber]
-			   ,[RemoteIoPointNumber]
-			   ,[IsActive]
-			   ,[RfidAddress]
-			   ,[Supplier]
-			   ,[YearBought]
-			   ,[OriginalCostDollars])
+				([WorkstationID]
+				,[ToolName]
+				,[ToolType]
+				,[RemoteIoModuleNumber]
+				,[RemoteIoPointNumber]
+				,[IsActive]
+				,[RfidAddress]
+				,[Supplier]
+				,[YearBought]
+				,[OriginalCostDollars])
 			VALUES
-			   (${1}
-			   ,${r.toolName}
-			   ,${r.toolType}
-			   ,${r.remoteIoModuleNumber}
-			   ,${r.remoteIoPointNumber}
-			   ,${1}
-			   ,${r.rfidAddress}
-			   ,${'GE'}
-			   ,${'2016-10-29'}
-			   ,${100.00});
+				(${r.workstationID}
+				,'${r.toolName}'
+				,'${r.toolType}'
+				,${r.remoteIoModuleNumber}
+				,${r.remoteIoPointNumber}
+				,${1}
+				,${r.rfidAddress}
+				,'${'GE'}'
+				,'${'2016-10-29'}'
+				,${100.00});
 			SELECT @toolId = SCOPE_IDENTITY();
-			INSERT INTO [dbo].[ToolAssignedTo] ([toolId], [employeeSso])
-			VALUES (@toolId, ${r.sso});
+			INSERT INTO [dbo].[ToolAssignedTo] ([ToolID], [Sso])
+			VALUES (@toolId, ${r.employeeSso});
 		END TRY
 		BEGIN CATCH
 			SELECT 

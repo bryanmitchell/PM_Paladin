@@ -2,9 +2,6 @@ module.exports = function(cp){
 	var express = require('express');
 	var router = express.Router();
 
-	var bcrypt = require('bcryptjs');
-	var salt = bcrypt.genSaltSync(10);
-
 	var emailgen = require('./emailgen');
 	var dbconn = require('./dbconn2');
 
@@ -27,34 +24,7 @@ module.exports = function(cp){
 			return res.sendStatus(200);
 		});
 	};
-
-	// var isLoggedIn = function(req, res, next) {
-	// 	if (req.isAuthenticated())
-	// 		return next(); // if user authenticated in the session, carry on
-	// 	res.redirect('/'); // if they aren't redirect them to the home page
-	// };
-
-	// router.route('/login')
-	// 	.post(passport.authenticate('local-login', {
-	// 			successRedirect : '/', // redirect to the secure profile section
-	// 			failureRedirect : '/', // redirect back to the signup page if there is an error
-	// 			failureFlash : true // allow flash messages
-	// 		}),
-	// 		function(req, res){
-	// 			if (req.body.remember) {
-	// 				req.session.cookie.maxAge = 1000 * 60 * 3;
-	// 			} else {
-	// 				req.session.cookie.expires = false;
-	// 			}
-	// 			res.redirect('/');
-	// 		});
-
-	// router.route('/logout')
-	// 	.get(function(req, res) {
-	// 		req.logout();
-	// 		res.redirect('/');
-	// 	});
-
+	
 	// Getting Users for User Management
 	router.route('/employees')
 		.get(function(req, res){

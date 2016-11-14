@@ -170,15 +170,15 @@ app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $time
 app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http, $location)
 	{
 		// Used to be done as a function in app.js state('app')
-		$rootScope.isLoginPage        = false;
-		$rootScope.isLightLoginPage   = false;
-		$rootScope.isLockscreenPage   = false;
-		$rootScope.isMainPage         = true;
-		$rootScope.isLoggedIn		  = false;
-		$rootScope.userPosition		  = [];
-		$rootScope.buttonDisabled = false;
+		$rootScope.isLoginPage 		= false;
+		$rootScope.isLightLoginPage = false;
+		$rootScope.isLockscreenPage = false;
+		$rootScope.isMainPage 		= true;
+		$rootScope.isLoggedIn 		= false;
+		$rootScope.userPosition 	= [];
+		$rootScope.buttonDisabled 	= false;
 		$rootScope.currentPageTitle = 'Dashboard';
-		$rootScope.userSSO = null;
+		$rootScope.userSSO 			= null;
 
 		$scope.logInUser = {
 			'sso': '',
@@ -512,6 +512,12 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
+		$scope.rfidAddresses = [0,1,2,3,4,5,6,7,8,9];
+		$scope.users = {}; // Just a declaration
+		$scope.userInCharge = {};
 
 		$scope.lineInfo = {
 			'lineName': '',
@@ -520,9 +526,6 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'supervisorLastName': '',
 			'supervisorEmail': ''
 		};
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
-		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
-		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 
 		$scope.workstationInfo = {
 			'workstationName': '',
@@ -544,18 +547,14 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'employeeSso': ''
 		};
 
-		$scope.users = {}; // Just a declaration
-		$scope.userInCharge = {};
-
+	
 		$http.get('../../api/employees')
 			.success(function (data) {
 				console.log("empleados");
 				$scope.users = data;
-				//$scope.userInCharge = $scope.users.firstName + $scope.users.lastName;
-				//console.log($scope.userInCharge);
 			}).error(function (data, status) {
 				alert();
-			});	
+			});
 
 		$scope.createLine = function () {
 			//Request

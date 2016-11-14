@@ -101,7 +101,7 @@
 					<div class="form-group" ng-class="{ 'has-error': createUserForm.email.$invalid && !createUserForm.email.$pristine }" required>
 						<label for="field-3" class="control-label">Email Address</label>
 						
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="userInfo.email" required>
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="userInfo.email" required ng-pattern="/.+@.+\..+/">
 
 						<p ng-show="createUserForm.email.$invalid && !createUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	
@@ -200,7 +200,7 @@
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.email.$invalid && !updateUserForm.email.$pristine }">
 						<label for="field-3" class="control-label">Email Address</label>
 						
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="selectedUser.email" required>
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="selectedUser.email" required ng-pattern="/.+@.+\..+/">
 
 						<p ng-show="updateUserForm.email.$invalid && !updateUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	

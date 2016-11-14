@@ -133,7 +133,7 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': lineForm.lineName.$invalid && lineForm.lineName.$pristine }">
-						<label for="field-1" class="control-label">Line Name</label>
+						<label for="field-1" class="control-label">Line Name (from PM Pro)</label>
 						<select style="width: 150px;" name="lineName" ng-model="lineInfo.lineName" required>
 						  <option value="">--- Select from list ---</option>
 						  <option value="saab">Saab</option>
@@ -215,12 +215,13 @@
 	
 	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
 		<form role="form" name="wsForm" novalidate>
-			<div class="row">
-				<div class="col-md-6">
 
-					<!-- NAME -->
+
+			<div class="row">
+				<!-- NAME -->
+				<div class="col-md-6">	
 					<div class="form-group" ng-class="{ 'has-error': wsForm.wsName.$invalid && wsForm.wsName.$pristine }">
-						<label for="field-1" class="control-label">Workstation Name</label>
+						<label for="field-1" class="control-label">Workstation Name (from PM Pro)</label>
 						<select style="width: 150px;" ng-model="workstationInfo.workstationName" name="wsName" required>
 						  <option value="">--- Select from list ---</option>
 						  <option value="Saab">Saab</option>
@@ -293,7 +294,7 @@
 
 						<!-- Engineer in charge -->
 						<label for="field-3" class="control-label">Engineer in Charge</label>
-						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" ng-options="(user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Engineer'}" required>
+						<select style="width: 150px;" ng-model="workstationInfo.employeeSso" name="wsPerson" ng-options="user.sso as (user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Engineer'}" required>
 						  <option value="">--- Select from list ---</option>
 						</select>				
 					</div>
@@ -317,11 +318,12 @@
 	
 	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
 		<form role="form" name="toolForm" novalidate>
+
 			<!-- TOOL NAME -->
 			<div class="row form-group" ng-class="{ 'has-error': toolForm.toolName.$invalid && toolForm.toolName.$pristine }">
 				<div class="col-md-4">
 					<div>
-						<label for="field-1" class="control-label">Tool Name</label>
+						<label for="field-1" class="control-label">Tool Name (from PM Pro)</label>
 					</div>
 				</div>
 						
@@ -376,12 +378,12 @@
 				</div>	
 
 				<div class="col-md-4">
-					<select style="width: 150px;" ng-model="toolInfo.pointNumber" name="point" required ng-options="point for point in pointNumbers">
+					<select style="width: 150px;" ng-model="toolInfo.remoteIoPointNumber" name="point" required ng-options="point for point in pointNumbers">
 						<option value="">--- Select from list ---</option>
 					</select>				
 				</div>	
 			</div>
-			
+
 			<!-- RFID TAG -->
 			<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
 				<div class="col-md-4">
@@ -390,11 +392,8 @@
 					</div>
 				</div>
 				<div class="col-md-4">
-					<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required>
+					<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add for add in rfidAddresses">
 					  <option value="">--- Select from list ---</option>
-					  <option value=1>1</option>
-					  <option value=2>2</option>
-					  <option value=3>3</option>
 					</select>	
 				</div>	
 			</div>
@@ -408,7 +407,7 @@
 				</div>
 
 				<div class="col-md-1">
-					<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="technician" ng-options="(user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Technician'}" required>
+					<select style="width: 150px;" ng-model="toolInfo.employeeSso" name="technician" ng-options="user.sso as (user.firstName + ' ' + user.lastName + ' (' + user.sso + ')') for user in users | filter: {types:'Technician'}" required>
 						<option value="">--- Select from list ---</option>
 					</select>				
 				</div>	
