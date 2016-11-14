@@ -36,10 +36,14 @@
 				<!-- BUTTONS -->
 				<div class="row">
 					<div class="col-md-8">
-						<button type="button" class="btn btn-success pull-right" ng-click="approveTasks(); uncheckBoxes();" ng-disabled="selection.length==0">Approve</button>
-						<button type="submit" class="btn btn-purple pull-right" ng-click="getApproveTasks();">
-							<span class="fa-rotate-right"></span> <!-- REFRESH -->
-						</button>
+						<div class="btn-group right-align pull-right">
+							<button type="button" class="btn btn-success" ng-click="approveTasks(); uncheckBoxes();" ng-disabled="selection.length==0">Approve</button>
+						</div>
+						<div class="btn-group right-align pull-right">
+							<button type="submit" class="btn btn-purple" ng-click="getApproveTasks();">
+								<span class="fa-rotate-right"></span> <!-- REFRESH -->
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
