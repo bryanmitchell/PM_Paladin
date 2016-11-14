@@ -6,7 +6,7 @@
 				
 				<!-- TABLE -->
 				<div class="row">
-					<div class="col-sm-8">
+					<div class="col-md-8">
 						<table class="table table-bordered table-striped table-condensed">
 							<thead>
 								<tr>
@@ -35,8 +35,8 @@
 
 				<!-- BUTTONS -->
 				<div class="row">
-					<div class="col-sm-6">
-						<button type="button" class="btn btn-success" ng-click="approveTasks(); sendEmail(); uncheckBoxes();" ng-disabled="selection.length==0">Approve</button>
+					<div class="col-md-8">
+						<button type="button" class="btn btn-success pull-right" ng-click="approveTasks(); uncheckBoxes();" ng-disabled="selection.length==0">Approve</button>
 						<button type="submit" class="btn btn-purple pull-right" ng-click="getApproveTasks();">
 							<span class="fa-rotate-right"></span> <!-- REFRESH -->
 						</button>

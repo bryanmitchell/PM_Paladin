@@ -79,8 +79,8 @@ exports.getEmployeePassword = function(cp, req, res){
 		else{
 			console.log("Query success!");
 			res.send({
-				'success': bcrypt.compareSync(pwd, recordset[0].hash),
-				'types': recordset[0].types,
+				'success': recordset.length !== 0 && bcrypt.compareSync(pwd, recordset[0].hash),
+				'types': (recordset[0].types && recordset[0].types) || '',
 			});
 		}
 	});
