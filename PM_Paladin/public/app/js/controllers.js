@@ -873,6 +873,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 		$scope.getConfirmTasks();	
 
 		$scope.selection = [];
+		$scope.selectionID = [];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -892,18 +893,26 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 		};
 
 		$scope.confirmFull = function(){
-			$http.post('../../api/confirmfull', $scope.selection)
+			var newSelection = [];
+			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
+			$http.post('../../api/confirmfull', {'tasks': newSelection})
 			.success(function (data) {
 				console.log('confirmFull');
+				$scope.sendEmail('full');
+				$scope.uncheckBoxes();
 			}).error(function (data, status) {
 				alert();
 			});
 		};
 
 		$scope.confirmPartial = function(){
-			$http.post('../../api/confirmpartial', $scope.selection)
+			var newSelection = [];
+			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
+			$http.post('../../api/confirmpartial', {'tasks': newSelection})
 			.success(function (data) {
 				console.log('confirmPartial');
+				$scope.sendEmail('partial');
+				$scope.uncheckBoxes();
 			}).error(function (data, status) {
 				alert();
 			});
@@ -950,8 +959,6 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 			$http.post('../../api/approvetasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
 				$scope.tasks = data;
-				console.log(data);
-				console.log(data[0].LineSupervisorEmail);
 			}).error(function (data, status) {
 				alert();
 			});
@@ -989,7 +996,9 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 		};
 
 		$scope.approveTasks = function(){
-			$http.post('../../api/approve', $scope.selection)
+			var newSelection = [];
+			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
+			$http.post('../../api/approve', {'tasks': newSelection})
 			.success(function (data) {
 				console.log('approveTasks');
 				console.log(data);
