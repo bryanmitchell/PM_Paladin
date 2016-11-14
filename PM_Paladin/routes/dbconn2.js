@@ -674,7 +674,7 @@ exports.setPartialConfirm = function(cp, req, res){
 	var query = `
 		UPDATE [dbo].[Task]
 		SET [TaskStatus] = 'ConfirmPartial'
-		WHERE TaskID IN (${tasks.toString()})
+		WHERE TaskID IN (${r.tasks.toString()})
 	`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
@@ -688,7 +688,7 @@ exports.setFullConfirm = function(cp, req, res){
 	var query = `
 		UPDATE [dbo].[Task]
 		SET [TaskStatus] = 'ApprovePending'
-		WHERE TaskID IN (${tasks.toString()})
+		WHERE TaskID IN (${r.tasks.toString()})
 	`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
@@ -742,14 +742,14 @@ exports.setApprove = function(cp, req, res){
 		UPDATE [dbo].[Task]
 		SET [TaskStatus] = 'OnTime'
 			,[LastCompleted] = GETDATE()
-		WHERE TaskID IN (${tasks.toString()});
+		WHERE TaskID IN (${r.tasks.toString()});
 		
 		UPDATE [dbo].[TaskLog]
-		SET [DateFinished] = SETDATE()
+		SET [DateFinished] = GETDATE()
 		WHERE LogID IN 
-			SELECT [tsk].[LastLog]
+			(SELECT [tsk].[LastLog]
 			FROM [dbo].[Task] AS [tsk]
-			WHERE [tsk].[TaskID] IN (${tasks.toString()})
+			WHERE [tsk].[TaskID] IN (${r.tasks.toString()}))
 	`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
