@@ -25,14 +25,14 @@ app.run(['$rootScope', '$state', '$location', '$window', function($rootScope, $s
 			if (!$rootScope.isLoggedIn) {
 				$state.go('app.dashboard');
 			}
-			else {
-				var isAdmin = $rootScope.userPosition.indexOf('Administrator') > -1;
-				var isEng = $rootScope.userPosition.indexOf('Engineer') > -1;
-				var isTech = $rootScope.userPosition.indexOf('Technician') > -1;
-				if (!isAdmin) {
-					$state.go('app.dashboard');
-				}
-			}
+			// else {
+			// 	var isAdmin = $rootScope.userPosition.indexOf('Administrator') > -1;
+			// 	var isEng = $rootScope.userPosition.indexOf('Engineer') > -1;
+			// 	var isTech = $rootScope.userPosition.indexOf('Technician') > -1;
+			// 	if (!isAdmin || !isEng || !isTech) {
+			// 		$state.go('app.dashboard');
+			// 	}
+			// }
 		});
 
 		// Page Loading Overlay
