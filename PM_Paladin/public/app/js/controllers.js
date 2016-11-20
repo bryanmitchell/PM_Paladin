@@ -179,6 +179,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$rootScope.buttonDisabled 	= false;
 		$rootScope.currentPageTitle = 'Dashboard';
 		$rootScope.userSSO 			= null;
+		$rootScope.userName			= '';
 
 		$scope.logInUser = {
 			'sso': '',
@@ -194,14 +195,15 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 				if($rootScope.isLoggedIn){
 					$rootScope.userPosition = data.types.split(',');
 					$rootScope.userSSO = $scope.logInUser.sso;
+					$rootScope.userName = data.name;
 				}
 				else{
-					alert("Invalid password. \nPlease try again.");
+					alert("Invalid SSO or password. \nPlease try again.");
 				}
 			})
 			.error(function(data, status) {
 				console.log("Error");
-				alert("Invalid SSO. \nPlease try again.");
+				alert("Invalid SSO or password. \nPlease try again.");
 			});
 		};
 
@@ -264,7 +266,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/gettooldates')
 			.success(function (data) {
 				$scope.upcomingTools = data;
-				// console.log(data);
+				console.dir(data);
 			}).error(function (data, status) {
 				alert();
 			});
@@ -272,7 +274,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/getpiechartinfo')
 			.success(function (data) {
 				$scope.pieChart = data;
-				// console.log($scope.pieChart);
+				console.log($scope.pieChart);
 				$scope.labelsPie = getPieLabels();
   				$scope.dataPie = getPieCounts();
   				// console.log($scope.labelsPie);
@@ -343,7 +345,8 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		}
 
 		$scope.seriesBar = ['On Time', 'Past Due']; 
-		$scope.pieColors=['#1f9314', '#bc1a1a', '#fdb45c'];
+		//g - r - y
+		$scope.pieColors=['#bc1a1a', '#1f9314', '#fdb45c'];
 		$scope.barColors= ['#1f9314', '#bc1a1a'];
 		$scope.barOptions = {
 			legend: {
@@ -733,7 +736,10 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 			'lastName': '',
 			'email': '',
 			'password': '',
-			'employeeType': $scope.selection
+			'employeeType': $scope.selection,
+			'supervisorFirstName': '',
+			'supervisorLastName': '',
+			'supervisorEmail': ''
 		}; // Binded to Create User Modal fields
 		$scope.selectedUser = {}; // User (obtained from DB) to pass to Update User modal
 		
@@ -824,6 +830,9 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 				}
 			});
 		};
+
+		$scope.isTechnician = function(){return $scope.selection.indexOf('Technician') > -1;};
+		
 	});
 
 app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedUser', function($scope, $rootScope, $http, $modalInstance, selectedUser)
@@ -866,6 +875,8 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		$scope.close = function(){
 			$modalInstance.close();
 		};
+
+		$scope.isTechnician = function(){return $scope.typesSelected.indexOf('Technician') > -1;};
 
 	}]);
 
@@ -945,6 +956,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 				$http.post('../../api/emailpartial', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
 				.success(function(data, status) {
 					console.log("Sent ok");
+					alert("An email has been sent to "+$scope.tasks[0].EngFName+" "+$scope.tasks[0].EngLName+" at "+$scope.tasks[0].EngEmail);
 				})
 				.error(function(data, status) {
 					console.log("Error");
@@ -956,6 +968,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 				$http.post('../../api/emailfull', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
 				.success(function(data, status) {
 					console.log("Sent ok");
+					alert("An email has been sent to "+$scope.tasks[0].EngFName+" "+$scope.tasks[0].EngLName+" at "+$scope.tasks[0].EngEmail);
 				})
 				.error(function(data, status) {
 					console.log("Error");

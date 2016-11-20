@@ -5,17 +5,6 @@ var bcrypt = require('bcryptjs');
 require('dotenv').config();
 var salt = bcrypt.genSaltSync(parseInt(process.env.SALT));
 
-// https://journalofasoftwaredev.wordpress.com/2011/10/30/replicating-string-format-in-javascript/
-String.prototype.format = function()
-{
-	var content = this;
-	for (var i=0; i < arguments.length; i++)
-	{
-		var replacement = '{' + i + '}';
-		content = content.replace(replacement, arguments[i]);  
-	}
-	return content;
-};
 
 function runQuery(query, cp, res) {
 	console.log("Gonna create request and run query...");
@@ -59,6 +48,8 @@ exports.getEmployeePassword = function(cp, req, res){
 	console.log(bcrypt.hashSync(pwd, salt));
 	var query = `
 		SELECT e.Sso AS [sso]
+			,e.FirstName AS [firstName]
+			,e.LastName AS [lastName]
 			,e.PasswordHash AS [hash]
 			,typeList.types AS [types]
 		FROM Employee e 
@@ -80,10 +71,15 @@ exports.getEmployeePassword = function(cp, req, res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query getEmployeePassword success!");
-			res.send({
-				'success': recordset.length !== 0 && bcrypt.compareSync(pwd, recordset[0].hash),
-				'types': (recordset[0] && recordset[0].types) || '',
-			});
+			if(recordset.length == 0 || !bcrypt.compareSync(pwd, recordset[0].hash)){
+				res.send({'success': false, 'name': '', 'types': ''});
+			} else {
+				res.send({
+					'success': true,
+					'name': recordset[0].firstName + " " + recordset[0].lastName,
+					'types': recordset[0].types
+				});
+			}
 		}
 	});
 };
@@ -555,6 +551,9 @@ exports.getEmployees = function(cp, res){
 			,e.LastName AS [lastName]
 			,e.Email AS [email]
 			,typeList.types AS [types]
+			,es.FirstName AS [supervisorFirstName]
+			,es.LastName AS [supervisorLastName]
+			,es.Email AS [supervisorEmail]
 		FROM Employee e 
 		INNER JOIN (
 			SELECT DISTINCT st2.Sso AS [Sso],
@@ -566,7 +565,9 @@ exports.getEmployees = function(cp, res){
 				AS [types]
 			FROM EmployeeRole st2
 		) [typeList] 
-		ON e.Sso = typeList.Sso;
+		ON e.Sso = typeList.Sso
+		LEFT OUTER JOIN EmployeeSupervisor es
+		ON e.Sso = es.Sso;
 		`, cp, res);
 };
 
@@ -584,12 +585,21 @@ exports.createEmployee = function(cp, req, res){
 			VALUES (${r.sso},'${r.employeeType[i]}');
 		`;
 	}
+	if (r.employeeType.indexOf('Technician') > -1){
+		query += `
+			INSERT INTO EmployeeSupervisor
+				([Sso],[FirstName],[LastName],[Email])
+			VALUES
+				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
+	}
 	runPostQuery(query, cp, res);
 }; //TODO FIX
 
 exports.updateEmployee = function(cp, req, res){
 	var r = req.body;
 	var types = r.types.split(',');
+
+	// First query
 	var query = `
 		UPDATE Employee
 		SET FirstName = '${r.firstName}'
@@ -608,12 +618,17 @@ exports.updateEmployee = function(cp, req, res){
 		}
 	});
 
+	// Delete employee roles and technician supervisor
 	var query2 = `
 		BEGIN TRANSACTION;
 		BEGIN TRY
 		DELETE FROM EmployeeType
 		WHERE Sso = ${r.sso}
+		DELETE FROM EmployeeSupervisor
+		WHERE Sso = ${r.sso}
 		`;
+
+	// Insert employee roles
 	for (var i=0; i<types.length; i++){
 		console.log('in for');
 		query2 += `
@@ -621,6 +636,15 @@ exports.updateEmployee = function(cp, req, res){
 			VALUES (${r.sso}, '${types[i]}')`;
 		if (i==types.length-1){query2+=`;\n`;}
 		else{query2+=`\n`;}
+	}
+
+	// Insert supervisor
+	if (types.indexOf('Technician') > -1){
+		query += `
+			INSERT INTO EmployeeSupervisor
+				([Sso],[FirstName],[LastName],[Email])
+			VALUES
+				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
 	}
 	query2 += `
 		END TRY
@@ -638,6 +662,7 @@ exports.updateEmployee = function(cp, req, res){
 		END CATCH;
 		IF @@TRANCOUNT > 0 
 			COMMIT TRANSACTION;`;
+	// Second query
 	runPostQuery(query2, cp, res);
 };
 

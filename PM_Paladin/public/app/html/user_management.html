@@ -68,6 +68,7 @@
 				</div>
 			</div>
 	
+			<!-- USER FIRST AND LAST NAME -->
 			<div class="row">
 				<div class="col-md-6">
 
@@ -133,33 +134,74 @@
 					<p style="color:#a94442;" ng-show="createUserForm.password.$error.pattern" class="help-block">Password must be between 8 and 25 characters long, contain at least one number, one upper and lower case letter, and one special character.</p>
 				</div>	
 			</div>
-			
-			<div class="row">
-					
-				<div class="col-md-12">
 
-					<!-- User Type -->
+			<!-- User Type -->
+			<div class="row">		
+				<div class="col-md-12">
 					<div class="form-group no-margin" ng-class="{ 'has-error': createUserForm.type.$invalid && createUserForm.type.$pristine }">
-						
 						<label for="field-7" class="control-label">Type of User</label>
-						
 						</br>
-						
 						<div class="col-sm-4" ng-repeat="item in employeeTypes">
 							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required> {{item}}
 						</div>
-					</div>	
+					</div>
 				</div>
 			</div>
 
 			<br>
+
+			<!-- SUPERVISOR INFORMATION -->
+			<div ng-show="isTechnician();">
+				<!-- Supervisor FIRST AND LAST NAME -->
+				<div class="row">
+					<div class="col-md-6">
+
+						<!-- Supervisor First Name -->
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine }">
+							<label for="field-1" class="control-label">Teechnician's Supervisor First Name</label>
+							
+							<input type="text" class="form-control" name="supervisorFirstName" placeholder="Supervisor First Name" ng-model="userInfo.supervisorFirstName" ng-pattern="/^\w+\D$/" required />
+
+							<p ng-show="createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine" class="help-block">Enter a valid first name.</p>
+
+						</div>	
+					</div>
+						
+					<div class="col-md-6">
+						
+						<!-- Supervisor Last Name -->
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine }">
+							<label for="field-2" class="control-label">Technician's Supervisor Last Name</label>
+							
+							<input type="text" class="form-control" name="supervisorLastName" placeholder="Supervisor's Last Name" ng-model="userInfo.supervisorLastName" ng-pattern="/^\w+\D$/" required />
+
+							<p ng-show="createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine" class="help-block">Enter a valid last name.</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Supervisor Email Address -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine }" required>
+							<label for="field-3" class="control-label">Supervisor Email Address</label>
+							
+							<input type="email" class="form-control" name="supervisorEmail" placeholder="Supervisor's Email" ng-model="userInfo.supervisorEmail" required ng-pattern="/.+@.+\..+/">
+
+							<p ng-show="createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine" class="help-block">Enter a valid email address.</p>
+						</div>	
+					</div>
+				</div>
+			</div> <!-- END Supervisor Info-->
+
+			<br>
 				
 			<div class="modal-footer">
-
 					<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee(); sendEmail();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
-			</div>	
+			</div>
+
 		</form>
-	</div> <!-- end modal body-->	
+	</div> <!-- end modal body-->
 </script>
 
 <!-- Update User modal view template -->
@@ -177,7 +219,7 @@
 			<div class="row"> <!-- Name Row -->
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
-						<label for="field-1" class="control-label">Name</label>
+						<label for="field-1" class="control-label">FirstName</label>
 
 						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="selectedUser.firstName" ng-pattern="/^\w+\D$/" required />
 
@@ -226,7 +268,7 @@
 				</div>
 			</div>
 
-
+			<!-- USER ROLES CHECKBOXES -->
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group no-margin" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
@@ -238,6 +280,54 @@
 					</div>	
 				</div>
 			</div>
+
+			<br>
+
+			<!-- SUPERVISOR INFORMATION -->
+			<div ng-show="isTechnician();">
+				<!-- Supervisor FIRST AND LAST NAME -->
+				<div class="row">
+					<div class="col-md-6">
+
+						<!-- Supervisor First Name -->
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine }">
+							<label for="field-1" class="control-label">Technician's Supervisor First Name</label>
+							
+							<input type="text" class="form-control" name="supervisorFirstName" placeholder="Supervisor First Name" ng-model="selectedUser.supervisorFirstName" ng-pattern="/^\w+\D$/" required />
+
+							<p ng-show="createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine" class="help-block">Enter a valid first name.</p>
+
+						</div>	
+					</div>
+						
+					<div class="col-md-6">
+						
+						<!-- Supervisor Last Name -->
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine }">
+							<label for="field-2" class="control-label">Technician's Supervisor Last Name</label>
+							
+							<input type="text" class="form-control" name="supervisorLastName" placeholder="Supervisor's Last Name" ng-model="selectedUser.supervisorLastName" ng-pattern="/^\w+\D$/" required />
+
+							<p ng-show="createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine" class="help-block">Enter a valid last name.</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Supervisor Email Address -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine }" required>
+							<label for="field-3" class="control-label">Supervisor Email Address</label>
+							
+							<input type="email" class="form-control" name="supervisorEmail" placeholder="Supervisor's Email" ng-model="selectedUser.supervisorEmail" required ng-pattern="/.+@.+\..+/">
+
+							<p ng-show="createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine" class="help-block">Enter a valid email address.</p>
+						</div>	
+					</div>
+				</div>
+			</div> <!-- END Supervisor Info-->
+
+
 		</div> <!-- End modal body -->
 		
 		<!-- Modal footer -->
