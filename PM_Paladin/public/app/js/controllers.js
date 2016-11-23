@@ -234,6 +234,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 					return isAdmin || isEng || isTech;
 				case 'User Management':
 					return isAdmin;
+				case 'My Tasks':
+					return isTech;
 				case 'Maintenance Confirmation':
 					return isTech;
 				case 'Maintenance Approval':
@@ -880,6 +882,23 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 
 	}]);
 
+/**
+MY TASKS
+**/
+app.controller('MyTasksCtrl', function($scope, $rootScope, $http) 
+	{
+		$rootScope.currentPageTitle = 'My Tasks';
+
+		console.log('called getConfirmTasks')
+		$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
+		.success(function (data) {
+			console.log(data);
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
+
+	});
 
 /**
 MAINTENANCE CONFIRMATION

@@ -87,6 +87,13 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			authenticate: true
 		}).
 
+		state('app.my_tasks', {
+			url: '/my_tasks',
+			templateUrl: appHelper.templatePath('my_tasks'),
+			controller: 'MyTasksCtrl',
+			authenticate: true
+		}).
+
 		state('app.maintenance_confirmation', {
 			url: '/maintenance_confirmation',
 			templateUrl: appHelper.templatePath('maintenance_confirmation'),
