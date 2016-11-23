@@ -1,3 +1,6 @@
+// 14, 7, 3, 2, 1, 0
+// weekly partial and past due
+
 if(process.argv.length !== 3){
 	throw "Please call 'node sendEmail n', where n is the number of days left to send email";
 } else {
@@ -26,9 +29,15 @@ var cp = new sql.Connection(sqlConfig, function(err){
 });
 
 /** GET RECIPIENT EMPLOYEES **/
+// pl ⋈ WS ⋈ tool ⋈ tsk ⋈ wat ⋈ eng ⋈ tat ⋈ tec
 var query = `
-	SELECT  
-	FROM Workstation ws 
+	SELECT pl.LineName,
+		ws.WorkstationName,
+		t.ToolName,
+		
+	FROM ProductionLine pl
+	INNER JOIN Workstation ws 
+	ON pl.LineID = ws.LineID
 	INNER JOIN [Tool] t
 	ON t.WorkstationID = ws.WorkstationID
 	INNER JOIN [Task] tsk 
@@ -39,7 +48,12 @@ var query = `
 	ON eng.Sso = wat.Sso
 	INNER JOIN [ToolAssignedTo] tat 
 	ON tat.WorkstationID = t.ToolID
-	INNER JOIN [Employee] tec
+	INNER JOIN (
+		SELECT *
+		FROM [Employee] tec2
+		INNER JOIN EmployeeSupervisor es 
+		ON tec2.Sso = es.Sso
+	) tec
 	ON tec.Sso = tat.Sso
 	WHERE tsk.TaskStatus = 'OnTime'
 	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = ${daysLeft}
