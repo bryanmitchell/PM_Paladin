@@ -124,18 +124,6 @@ CREATE TABLE paladin2.dbo.EmployeeRole (
 		ON UPDATE CASCADE
 );
 
-CREATE TABLE paladin2.dbo.EmployeeSupervisor (
-	Sso int NOT NULL PRIMARY KEY,
-	FirstName nvarchar(MAX) NOT NULL,
-	LastName nvarchar(MAX) NOT NULL,
-	Email varchar(320) NOT NULL,
-	CONSTRAINT FK_EmployeeSupervisor_Sso
-		FOREIGN KEY (Sso) 
-		REFERENCES Employee(Sso)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
-);
-
 GO
 
 
