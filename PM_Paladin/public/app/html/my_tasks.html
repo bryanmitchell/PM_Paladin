@@ -1,0 +1,41 @@
+<div class="row">
+	<div class="col-md-12">
+	
+		<div class="panel panel-default">
+
+			<div class="panel-body">
+			
+				<div class="row">
+					<div class="col-md-12">
+					
+						<!-- Condensed Table -->
+						<strong>My Tasks</strong>
+						
+						<table class="table table-bordered table-striped table-condensed">
+							<thead>
+								<tr>
+									<th>Task</th>
+									<th>Tool Name</th>
+									<th>WS Name</th>
+									<th>Line Name</th>
+									<th>Days Left</th>
+									<th>Task Status</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<tr ng-repeat="item in upcomingTools" ng-if="item.date <= 14 && item.date >= 0">
+									<td>{{item.toolID}}</td>
+									<td>{{item.toolName}}</td>
+									<td>{{item.firstName + ' ' + item.lastName}}</td>
+									<td>{{item.date}}</td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

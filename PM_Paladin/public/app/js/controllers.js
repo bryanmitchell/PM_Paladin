@@ -4,9 +4,6 @@ var app = angular.module('xenon.controllers', []);
 
 app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $layoutToggles, $pageLoadingBar, Fullscreen)
 	{
-		$rootScope.isLoginPage        = false;
-		$rootScope.isLightLoginPage   = false;
-		$rootScope.isLockscreenPage   = false;
 		$rootScope.isMainPage         = true;
 
 		$rootScope.layoutOptions = {
@@ -29,13 +26,6 @@ app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $lay
 
 				// Added in v1.3
 				userProfile		: true
-			},
-			chat: {
-				isOpen			: false,
-			},
-			settingsPane: {
-				isOpen			: false,
-				useAnimation	: true
 			},
 			container: {
 				isBoxed			: false
@@ -129,19 +119,6 @@ app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $lay
 		});
 
 
-		// Full screen feature added in v1.3
-		$scope.isFullscreenSupported = Fullscreen.isSupported();
-		$scope.isFullscreen = Fullscreen.isEnabled() ? true : false;
-
-		$scope.goFullscreen = function()
-		{
-			if (Fullscreen.isEnabled())
-				Fullscreen.cancel();
-			else
-				Fullscreen.all();
-
-			$scope.isFullscreen = Fullscreen.isEnabled() ? true : false;
-		}
 	});
 
 app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $timeout, $location, $state, $layout)
@@ -170,9 +147,6 @@ app.controller('SidebarMenuCtrl', function($scope, $rootScope, $menuItems, $time
 app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $http, $location)
 	{
 		// Used to be done as a function in app.js state('app')
-		$rootScope.isLoginPage 		= false;
-		$rootScope.isLightLoginPage = false;
-		$rootScope.isLockscreenPage = false;
 		$rootScope.isMainPage 		= true;
 		$rootScope.isLoggedIn 		= false;
 		$rootScope.userPosition 	= [];
@@ -234,6 +208,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 					return isAdmin || isEng || isTech;
 				case 'User Management':
 					return isAdmin;
+				case 'My Tasks':
+					return isTech;
 				case 'Maintenance Confirmation':
 					return isTech;
 				case 'Maintenance Approval':
@@ -880,6 +856,23 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 
 	}]);
 
+/**
+MY TASKS
+**/
+app.controller('MyTasksCtrl', function($scope, $rootScope, $http) 
+	{
+		$rootScope.currentPageTitle = 'My Tasks';
+
+		console.log('called getConfirmTasks')
+		$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
+		.success(function (data) {
+			console.log(data);
+			$scope.tasks = data;
+		}).error(function (data, status) {
+			alert();
+		});
+
+	});
 
 /**
 MAINTENANCE CONFIRMATION

@@ -87,6 +87,13 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			authenticate: true
 		}).
 
+		state('app.my_tasks', {
+			url: '/my_tasks',
+			templateUrl: appHelper.templatePath('my_tasks'),
+			controller: 'MyTasksCtrl',
+			authenticate: true
+		}).
+
 		state('app.maintenance_confirmation', {
 			url: '/maintenance_confirmation',
 			templateUrl: appHelper.templatePath('maintenance_confirmation'),
@@ -99,48 +106,9 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 			templateUrl: appHelper.templatePath('maintenance_approval'),
 			controller: 'MaintApprCtrl',
 			authenticate: true
-		}).
-
-		// Logins and Lockscreen
-		state('login', {
-			url: '/login',
-			templateUrl: appHelper.templatePath('login'),
-			controller: 'LoginCtrl',
-			resolve: {
-				resources: function($ocLazyLoad){
-					return $ocLazyLoad.load([
-						ASSETS.forms.jQueryValidate,
-						ASSETS.extra.toastr,
-					]);
-				},
-			}
-		}).
-		state('login-light', {
-			url: '/login-light',
-			templateUrl: appHelper.templatePath('login-light'),
-			controller: 'LoginLightCtrl',
-			resolve: {
-				resources: function($ocLazyLoad){
-					return $ocLazyLoad.load([
-						ASSETS.forms.jQueryValidate,
-					]);
-				},
-			}
-		}).
-		state('lockscreen', {
-			url: '/lockscreen',
-			templateUrl: appHelper.templatePath('lockscreen'),
-			controller: 'LockscreenCtrl',
-			resolve: {
-				resources: function($ocLazyLoad){
-					return $ocLazyLoad.load([
-						ASSETS.forms.jQueryValidate,
-						ASSETS.extra.toastr,
-					]);
-				},
-			}
 		});
 
+		
 
 });
 
@@ -148,10 +116,6 @@ app.config(function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, ASS
 
 
 app.constant('ASSETS', {
-
-	'chartist': {
-		'bars': appHelper.assetPath('js/chartist/chartist.min.js')
-	},
 
 	'core': {
 		'bootstrap': appHelper.assetPath('js/bootstrap.min.js'), // Some plugins which do not support angular needs this
@@ -163,27 +127,10 @@ app.constant('ASSETS', {
 
 		'moment': appHelper.assetPath('js/moment.min.js'),
 
-		'googleMapsLoader': appHelper.assetPath('app/js/angular-google-maps/load-google-maps.js')
-	},
-
-	'charts': {
-
-		'dxGlobalize': appHelper.assetPath('js/devexpress-web-14.1/js/globalize.min.js'),
-		'dxCharts': appHelper.assetPath('js/devexpress-web-14.1/js/dx.chartjs.js'),
-		'dxVMWorld': appHelper.assetPath('js/devexpress-web-14.1/js/vectormap-data/world.js'),
 	},
 
 	'xenonLib': {
 		notes: appHelper.assetPath('js/xenon-notes.js'),
-	},
-
-	'maps': {
-
-		'vectorMaps': [
-			appHelper.assetPath('js/jvectormap/jquery-jvectormap-1.2.2.min.js'),
-			appHelper.assetPath('js/jvectormap/regions/jquery-jvectormap-world-mill-en.js'),
-			appHelper.assetPath('js/jvectormap/regions/jquery-jvectormap-it-mill-en.js'),
-		],
 	},
 
 	'icons': {

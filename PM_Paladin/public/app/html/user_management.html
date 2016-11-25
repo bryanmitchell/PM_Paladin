@@ -57,13 +57,12 @@
 				<div class="col-md-6">
 
 					<!-- User ID -->
-					<div class="form-group" ng-class="{ 'has-error': createUserForm.sso.$invalid && createUserForm.sso.$pristine }">
+					<div class="form-group" ng-class="{ 'has-error': createUserForm.sso.$invalid && !createUserForm.sso.$pristine }">
 						<label class="control-label">SSO</label>
-						<select style="width: 150px;" name="sso" ng-model="userInfo.sso" ng-options="sso for sso in ssos" required>
-							<option value="">--- Select from list ---</option>
-						</select>
 
-						<!-- <p ng-show="createUserForm.sso.$invalid && createUserForm.sso.$dirty" class="help-block">Select an SSO.</p> -->
+						<input type="text" class="form-control" name="sso" placeholder="SSO" ng-model="userInfo.sso" ng-minlength="9" ng-maxlength="9" ng-pattern="/^\d/" required />
+
+						<p ng-show="createUserForm.sso.$invalid && !createUserForm.sso.$pristine" class="help-block">SSO must be 9 digits long.</p>
 					</div>
 				</div>
 			</div>
