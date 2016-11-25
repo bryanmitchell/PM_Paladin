@@ -81,10 +81,23 @@ CREATE TABLE paladin2.dbo.tblPM_ScheduledPmItems (
 	[Created] DATETIME,
 );
 
-CREATE TABLE paladin2.dbo.ChangeFlag (
-	[name] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+CREATE TABLE paladin2.dbo.Flags (
+	[id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[name] NVARCHAR(MAX) NOT NULL,
 	[value] BIT NOT NULL DEFAULT 0
 );
+
+CREATE TABLE paladin2.dbo.Variables (
+	[id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[name] NVARCHAR(MAX) NOT NULL,
+	[value] INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO [dbo].[Flags] ([name], [value])
+VALUES ('ChangeOccurred',0),('RfidRegister',0);
+
+INSERT INTO [dbo].[Variables] ([name], [value])
+VALUES ('RfidAddress',0);
 
 GO
 --

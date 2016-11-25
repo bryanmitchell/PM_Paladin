@@ -205,6 +205,10 @@ exports.getPieChartInfo = function(cp,res){
 
 
 
+
+
+
+
 /**
 EQUIPMENT MANAGEMENT
 **/
@@ -255,6 +259,56 @@ exports.getTools = function(cp, res){
 		`, cp, res);
 }; // TODO Assumes tool assigned to ONE person
 
+exports.getPmProLines = function(cp,res){
+	query = `
+		SELECT DISTINCT eqlist.strProduct_line_t AS [lineName]
+		FROM tblPM_MasterEquipment AS eqlist;`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+
+exports.getPmProWorkstations = function(cp,res){
+	query = `
+		SELECT eqlist.strEquipID AS [workstationName]
+			,eqlist.strProduct_line_t AS [lineName]
+		FROM tblPM_MasterEquipment AS eqlist;`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+
+exports.getPmProTools = function(cp,res){
+	query = `
+		SELECT DISTINCT eqlist.strEquipDescription AS [toolName]
+			,eqlist.intEquipRecID AS [pmProToolID]
+			,eqlist.strEquipID AS [workstationName]
+			,eqlist.strProduct_line_t AS [lineName]
+			,eqlist.strEquip_Supplier AS [supplier]
+			,eqlist.datYearMaker AS [yearBought]
+			,eqlist.fltOriginalCost_USDollar AS [originalCostDollars]
+		FROM tblPM_MasterEquipment AS eqlist;`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+
+exports.getScannedRfidTag = function(cp,res){
+	var query=`SELECT [value] AS [rfidTag] FROM [dbo].[Flags] WHERE [Name] = 'RfidAddress'`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query 'getScannedRfidTag' success!");
+			res.send(recordset);
+		}
+	});
+};
 
 /* CREATE */
 exports.createLine = function(cp, req, res){
@@ -270,7 +324,7 @@ exports.createLine = function(cp, req, res){
 exports.createWorkstation = function(cp, req, res){
 	var r = req.body;
 	console.log(r);
-	var query1 = `
+	var query = `
 	DECLARE @wsid INT
 	BEGIN TRANSACTION;
 	BEGIN TRY
@@ -318,7 +372,7 @@ exports.createWorkstation = function(cp, req, res){
 			COMMIT TRANSACTION;
 	`;
 
-	new sql.Request(cp).query(query1, function(err, recordset){
+	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{console.log("Query success!");}
 	});
@@ -326,6 +380,7 @@ exports.createWorkstation = function(cp, req, res){
 	res.redirect('back');
 };
 
+// TODO
 exports.createTool = function(cp, req, res){
 	var r = req.body;
 	console.log(r);
@@ -353,12 +408,13 @@ exports.createTool = function(cp, req, res){
 				,${r.remoteIoPointNumber}
 				,${1}
 				,${r.rfidAddress}
-				,'${'GE'}'
-				,'${'2016-10-29'}'
-				,${100.00});
+				,'${r.supplier}'
+				,'${r.yearBought}'
+				,${r.originalCostDollars});
 			SELECT @toolId = SCOPE_IDENTITY();
 			INSERT INTO [dbo].[ToolAssignedTo] ([ToolID], [Sso])
 			VALUES (@toolId, ${r.employeeSso});
+
 		END TRY
 		BEGIN CATCH
 			SELECT 
@@ -374,6 +430,34 @@ exports.createTool = function(cp, req, res){
 		END CATCH;
 		IF @@TRANCOUNT > 0 
 			COMMIT TRANSACTION;`;
+
+	// INSERT INTO [dbo].[Task]
+	// 	([ToolID]
+	// 	,[EstHours]
+	// 	,[FrequencyDays]
+	// 	,[TaskDescription]
+	// 	,[CreatedOn]
+	// 	,[LastCompleted]
+	// 	,[TaskStatus]
+	// 	,[DaysLeft14]
+	// 	,[DaysLeft3])
+	// SELECT (@toolId, 
+	// 	p.[Est Hrs], 
+	// 	p.[Frequency Days], 
+	// 	p.[Description], 
+	// 	p.[Created], 
+	// 	p.[Last Complet], 
+	// 	CALCULATION, 
+	// 	0, 
+	// 	0)
+	// FROM tblPM_ScheduledPmItems p
+	// WHERE spi.intEquipRecID = ${r.pmProToolID}
+
+	// CASE 
+	// WHEN ()
+	// 	THEN 'OnTime' 
+	// ELSE 'PastDue'
+	// END AS [status]
 
 	new sql.Request(cp).query(query1, function(err, recordset){
 		if(err){console.log(err);}
@@ -485,6 +569,13 @@ exports.setToolInactive = function(cp,req,res){
 	});
 };
 
+exports.setRfidRegisterFlagOn = function(cp,res){
+	var query=`UPDATE [dbo].[Flags] SET [Name] = 1`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setRfidRegisterFlagOn' success!");}
+	});
+};
 
 /* DELETE */
 exports.deleteLine = function(cp, req, res){
@@ -536,6 +627,11 @@ exports.deleteTool = function(cp, req, res){
 		}
 	});
 };
+
+
+
+
+
 
 
 
@@ -686,6 +782,11 @@ exports.deleteEmployee = function(cp, req, res){
 };
 
 
+
+
+
+
+
 /**
 MAINTENANCE CONFIRMATION
 **/
@@ -754,6 +855,11 @@ exports.setFullConfirm = function(cp, req, res){
 		else{console.log("Query 'setFullConfirm' success!");}
 	});	
 };
+
+
+
+
+
 
 
 /**
