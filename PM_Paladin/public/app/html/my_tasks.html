@@ -24,11 +24,13 @@
 							</thead>
 							
 							<tbody>
-								<tr ng-repeat="item in upcomingTools" ng-if="item.date <= 14 && item.date >= 0">
-									<td>{{item.toolID}}</td>
-									<td>{{item.toolName}}</td>
-									<td>{{item.firstName + ' ' + item.lastName}}</td>
-									<td>{{item.date}}</td>
+								<tr ng-repeat="item in tasks">
+									<td>{{item.Desc}}</td>
+									<td>{{item.Tool}}</td>
+									<td>{{item.WS}}</td>
+									<td>{{item.Line}}</td>
+									<td>{{item.DaysLeft}}</td>
+									<td>{{item.TaskStatus}}</td>
 								</tr>
 							</tbody>
 

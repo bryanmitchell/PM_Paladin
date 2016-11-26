@@ -93,7 +93,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr ng-repeat="tool in tools | filter: {wsID:selectedWS}" ng-class="{'selected':tool.toolID == selectedTool}" ng-click="setClickedTool(tool.toolID)">
+								<tr ng-repeat="tool in tools | filter: {wsID:selectedWS}" ng-class="{'selected':tool.toolID == selectedTool}" ng-click="setClickedTool(tool.toolID, tool.isActive)">
 									<td id="{{tool.toolID}}">{{tool.toolName}}</td>	
 								</tr>
 							</tbody>
@@ -105,11 +105,11 @@
 				<div class="row">
 					<div class="equipment_buttons">
 						<div class="btn-group">
-							<button type="button" class="btn btn-red" ng-click="disableButton();" ng-disabled="buttonDisabled">Turn Off</button>
+							<button type="button" class="btn btn-red" ng-click="disableOffButtonDelay();" ng-disabled="offButtonDisabled">Turn Off</button>
 						</div>
 
 						<div class="btn-group">
-							<button type="button" class="btn btn-success" ng-click="disableButton();" ng-disabled="buttonDisabled">Turn On</button>
+							<button type="button" class="btn btn-success" ng-click="disableOnButtonDelay();" ng-disabled="onButtonDisabled">Turn On</button>
 						</div>	
 					</div>
 				</div>	<!-- END Tool Control Buttons -->
@@ -301,6 +301,7 @@
 			</div>
 
 			<div class="modal-footer">
+				<font color="red" style="margin-right:15px;">Make sure workstation Module and Point match enclosure.</font>
 				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createWorkstation()" ng-disabled="wsForm.$invalid">Save</button>
 			</div>
 		</form>
@@ -392,8 +393,14 @@
 				</div>
 				<div class="col-md-4">
 					<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add for add in rfidAddresses">
-					  <option value="">--- Select from list ---</option>
-					</select>	
+						<option value="">--- Select from list ---</option>
+					</select>
+				</div>
+				<div class="col-md-2">
+					<button type="button" class="btn btn-blue btn-xs" style="margin-left:10px;">Register</button>	
+				</div>
+				<div class="col-md-2">
+					<button type="button" class="btn btn-secondary btn-xs">Populate</button>	
 				</div>	
 			</div>
 
@@ -414,7 +421,8 @@
 
 			<!-- SAVE BUTTON -->
 			<div class="modal-footer">
-				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createTool();" ng-disabled="toolForm.$invalid">Save</button>
+				<font color="red" style="margin-right:15px;">Make sure tool Module and Point match enclosure.</font>
+				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss(); createtool();" ng-disabled="toolForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>
@@ -636,11 +644,15 @@
 					<label for="field-1" class="control-label">RFID Tag</label>
 				</div>
 			</div>
-			<div class="col-md-4">
-				<select style="width: 150px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add for add in rfidAddresses">
-				  <option value="">--- Select from list ---</option>
-				</select>	
-			</div>	
+			<div class="col-md-2">
+					<input type="text" name="rfid" placeholder="RFID Tag" ng-model="rfid" style="width:80px;" disabled>	
+				</div>
+				<div class="col-md-3">
+					<button type="button" class="btn btn-blue btn-xs" style="margin-left:10px;">Register RFID Tag</button>	
+				</div>
+				<div class="col-md-3">
+					<button type="button" class="btn btn-secondary btn-xs">Populate RFID Tag</button>	
+				</div>	
 		</div>
 
 		<!-- TECHNICIAN IN CHARGE -->
