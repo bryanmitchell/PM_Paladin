@@ -351,7 +351,10 @@ exports.createTool = function(cp, req, res){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query success!");}
+		else{
+			console.log("Query success!");
+			refreshActiveBit(cp);
+		}
 	});
 
 	res.redirect('back');
