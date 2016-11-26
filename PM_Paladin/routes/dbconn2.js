@@ -1,3 +1,13 @@
+/**
+API by PM Paladin's pages:
+	Dashboard: getEmployeePassword, getToolDates, getBarChartInfo, getPieChartInfo
+	Equipment Management: CRUD Lines/WS/Tools, getPmPro Lines/WS/Tools, setToolActive/Inactive
+	User Management: CRUD Employees
+	Maintenance Confirmation: getConfirmationTasks, setPartialConfirm, setFullyConfirm
+	Maintenance Approval: getApprovalTasks, setApprove
+	My Tasks:
+**/
+
 var exports = module.exports = {};
 
 var sql = require('mssql');
@@ -212,103 +222,6 @@ exports.getPieChartInfo = function(cp,res){
 /**
 EQUIPMENT MANAGEMENT
 **/
-/* READ */
-exports.getLines = function(cp, res){
-	runQuery(`
-		SELECT pl.LineId AS [lineID]
-			,pl.LineName AS [lineName]
-			,pl.SupervisorFirstName AS [supervisorFirstName]
-			,pl.SupervisorLastName AS [supervisorLastName]
-			,pl.SupervisorEmail AS [supervisorEmail]
-			,pl.RemoteIoAddress AS [remoteIoAddress]
-		FROM ProductionLine AS pl;
-		`, cp, res);
-};
-
-exports.getWorkstations = function(cp, res){
-	runQuery(`
-		SELECT ws.WorkstationID AS [wsID]
-			,ws.WorkstationName AS [wsName]
-			,ws.GreenLightModuleNumber AS [GreenLightModuleNumber]
-			,ws.GreenLightPointNumber AS [GreenLightPointNumber]
-			,ws.YellowLightModuleNumber AS [yellowLightModuleNumber]
-			,ws.YellowLightPointNumber AS [yellowLightPointNumber]
-			,ws.RedLightModuleNumber AS [redLightModuleNumber]
-			,ws.RedLightPointNumber AS [redLightPointNumber]
-			,ws.LineID AS [lineID]
-			,wat.Sso AS [employeeSso]
-		FROM Workstation AS ws 
-		INNER JOIN WorkstationAssignedTo as wat
-		ON ws.WorkstationID = wat.WorkstationID;
-		`, cp, res);
-}; // TODO Assumes WS assgined to ONE person
-
-exports.getTools = function(cp, res){
-	runQuery(`
-		SELECT t.WorkstationID AS [wsID]
-			,t.ToolID AS [toolID]
-			,t.ToolName AS [toolName] 
-			,t.ToolType AS [toolType] 
-			,t.RfidAddress AS [rfidAddress]
-			,t.RemoteIoModuleNumber AS [RemoteIoModuleNumber]
-			,t.RemoteIoPointNumber AS [RemoteIoPointNumber]
-			,tat.Sso AS [employeeSso]
-		FROM Tool as t 
-		INNER JOIN ToolAssignedTo AS tat
-		ON t.ToolID = tat.ToolID;
-		`, cp, res);
-}; // TODO Assumes tool assigned to ONE person
-
-exports.getPmProLines = function(cp,res){
-	query = `
-		SELECT DISTINCT eqlist.strProduct_line_t AS [lineName]
-		FROM tblPM_MasterEquipment AS eqlist;`;
-
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{res.send(recordset);}
-	});
-};
-
-exports.getPmProWorkstations = function(cp,res){
-	query = `
-		SELECT eqlist.strEquipID AS [workstationName]
-			,eqlist.strProduct_line_t AS [lineName]
-		FROM tblPM_MasterEquipment AS eqlist;`;
-
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{res.send(recordset);}
-	});
-};
-
-exports.getPmProTools = function(cp,res){
-	query = `
-		SELECT DISTINCT eqlist.strEquipDescription AS [toolName]
-			,eqlist.intEquipRecID AS [pmProToolID]
-			,eqlist.strEquipID AS [workstationName]
-			,eqlist.strProduct_line_t AS [lineName]
-			,eqlist.strEquip_Supplier AS [supplier]
-			,eqlist.datYearMaker AS [yearBought]
-			,eqlist.fltOriginalCost_USDollar AS [originalCostDollars]
-		FROM tblPM_MasterEquipment AS eqlist;`;
-
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{res.send(recordset);}
-	});
-};
-
-exports.getScannedRfidTag = function(cp,res){
-	var query=`SELECT [value] AS [rfidTag] FROM [dbo].[Flags] WHERE [Name] = 'RfidAddress'`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{
-			console.log("Query 'getScannedRfidTag' success!");
-			res.send(recordset);
-		}
-	});
-};
 
 /* CREATE */
 exports.createLine = function(cp, req, res){
@@ -320,7 +233,6 @@ exports.createLine = function(cp, req, res){
 			('${r.lineName}', '${r.supervisorFirstName}', '${r.supervisorLastName}', '${r.supervisorEmail}');
 		`, cp, res);
 };
-
 exports.createWorkstation = function(cp, req, res){
 	var r = req.body;
 	console.log(r);
@@ -379,13 +291,9 @@ exports.createWorkstation = function(cp, req, res){
 
 	res.redirect('back');
 };
-
-// TODO
 exports.createTool = function(cp, req, res){
 	var r = req.body;
-	console.log(r);
-
-	var query1 = `
+	var query = `
 		DECLARE @toolId INT
 		BEGIN TRANSACTION;
 		BEGIN TRY
@@ -415,6 +323,14 @@ exports.createTool = function(cp, req, res){
 			INSERT INTO [dbo].[ToolAssignedTo] ([ToolID], [Sso])
 			VALUES (@toolId, ${r.employeeSso});
 
+			INSERT INTO [dbo].[Task]
+				([ToolID], [EstHours], [FrequencyDays], [TaskDescription], [CreatedOn], [LastCompleted],
+				[TaskStatus],[DaysLeft14],[DaysLeft3])
+			SELECT (@toolId, p.[Est Hrs], p.[Frequency Days], p.[Description], p.[Created], p.[Last Complet], 
+				'OnTime', 0, 0)
+			FROM tblPM_ScheduledPmItems spi
+			WHERE spi.intEquipRecID = ${r.pmProToolID};
+
 		END TRY
 		BEGIN CATCH
 			SELECT 
@@ -431,41 +347,61 @@ exports.createTool = function(cp, req, res){
 		IF @@TRANCOUNT > 0 
 			COMMIT TRANSACTION;`;
 
-	// INSERT INTO [dbo].[Task]
-	// 	([ToolID]
-	// 	,[EstHours]
-	// 	,[FrequencyDays]
-	// 	,[TaskDescription]
-	// 	,[CreatedOn]
-	// 	,[LastCompleted]
-	// 	,[TaskStatus]
-	// 	,[DaysLeft14]
-	// 	,[DaysLeft3])
-	// SELECT (@toolId, 
-	// 	p.[Est Hrs], 
-	// 	p.[Frequency Days], 
-	// 	p.[Description], 
-	// 	p.[Created], 
-	// 	p.[Last Complet], 
-	// 	CALCULATION, 
-	// 	0, 
-	// 	0)
-	// FROM tblPM_ScheduledPmItems p
-	// WHERE spi.intEquipRecID = ${r.pmProToolID}
+	
 
-	// CASE 
-	// WHEN ()
-	// 	THEN 'OnTime' 
-	// ELSE 'PastDue'
-	// END AS [status]
-
-	new sql.Request(cp).query(query1, function(err, recordset){
+	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{console.log("Query success!");}
 	});
 
 	res.redirect('back');
 };
+
+
+/* READ */
+exports.getLines = function(cp, res){
+	runQuery(`
+		SELECT pl.LineId AS [lineID]
+			,pl.LineName AS [lineName]
+			,pl.SupervisorFirstName AS [supervisorFirstName]
+			,pl.SupervisorLastName AS [supervisorLastName]
+			,pl.SupervisorEmail AS [supervisorEmail]
+			,pl.RemoteIoAddress AS [remoteIoAddress]
+		FROM ProductionLine AS pl;
+		`, cp, res);
+};
+exports.getWorkstations = function(cp, res){
+	runQuery(`
+		SELECT ws.WorkstationID AS [wsID]
+			,ws.WorkstationName AS [wsName]
+			,ws.GreenLightModuleNumber AS [GreenLightModuleNumber]
+			,ws.GreenLightPointNumber AS [GreenLightPointNumber]
+			,ws.YellowLightModuleNumber AS [yellowLightModuleNumber]
+			,ws.YellowLightPointNumber AS [yellowLightPointNumber]
+			,ws.RedLightModuleNumber AS [redLightModuleNumber]
+			,ws.RedLightPointNumber AS [redLightPointNumber]
+			,ws.LineID AS [lineID]
+			,wat.Sso AS [employeeSso]
+		FROM Workstation AS ws 
+		INNER JOIN WorkstationAssignedTo as wat
+		ON ws.WorkstationID = wat.WorkstationID;
+		`, cp, res);
+}; // TODO Assumes WS assgined to ONE person
+exports.getTools = function(cp, res){
+	runQuery(`
+		SELECT t.WorkstationID AS [wsID]
+			,t.ToolID AS [toolID]
+			,t.ToolName AS [toolName] 
+			,t.ToolType AS [toolType] 
+			,t.RfidAddress AS [rfidAddress]
+			,t.RemoteIoModuleNumber AS [RemoteIoModuleNumber]
+			,t.RemoteIoPointNumber AS [RemoteIoPointNumber]
+			,tat.Sso AS [employeeSso]
+		FROM Tool as t 
+		INNER JOIN ToolAssignedTo AS tat
+		ON t.ToolID = tat.ToolID;
+		`, cp, res);
+}; // TODO Assumes tool assigned to ONE person
 
 
 /* UPDATE */
@@ -490,7 +426,6 @@ exports.updateLine = function(cp, req, res){
 		}
 	});
 }; // Change when RunPostQuery is changed
-
 exports.updateWorkstation = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -518,7 +453,6 @@ exports.updateWorkstation = function(cp, req, res){
 		}
 	});
 }; //change when RunPostQuery is changed
-
 exports.updateTool = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -545,37 +479,6 @@ exports.updateTool = function(cp, req, res){
 	});
 }; //change when RunPostQuery is changed
 
-exports.setToolActive = function(cp,req,res){
-	var r = req.body;
-	var query=`
-	UPDATE [dbo].[Tool]
-	SET [IsActive] = 1
-	WHERE ToolID = ${r.toolID}`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setActive' success!");}
-	});
-};
-
-exports.setToolInactive = function(cp,req,res){
-	var r = req.body;
-	var query=`
-	UPDATE [dbo].[Tool]
-	SET [IsActive] = 0
-	WHERE ToolID = ${r.toolID}`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setInactive' success!");}
-	});
-};
-
-exports.setRfidRegisterFlagOn = function(cp,res){
-	var query=`UPDATE [dbo].[Flags] SET [Name] = 1`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setRfidRegisterFlagOn' success!");}
-	});
-};
 
 /* DELETE */
 exports.deleteLine = function(cp, req, res){
@@ -593,7 +496,6 @@ exports.deleteLine = function(cp, req, res){
 		else{console.log("Query deleteLine success!");}
 	});
 };
-
 exports.deleteWorkstation = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -609,7 +511,6 @@ exports.deleteWorkstation = function(cp, req, res){
 		else{console.log("Query deleteWorkstation success!");}
 	});
 };
-
 exports.deleteTool = function(cp, req, res){
 	var r = req.body;
 	var query = `
@@ -629,7 +530,88 @@ exports.deleteTool = function(cp, req, res){
 };
 
 
+/* READ FROM PM PRO */
+exports.getPmProLines = function(cp,res){
+	query = `
+		SELECT DISTINCT eqlist.strProduct_line_t AS [lineName]
+		FROM tblPM_MasterEquipment AS eqlist;`;
 
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+exports.getPmProWorkstations = function(cp,res){
+	query = `
+		SELECT eqlist.strEquipID AS [workstationName]
+			,eqlist.strProduct_line_t AS [lineName]
+		FROM tblPM_MasterEquipment AS eqlist;`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+exports.getPmProTools = function(cp,res){
+	query = `
+		SELECT DISTINCT eqlist.strEquipDescription AS [toolName]
+			,eqlist.intEquipRecID AS [pmProToolID]
+			,eqlist.strEquipID AS [workstationName]
+			,eqlist.strProduct_line_t AS [lineName]
+			,eqlist.strEquip_Supplier AS [supplier]
+			,eqlist.datYearMaker AS [yearBought]
+			,eqlist.fltOriginalCost_USDollar AS [originalCostDollars]
+		FROM tblPM_MasterEquipment AS eqlist;`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{res.send(recordset);}
+	});
+};
+
+
+/* TOOL OPERATION CONTROL */
+exports.setToolActive = function(cp,req,res){
+	var r = req.body;
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 1
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setActive' success!");}
+	});
+};
+exports.setToolInactive = function(cp,req,res){
+	var r = req.body;
+	var query=`
+	UPDATE [dbo].[Tool]
+	SET [IsActive] = 0
+	WHERE ToolID = ${r.toolID}`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setInactive' success!");}
+	});
+};
+
+/* RFID GET/SET (Under consideration) */
+exports.getScannedRfidTag = function(cp,res){
+	var query=`SELECT [value] AS [rfidTag] FROM [dbo].[Flags] WHERE [Name] = 'RfidAddress'`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{
+			console.log("Query 'getScannedRfidTag' success!");
+			res.send(recordset);
+		}
+	});
+};
+exports.setRfidRegisterFlagOn = function(cp,res){
+	var query=`UPDATE [dbo].[Flags] SET [Name] = 1`;
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
+		else{console.log("Query 'setRfidRegisterFlagOn' success!");}
+	});
+};
 
 
 
@@ -639,6 +621,30 @@ exports.deleteTool = function(cp, req, res){
 /**
 USER MANAGEMENT
 **/
+exports.createEmployee = function(cp, req, res){
+	var r = req.body;
+	query = `
+		INSERT INTO Employee
+			([Sso],[FirstName],[LastName],[Email],[PasswordHash])
+		VALUES
+			(${r.sso},'${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
+		`
+	for (i = 0; i < r.employeeType.length; i++){
+		query +=`
+			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
+			VALUES (${r.sso},'${r.employeeType[i]}');
+		`;
+	}
+	if (r.employeeType.indexOf('Technician') > -1){
+		query += `
+			INSERT INTO EmployeeSupervisor
+				([Sso],[FirstName],[LastName],[Email])
+			VALUES
+				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
+	}
+	runPostQuery(query, cp, res);
+}; //TODO FIX
+
 exports.getEmployees = function(cp, res){
 	console.log("Getting all employees...");
 	runQuery(`
@@ -666,30 +672,6 @@ exports.getEmployees = function(cp, res){
 		ON e.Sso = es.Sso;
 		`, cp, res);
 };
-
-exports.createEmployee = function(cp, req, res){
-	var r = req.body;
-	query = `
-		INSERT INTO Employee
-			([Sso],[FirstName],[LastName],[Email],[PasswordHash])
-		VALUES
-			(${r.sso},'${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
-		`
-	for (i = 0; i < r.employeeType.length; i++){
-		query +=`
-			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
-			VALUES (${r.sso},'${r.employeeType[i]}');
-		`;
-	}
-	if (r.employeeType.indexOf('Technician') > -1){
-		query += `
-			INSERT INTO EmployeeSupervisor
-				([Sso],[FirstName],[LastName],[Email])
-			VALUES
-				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
-	}
-	runPostQuery(query, cp, res);
-}; //TODO FIX
 
 exports.updateEmployee = function(cp, req, res){
 	var r = req.body;
@@ -838,7 +820,10 @@ exports.setPartialConfirm = function(cp, req, res){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'setPartialConfirm' success!");}
+		else{
+			console.log("Query 'setPartialConfirm' success!");
+			refreshActiveBit(cp);
+		}
 	});
 };
 
@@ -852,7 +837,10 @@ exports.setFullConfirm = function(cp, req, res){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'setFullConfirm' success!");}
+		else{
+			console.log("Query 'setFullConfirm' success!");
+			refreshActiveBit(cp);
+		}
 	});	
 };
 
@@ -918,6 +906,43 @@ exports.setApprove = function(cp, req, res){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'setApprove' success!");}
+		else{
+			console.log("Query 'setApprove' success!");
+			refreshActiveBit(cp);
+		}
+	});
+};
+
+
+
+
+
+var refreshActiveBit = function(cp){
+	var query = `
+		UPDATE Tool
+		SET [IsActive] = 0
+		FROM(
+			SELECT ToolID, COUNT(*) AS [OffToolCount]
+			FROM Task 
+			WHERE TaskStatus = 'PastDue'
+			OR TaskStatus = 'ConfirmPending'
+			OR TaskStatus = 'ApprovePending'
+			GROUP BY ToolID) AS [OffTools]
+		WHERE OffToolCount > 0;
+
+		UPDATE Tool
+		SET [IsActive] = 1
+		FROM(
+			SELECT ToolID, COUNT(*) AS [OffToolCount]
+			FROM Task 
+			WHERE TaskStatus = 'PastDue'
+			OR TaskStatus = 'ConfirmPending'
+			OR TaskStatus = 'ApprovePending'
+			GROUP BY ToolID) AS [OffTools]
+		WHERE OffToolCount = 0;
+		`;
+
+	new sql.Request(cp).query(query, function(err, recordset){
+		if(err){console.log(err);}
 	});
 };

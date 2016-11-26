@@ -1,1 +1,0 @@
-sqlcmd -S LRMM-LENOVO-Y40\SQLEXPRESS -i .\PastDueChecker.sql -o .\PastDueChecker.txt

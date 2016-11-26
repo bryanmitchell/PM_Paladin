@@ -1,3 +1,0 @@
-Changed database context to 'paladin2'.
-
-(1 rows affected)

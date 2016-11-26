@@ -96,8 +96,5 @@ CREATE TABLE paladin2.dbo.Variables (
 INSERT INTO [dbo].[Flags] ([name], [value])
 VALUES ('ChangeOccurred',0),('RfidRegister',0);
 
-INSERT INTO [dbo].[Variables] ([name], [value])
-VALUES ('RfidAddress',0);
-
 GO
 --
