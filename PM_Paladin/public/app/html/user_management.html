@@ -125,7 +125,7 @@
 						
 						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="userInfo.password" required />
 
-						<p ng-show="createUserForm.confirmPassword.$error" class="help-block">Must match password in previous field.</p>
+						<p ng-show="createUserForm.confirmPassword.$invalid && !createUserForm.confirmPassword.$pristine" class="help-block">Must match password in previous field.</p>
 					</div>	
 				</div>
 

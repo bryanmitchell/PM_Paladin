@@ -180,7 +180,14 @@ module.exports = function(cp){
 			dbconn.deleteEmployee(cp, req, res);
 		});
 
-
+	/**
+	MY TASKS
+	**/
+	router.route('/gettasks')
+		.post(function(req, res){
+			console.log("router.route(/gettasks)");
+			dbconn.getTasks(cp, req, res);
+		});
 
 
 	/**

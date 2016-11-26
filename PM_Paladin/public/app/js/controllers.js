@@ -192,6 +192,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$scope.logout = function () {
 			$rootScope.isLoggedIn = false;
 			$rootScope.userPosition = '';
+			$rootScope.userSSO = null;
+			$rootScope.userName = '';
 			$scope.showLogoutButton();
 			$location.path('app/dashboard').replace();
 		}
@@ -390,7 +392,6 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 
 			$http.get('../../api/tools') 
 				.success(function(data, status) {
-					console.log(data);
 					$scope.tools = data;
 				})
 				.error(function(data, status) {
@@ -405,6 +406,8 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		$scope.selectedTool = null;  // initialize our variable to null
 		$scope.updateModal = null; //assign function to it according to what is selected
 		$scope.deleteEquipment = null;
+		$rootScope.onButtonDisabled = true;
+		$rootScope.offButtonDisabled = true;
 
 		$scope.updateLineModal = function(modal_id, modal_size, modal_backdrop){
 			$scope.modalInstance = $modal.open({
@@ -495,12 +498,34 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			});
 		};
 
+		$scope.turnToolOn = function () {
+			$http.post('../../api/settoolactive', {'toolID': $scope.selectedTool}) 
+			.success(function(data, status) {
+				console.log("Tool activated.");
+			})
+			.error(function(data, status) {
+				alert("Error turning on tool\n"+data);
+			});
+		};
+
+		$scope.turnToolOff = function () {
+			$http.post('../../api/settoolinactive', {'toolID': $scope.selectedTool}) 
+			.success(function(data, status) {
+				console.log("Tool disactivated.");
+			})
+			.error(function(data, status) {
+				alert("Error turning off tool\n"+data);
+			});
+		};
+
 		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
 			$scope.selectedLine = index;
 			$scope.selectedWS = null;  //para evitar que se guarde la seleccion de ws
 			$scope.selectedTool = null;
 			$scope.updateModal = $scope.updateLineModal;
 			$scope.deleteEquipment = $scope.deleteLine;
+			$rootScope.onButtonDisabled = true;
+			$rootScope.offButtonDisabled = true;
 		};
 		
 		$scope.setClickedWS = function(index){  //function that sets the value of selectedRow to current index
@@ -508,26 +533,41 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$scope.selectedTool = null;
 			$scope.updateModal = $scope.updateWorkstationModal;
 			$scope.deleteEquipment = $scope.deleteWorkstation;
+			$rootScope.onButtonDisabled = true;
+			$rootScope.offButtonDisabled = true;
 		};
 
-		$scope.setClickedTool = function(index){  //function that sets the value of selectedRow to current index
+		$scope.setClickedTool = function(index, isActive){  //function that sets the value of selectedRow to current index
 			$scope.selectedTool = index;
 			$scope.updateModal = $scope.updateToolModal;
 			$scope.deleteEquipment = $scope.deleteTool;
+			$rootScope.onButtonDisabled = isActive;
+			$rootScope.offButtonDisabled = !isActive;
 		};
 
-		$rootScope.disableButton = function(){
-			$rootScope.buttonDisabled=true;
+		$rootScope.disableOffButtonDelay = function(){
+			$rootScope.offButtonDisabled=true;
+			$scope.turnToolOff();
 			$timeout(function(){
-				$rootScope.buttonDisabled=false;
+				$rootScope.onButtonDisabled=false;
 			},5000);
 		};
+
+		$rootScope.disableOnButtonDelay = function(){
+			$rootScope.onButtonDisabled=true;
+			$scope.turnToolOn();
+			$timeout(function(){
+				$rootScope.offButtonDisabled=false;
+			},5000);
+		};
+
+
 	});
 
 app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 		$scope.rfidAddresses = [0,1,2,3,4,5,6,7,8,9];
@@ -604,6 +644,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 				console.log("Controller createtool Error");
 			});
 		};
+
 	});
 
 app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedLine', function($scope, $rootScope, $http, $modalInstance, selectedLine)
@@ -863,8 +904,8 @@ app.controller('MyTasksCtrl', function($scope, $rootScope, $http)
 	{
 		$rootScope.currentPageTitle = 'My Tasks';
 
-		console.log('called getConfirmTasks')
-		$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
+		console.log('called getTasks')
+		$http.post('../../api/gettasks', {'sso': $rootScope.userSSO})
 		.success(function (data) {
 			console.log(data);
 			$scope.tasks = data;

@@ -249,6 +249,7 @@ exports.getTools = function(cp, res){
 			,t.RemoteIoModuleNumber AS [RemoteIoModuleNumber]
 			,t.RemoteIoPointNumber AS [RemoteIoPointNumber]
 			,tat.Sso AS [employeeSso]
+			,t.IsActive AS [isActive]
 		FROM Tool as t 
 		INNER JOIN ToolAssignedTo AS tat
 		ON t.ToolID = tat.ToolID;
@@ -683,6 +684,45 @@ exports.deleteEmployee = function(cp, req, res){
 			res.send();
 		}
 	});
+};
+
+/**
+MY TASKS
+**/
+exports.getTasks = function(cp, req, res){
+	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
+	console.log("Getting all tasks...");
+	runQuery(`
+		SELECT tsk.TaskID AS [Task], 
+			tsk.TaskDescription AS [Desc],
+			tsk.TaskStatus AS [TaskStatus], 
+			t.ToolName AS [Tool], 
+			ws.WorkstationName AS [WS], 
+			pl.LineName AS [Line],
+			eng.FirstName AS [EngFName], 
+			eng.LastName AS [EngLName], 
+			eng.Email AS [EngEmail], 
+			tec.FirstName AS [TecFName], 
+			tec.LastName AS [TecLName], 
+			DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
+		FROM Task as tsk 
+		INNER JOIN Tool as t 
+		ON tsk.ToolID = t.ToolID 
+		INNER JOIN Workstation AS ws 
+		ON t.WorkstationID = ws.WorkstationID 
+		INNER JOIN ProductionLine AS pl 
+		ON ws.LineID = pl.LineID 
+		INNER JOIN ToolAssignedTo AS tat 
+		ON t.ToolID = tat.ToolID 
+		INNER JOIN Employee AS tec 
+		ON tat.Sso = tec.Sso 
+		INNER JOIN WorkstationAssignedTo AS wat 
+		ON ws.WorkstationID = wat.WorkstationID 
+		INNER JOIN Employee AS eng 
+		ON wat.Sso = eng.Sso
+		WHERE tec.sso = ${req.body.sso}
+		ORDER BY DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted));
+		`, cp, res);
 };
 
 
