@@ -598,21 +598,14 @@ exports.setToolInactive = function(cp,req,res){
 };
 
 /* RFID GET/SET (Under consideration) */
-exports.getScannedRfidTag = function(cp,res){
-	var query=`SELECT [value] AS [rfidTag] FROM [dbo].[Flags] WHERE [Name] = 'RfidAddress'`;
+exports.getScannedRfidTags = function(cp,res){
+	var query=`SELECT * FROM RfidReader`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getScannedRfidTag' success!");
 			res.send(recordset);
 		}
-	});
-};
-exports.setRfidRegisterFlagOn = function(cp,res){
-	var query=`UPDATE [dbo].[Flags] SET [Name] = 1`;
-	new sql.Request(cp).query(query, function(err, recordset){
-		if(err){console.log(err);}
-		else{console.log("Query 'setRfidRegisterFlagOn' success!");}
 	});
 };
 

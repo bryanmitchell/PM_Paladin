@@ -125,14 +125,9 @@ module.exports = function(cp){
 			dbconn.setToolInactive(cp, req, res);
 		});
 
-	router.route('/getscannedrfidtag')
+	router.route('/getscannedrfidtags')
 		.post(function(req, res){
-			dbconn.getScannedRfidTag(cp, res);
-		});
-
-	router.route('/setrfidregisterflag')
-		.post(function(req, res){
-			dbconn.setRfidRegisterFlagOn(cp, res);
+			dbconn.getScannedRfidTags(cp, res);
 		});
 
 

@@ -87,14 +87,18 @@ CREATE TABLE paladin2.dbo.Flags (
 	[value] BIT NOT NULL DEFAULT 0
 );
 
-CREATE TABLE paladin2.dbo.Variables (
-	[id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[name] NVARCHAR(MAX) NOT NULL,
-	[value] INT NOT NULL DEFAULT 0
-);
+INSERT INTO [paladin2].[dbo].[Flags] ([name], [value])
+VALUES ('ChangeOccurred',0);
 
-INSERT INTO [dbo].[Flags] ([name], [value])
-VALUES ('ChangeOccurred',0),('RfidRegister',0);
+CREATE TABLE paladin2.dbo.RfidReader (
+	[Line] INT NOT NULL,
+	[Reader] INT NOT NULL,
+	[LastTagRead] INT NOT NULL DEFAULT 0,
+	CONSTRAINT PK_RfidReader 
+		PRIMARY KEY (Line, Reader)
+);
+INSERT INTO [paladin2].[dbo].[RfidReader] ([Line], [Reader])
+VALUES (1,0), (1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7);
 
 GO
 --
