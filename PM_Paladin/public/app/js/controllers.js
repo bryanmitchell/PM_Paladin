@@ -570,7 +570,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
-		$scope.rfidAddresses = [0,1,2,3,4,5,6,7,8,9];
+		$scope.rfidAddresses = {};
 		$scope.users = {}; // Just a declaration
 		$scope.userInCharge = {};
 		$scope.lineNames = {};
@@ -669,6 +669,19 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			})
 			.error(function(data, status) {
 				console.log("Controller createtool Error");
+			});
+		};
+
+		$scope.getScannedTags = function () {
+			//Request
+			$http.get('../../api/getscannedrfidtags') 
+			.success(function(data, status) {
+				console.log("get tags ok");
+				console.log(data);
+				$scope.rfidAddresses = data;
+			})
+			.error(function(data, status) {
+				console.log("Controller get tags Error");
 			});
 		};
 

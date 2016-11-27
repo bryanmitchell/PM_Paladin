@@ -384,12 +384,12 @@
 					</div>
 				</div>
 				<div class="col-md-4">
-					<select style="width: 190px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add for add in rfidAddresses">
+					<select style="width: 190px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="('Line: ' + add.Line + ', ' + 'Reader: ' + add.Reader + ', ' + 'Tag: ' + add.LastTagRead) for add in rfidAddresses">
 						<option value="" disabled selected>--- Scan, Populate, Select ---</option>
 					</select>
 				</div>
 				<div class="col-md-2">
-					<button type="button" style="margin-left: 50px;" class="btn btn-secondary btn-xs">Populate</button>	
+					<button type="button" style="margin-left: 50px;" class="btn btn-secondary btn-xs" ng-click="getScannedTags();">Populate</button>	
 				</div>	
 			</div>
 

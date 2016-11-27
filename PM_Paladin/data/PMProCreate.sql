@@ -93,7 +93,7 @@ VALUES ('ChangeOccurred',0);
 CREATE TABLE paladin2.dbo.RfidReader (
 	[Line] INT NOT NULL,
 	[Reader] INT NOT NULL,
-	[LastTagRead] INT NOT NULL DEFAULT 0,
+	[LastTagRead] INT,
 	CONSTRAINT PK_RfidReader 
 		PRIMARY KEY (Line, Reader)
 );
