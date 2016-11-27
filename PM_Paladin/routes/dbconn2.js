@@ -5,7 +5,7 @@ API by PM Paladin's pages:
 	User Management: CRUD Employees
 	Maintenance Confirmation: getConfirmationTasks, setPartialConfirm, setFullyConfirm
 	Maintenance Approval: getApprovalTasks, setApprove
-	My Tasks:
+	My Tasks: getTasks
 **/
 
 var exports = module.exports = {};
