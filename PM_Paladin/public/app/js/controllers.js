@@ -163,8 +163,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$scope.validateLogIn = function () {
 			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
 			.success(function(data, status) {
-				console.log(data);
-				console.log(status);
+				// console.log(data);
+				// console.log(status);
 				$rootScope.isLoggedIn = data.success;
 				if($rootScope.isLoggedIn){
 					$rootScope.userPosition = data.types.split(',');
@@ -244,7 +244,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/gettooldates')
 			.success(function (data) {
 				$scope.upcomingTools = data;
-				console.dir(data);
+				// console.dir(data);
 			}).error(function (data, status) {
 				alert();
 			});
@@ -252,7 +252,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 		$http.get('../../api/getpiechartinfo')
 			.success(function (data) {
 				$scope.pieChart = data;
-				console.log($scope.pieChart);
+				// console.log($scope.pieChart);
 				$scope.labelsPie = getPieLabels();
   				$scope.dataPie = getPieCounts();
   				// console.log($scope.labelsPie);
@@ -573,6 +573,9 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 		$scope.rfidAddresses = [0,1,2,3,4,5,6,7,8,9];
 		$scope.users = {}; // Just a declaration
 		$scope.userInCharge = {};
+		$scope.lineNames = {};
+		$scope.wsNames = {};
+		$scope.toolNames = {};
 
 		$scope.lineInfo = {
 			'lineName': '',
@@ -607,6 +610,30 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			.success(function (data) {
 				console.log("empleados");
 				$scope.users = data;
+			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/pmprolines')
+			.success(function (data) {
+				console.log("lineas de pmpro");
+				$scope.lineNames = data;
+			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/pmproworkstations')
+			.success(function (data) {
+				console.log("ws de pmpro");
+				$scope.wsNames = data;
+			}).error(function (data, status) {
+				alert();
+			});
+
+		$http.get('../../api/pmprotools')
+			.success(function (data) {
+				console.log("tools de pmpro");
+				$scope.toolNames = data;
 			}).error(function (data, status) {
 				alert();
 			});
