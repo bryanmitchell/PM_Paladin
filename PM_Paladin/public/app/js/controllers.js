@@ -672,6 +672,10 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			});
 		};
 
+		$scope.instructions = function () {
+			alert(`Scan an unused RFID tag,\nthen click the Populate button,\nand select the Line and RFID Reader used to scan.`);
+		};
+
 	});
 
 app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedLine', function($scope, $rootScope, $http, $modalInstance, selectedLine)
