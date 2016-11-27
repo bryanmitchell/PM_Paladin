@@ -599,7 +599,7 @@ exports.setToolInactive = function(cp,req,res){
 
 /* RFID GET/SET (Under consideration) */
 exports.getScannedRfidTags = function(cp,res){
-	var query=`SELECT * FROM RfidReader`;
+	var query=`SELECT * FROM RfidReader WHERE LastTagRead IS NOT NULL;`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
