@@ -126,7 +126,7 @@ module.exports = function(cp){
 		});
 
 	router.route('/getscannedrfidtags')
-		.post(function(req, res){
+		.get(function(req, res){
 			dbconn.getScannedRfidTags(cp, res);
 		});
 
