@@ -322,7 +322,7 @@
 				</div>
 						
 				<div class="col-md-4">
-					<select style="width: 150px;" ng-model="toolInfo.toolName" name="toolName" ng-options="tool.toolName as (tool.toolName + ' (WS: ' + tool.workstationName + ')') for tool in toolNames" required>
+					<select style="width: 150px;" ng-model="toolInfo.toolName" name="toolName" ng-options="tool.toolName as (tool.toolName + ' (Line: ' + tool.lineName + ', WS: ' + tool.workstationName + ')') for tool in toolNames" required>
 					  <option value="" disabled selected>--- Select from list ---</option>
 					</select>
 				</div>		
