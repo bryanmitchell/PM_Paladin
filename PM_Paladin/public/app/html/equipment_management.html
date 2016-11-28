@@ -159,7 +159,7 @@
 					<!-- SUPERVISOR FIRST NAME -->
 					<div class="form-group" ng-class="{ 'has-error': lineForm.fName.$invalid && !lineForm.fName.$pristine }">
 
-						<label for="field-1" class="control-label">Name</label>
+						<label for="field-1" class="control-label">Supervisor First Name</label>
 
 						<input type="text" class="form-control" name="fName" 
 						placeholder="First Name" ng-model="lineInfo.supervisorFirstName" ng-pattern="/^\w+\D$/" required>
@@ -172,7 +172,7 @@
 					<!-- SUPERVISOR LAST NAME -->
 					<div class="form-group" ng-class="{ 'has-error': lineForm.lName.$invalid && !lineForm.lName.$pristine }">
 
-						<label for="field-2" class="control-label">Last Name</label>
+						<label for="field-2" class="control-label">Supervisor Last Name</label>
 
 						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="lineInfo.supervisorLastName" ng-pattern="/^\w+\D$/" required>
 
@@ -219,7 +219,9 @@
 				<div class="col-md-6">	
 					<div class="form-group" ng-class="{ 'has-error': wsForm.wsName.$invalid && wsForm.wsName.$pristine }">
 						<label for="field-1" class="control-label">Workstation Name</label>
-						<select style="width: 150px;" ng-model="workstationInfo.workstationName" ng-options="wsName.workstationName as wsName.workstationName for wsName in wsNames" name="wsName" required>
+
+						<select style="width: 150px;" ng-model="workstationInfo.workstationName" ng-options="ws.workstationName as (ws.workstationName + ' (Line: ' + ws.lineName + ')') for ws in wsNames" name="wsName" required>
+
 						  <option value="" disabled selected>--- Select from list ---</option>
 						</select>				
 					</div>		
@@ -322,7 +324,9 @@
 				</div>
 						
 				<div class="col-md-4">
-					<select style="width: 150px;" ng-model="selectedTool" name="toolName" ng-options="toolName as toolName.toolName for toolName in toolNames" required>
+
+					<select style="width: 150px;" ng-model="toolInfo.toolName" name="toolName" ng-options="tool.toolName as (tool.toolName + ' (Line: ' + tool.lineName + ', WS: ' + tool.workstationName + ')') for tool in toolNames" required>
+
 					  <option value="" disabled selected>--- Select from list ---</option>
 					</select>
 				</div>		
@@ -442,7 +446,7 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateLineForm.fName.$invalid && updateLineForm.fName.$pristine }">
-						<label for="field-1" class="control-label">Name</label>
+						<label for="field-1" class="control-label">Supervisor First Name</label>
 						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="lineInfo.supervisorFirstName" ng-pattern="/^\w+\D$/" required>
 						<p ng-show="lineForm.fName.$invalid && !lineForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
 					</div>	
@@ -450,7 +454,7 @@
 				
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateLineForm.lName.$invalid && updateLineForm.lName.$pristine }">
-						<label for="field-2" class="control-label">Last Name</label>
+						<label for="field-2" class="control-label">Supervisor Last Name</label>
 						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="lineInfo.supervisorLastName" ng-pattern="/^\w+\D$/" required>
 						<p ng-show="updateLineForm.lName.$invalid && !updateLineForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
 					</div>
@@ -585,7 +589,7 @@
 			</div>
 					
 			<div class="col-md-4">
-				<h5>{{toolInfo.toolName}}</h4>
+				<h5>{{toolInfo.toolName}}</h5>
 			</div>		
 		</div>
 
@@ -637,22 +641,17 @@
 		</div>
 
 		<!-- RFID TAG -->
-		<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
-			<div class="col-md-4">
-				<div>
-					<label for="field-1" class="control-label">RFID Tag</label>
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
+				<div class="col-md-4">
+					<div>
+						<label for="field-1" class="control-label">RFID Tag</label>
+						<button type="button" class="btn btn-default btn-xs" ng-click="rfidUpdateInstructions();"><i class="el-help-circled"></i></button>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<h5>{{toolInfo.rfidAddress}}</h5>
 				</div>
 			</div>
-			<div class="col-md-2">
-					<input type="text" name="rfid" placeholder="RFID Tag" ng-model="rfid" style="width:80px;" disabled>	
-				</div>
-				<div class="col-md-3">
-					<button type="button" class="btn btn-blue btn-xs" style="margin-left:10px;">Register RFID Tag</button>	
-				</div>
-				<div class="col-md-3">
-					<button type="button" class="btn btn-secondary btn-xs">Populate RFID Tag</button>	
-				</div>	
-		</div>
 
 		<!-- TECHNICIAN IN CHARGE -->
 		<div class="row">
