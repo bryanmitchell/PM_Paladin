@@ -163,7 +163,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$scope.validateLogIn = function () {
 			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
 			.success(function(data, status) {
-				// console.log(data);
+				console.log(data);
 				// console.log(status);
 				$rootScope.isLoggedIn = data.success;
 				if($rootScope.isLoggedIn){
@@ -238,93 +238,10 @@ DASHBOARD
 **/
 app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 	{
-
 		$rootScope.currentPageTitle = 'Dashboard';
 
-		$http.get('../../api/gettooldates')
-			.success(function (data) {
-				$scope.upcomingTools = data;
-				// console.dir(data);
-			}).error(function (data, status) {
-				alert();
-			});
-
-		$http.get('../../api/getpiechartinfo')
-			.success(function (data) {
-				$scope.pieChart = data;
-				// console.log($scope.pieChart);
-				$scope.labelsPie = getPieLabels();
-  				$scope.dataPie = getPieCounts();
-  				// console.log($scope.labelsPie);
-				// console.log($scope.dataPie);
-
-  			}).error(function (data, status) {
-				alert();
-			});
-
-		$http.get('../../api/getbarchartinfo')
-			.success(function (data) {
-				$scope.barChart = data;
-				// console.log($scope.barChart);
-				$scope.labelsBar = getBarDates();
-				$scope.dataBar = getBarCounts();
-  			}).error(function (data, status) {
-				alert();
-			});
-
-		var getPieCounts = function(){
-			var result = [];
-			for(var i=0; i<$scope.pieChart.length; i++){
-				result.push($scope.pieChart[i].count);
-			}
-			return result;
-		};
-		var getPieLabels = function(){
-			var result = [];
-			for(var i=0; i<$scope.pieChart.length; i++){
-				result.push($scope.pieChart[i].status);
-			}
-			return result;
-		};
-		var getBarCounts = function () {
-			var counts = [];
-			var onTime = [];
-			var pastDue = [];
-
-			for (var i = 0; i < $scope.barChart.length; i++) {
-				onTime.push($scope.barChart[i].OnTimeCount);
-				pastDue.push($scope.barChart[i].PastDueCount);
-			}
-			counts.push(onTime);
-			counts.push(pastDue);
-			// console.log(onTime);
-			// console.log(pastDue);
-			// console.log(counts);
-			return counts;
-
-
-		};
-		var getBarDates = function () {
-			var dates = [];
-			var monthNames = [ "", "Jan", "Feb", "Mar",
-				"Apr", "May", "Jun", "Jul",
-				"Aug", "Sep", "Oct",
-				"Nov", "Dec"
-			];
-			for (var i = 0; i < $scope.barChart.length; i++) {
-				var currentDate = $scope.barChart[i].Date;
-				var month = monthNames[currentDate.substring(4,6)];
-				var day = currentDate.substring(6,8);
-				var formattedDate = month + " " + day;
-				dates.push(formattedDate);
-			}
-			// console.log(dates);
-			return dates;
-		}
-
-		$scope.seriesBar = ['On Time', 'Past Due']; 
-		//g - r - y
-		$scope.pieColors=['#bc1a1a', '#1f9314', '#fdb45c'];
+		// BAR CHART INFO
+		$scope.seriesBar = ['On Time', 'Past Due'];
 		$scope.barColors= ['#1f9314', '#bc1a1a'];
 		$scope.barOptions = {
 			legend: {
@@ -349,6 +266,11 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 				}],
 			},
 		};
+
+		// PIE CHART INFO
+		$scope.dataPie = [];
+		$scope.labelsPie = [];
+		$scope.pieColors=[];
 		$scope.pieOptions = {
 			legend: {
 				display:true,
@@ -358,9 +280,97 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 				display: true,
 				text: 'Tasks By Status'
 			},
-		}
+		};
 
-		
+		$http.get('../../api/gettooldates')
+			.success(function (data) {
+				$scope.upcomingTools = data;
+			}).error(function (data, status) {
+				alert('Error getting data for Dashboard tables');
+			});
+
+		$http.get('../../api/getpiechartinfo')
+			.success(function (data) {
+				getPieInfo(data);
+  			}).error(function (data, status) {
+				alert('Error getting data for Dashboard pie chart');
+			});
+
+		$http.get('../../api/getbarchartinfo')
+			.success(function (data) {
+				$scope.barChart = data;
+				$scope.labelsBar = getBarDates();
+				$scope.dataBar = getBarCounts();
+  			}).error(function (data, status) {
+				alert('Error getting data for Dashboard bar chart');
+			});
+
+		var getPieCounts = function(){
+			var result = [];
+			for(var i=0; i<$scope.pieChart.length; i++){
+				result.push($scope.pieChart[i].count);
+			}
+			return result;
+		};
+		var getPieLabels = function(){
+			var result = [];
+			for(var i=0; i<$scope.pieChart.length; i++){
+				result.push($scope.pieChart[i].status);
+			}
+			return result;
+		};
+
+		var getPieInfo = function(data){
+			for(var i=0; i<data.length; i++) {
+				$scope.dataPie.push(data[i].count);
+				$scope.labelsPie.push(data[i].status);
+				switch(data[i].status){
+					case "On Time":
+						$scope.pieColors.push('#1f9314'); // Green
+						break;
+					case "Past Due":
+						$scope.pieColors.push('#bc1a1a'); // Red
+						break;
+					case "Upcoming":
+						$scope.pieColors.push('#eeee00'); // Yellow #fdb45c
+						break;
+					case "In Progress":
+						$scope.pieColors.push('#1a47d8'); // Blue
+						break;
+					default:
+						alert("Pie chart error, contact developers!");
+				}
+			}
+		};
+		var getBarCounts = function () {
+			var counts = [];
+			var onTime = [];
+			var pastDue = [];
+			for (var i = 0; i < $scope.barChart.length; i++) {
+				onTime.push($scope.barChart[i].OnTimeCount);
+				pastDue.push($scope.barChart[i].PastDueCount);
+			}
+			counts.push(onTime);
+			counts.push(pastDue);
+			return counts;
+		};
+		var getBarDates = function () {
+			var dates = [];
+			var monthNames = [ "", "Jan", "Feb", "Mar",
+				"Apr", "May", "Jun", "Jul",
+				"Aug", "Sep", "Oct",
+				"Nov", "Dec"
+			];
+			for (var i = 0; i < $scope.barChart.length; i++) {
+				var currentDate = $scope.barChart[i].Date;
+				var month = monthNames[currentDate.substring(4,6)];
+				var day = currentDate.substring(6,8);
+				var formattedDate = month + " " + day;
+				dates.push(formattedDate);
+			}
+			return dates;
+		};
+
 		
 	});
 
@@ -570,12 +580,13 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
-		$scope.rfidAddresses = {};
+		$scope.rfidAddresses = [];
 		$scope.users = {}; // Just a declaration
 		$scope.userInCharge = {};
-		$scope.lineNames = {};
+		$scope.lineNames = [];
 		$scope.wsNames = {};
 		$scope.toolNames = {};
+		$scope.selectedTool = {};
 
 		$scope.lineInfo = {
 			'lineName': '',
@@ -597,13 +608,20 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 		};
 
 		$scope.toolInfo = {
-			'toolName': '',
 			'toolType': '',
 			'rfidAddress': '',
 			'remoteIoModuleNumber': '',
 			'remoteIoPointNumber': '',
-			'employeeSso': ''
+			'employeeSso': '',
+			'toolName': '',
+			'pmProToolID': '',
+			'workstationName': '',
+			'lineName': '',
+			'supplier': '',
+			'yearBought': '',
+			'originalCostDollars':''
 		};
+
 
 	
 		$http.get('../../api/employees')
@@ -663,6 +681,13 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 
 		$scope.createTool = function () {
 			//Request
+			$scope.toolInfo.toolName = $scope.selectedTool.toolName;
+			$scope.toolInfo.pmProToolID = $scope.selectedTool.pmProToolID;
+			$scope.toolInfo.workstationName = $scope.selectedTool.workstationName;
+			$scope.toolInfo.lineName = $scope.selectedTool.lineName;
+			$scope.toolInfo.supplier = $scope.selectedTool.supplier;
+			$scope.toolInfo.yearBought = $scope.selectedTool.yearBought;
+			$scope.toolInfo.originalCostDollars = $scope.selectedTool.originalCostDollars;
 			$http.post('../../api/createtool', $scope.toolInfo) 
 			.success(function(data, status) {
 				console.log("createtool ok");

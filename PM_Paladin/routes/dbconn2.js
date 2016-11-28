@@ -252,8 +252,8 @@ exports.createWorkstation = function(cp, req, res){
 			,[YellowLightPointNumber]
 			,[RedLightModuleNumber]
 			,[RedLightPointNumber])
-		VALUES
-			(${1}
+		SELECT
+			[pl].[LineID]
 			,'${r.workstationName}'
 			,${1}
 			,${0}
@@ -263,7 +263,12 @@ exports.createWorkstation = function(cp, req, res){
 			,${r.yellowLightModuleNumber}
 			,${r.yellowLightPointNumber}
 			,${r.redLightModuleNumber}
-			,${r.redLightPointNumber});
+			,${r.redLightPointNumber}
+		FROM tblPM_MasterEquipment meq 
+		INNER JOIN [ProductionLine] pl ON meq.[strProduct_line_t] = pl.[LineName]
+		WHERE meq.[strEquipID] = '${r.workstationName}'
+		LIMIT 1;
+
 		SELECT @wsid = SCOPE_IDENTITY();
 		INSERT INTO [dbo].[WorkstationAssignedTo] ([WorkstationID], [Sso])
 		VALUES (@wsId, ${r.employeeSso});
@@ -308,8 +313,8 @@ exports.createTool = function(cp, req, res){
 				,[Supplier]
 				,[YearBought]
 				,[OriginalCostDollars])
-			VALUES
-				(${1}
+			SELECT
+				[ws].[WorkstationID]
 				,'${r.toolName}'
 				,'${r.toolType}'
 				,${r.remoteIoModuleNumber}
@@ -318,18 +323,41 @@ exports.createTool = function(cp, req, res){
 				,${r.rfidAddress}
 				,'${r.supplier}'
 				,'${r.yearBought}'
-				,${r.originalCostDollars});
+				,${r.originalCostDollars}
+			FROM tblPM_MasterEquipment meq 
+			INNER JOIN [Workstation] ws ON meq.[strProduct_line_t] = pl.[LineName]
+			WHERE meq.[strEquipID] = '${r.workstationName}'
+			LIMIT 1;
+
 			SELECT @toolId = SCOPE_IDENTITY();
+
 			INSERT INTO [dbo].[ToolAssignedTo] ([ToolID], [Sso])
 			VALUES (@toolId, ${r.employeeSso});
 
 			INSERT INTO [dbo].[Task]
-				([ToolID], [EstHours], [FrequencyDays], [TaskDescription], [CreatedOn], [LastCompleted],
-				[TaskStatus],[DaysLeft14],[DaysLeft3])
-			SELECT (@toolId, p.[Est Hrs], p.[Frequency Days], p.[Description], p.[Created], p.[Last Complet], 
-				'OnTime', 0, 0)
+				([ToolID]
+				,[EstHours]
+				,[FrequencyDays]
+				,[TaskDescription]
+				,[TaskPriority]
+				,[CreatedOn]
+				,[LastCompleted]
+				,[TaskStatus]
+				,[DaysLeft14]
+				,[DaysLeft3])
+			SELECT 
+				@toolId
+				,spi.[Est Hrs]
+				,spi.[Frequency Days]
+				,'spi.[Description]'
+				,'Hi'
+				,spi.[Created]
+				,spi.[Last Complet]
+				,'OnTime'
+				,0
+				,0
 			FROM tblPM_ScheduledPmItems spi
-			WHERE spi.intEquipRecID = ${r.pmProToolID};
+			WHERE spi.intEquipRecID = '${r.pmProToolID}';
 
 		END TRY
 		BEGIN CATCH
@@ -536,8 +564,11 @@ exports.deleteTool = function(cp, req, res){
 /* READ FROM PM PRO */
 exports.getPmProLines = function(cp,res){
 	query = `
-		SELECT DISTINCT eqlist.strProduct_line_t AS [lineName]
-		FROM tblPM_MasterEquipment AS eqlist;`;
+		SELECT DISTINCT 
+			CASE eqlist.strProduct_line_t AS [lineName]
+		FROM tblPM_MasterEquipment AS eqlist
+		WHERE eqlist.strProduct_line_t IS NOT NULL
+		AND eqlist.strProduct_line_t NOT IN (SELECT [LineName] FROM [ProductionLine]);`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
@@ -548,7 +579,14 @@ exports.getPmProWorkstations = function(cp,res){
 	query = `
 		SELECT eqlist.strEquipID AS [workstationName]
 			,eqlist.strProduct_line_t AS [lineName]
-		FROM tblPM_MasterEquipment AS eqlist;`;
+		FROM tblPM_MasterEquipment AS eqlist
+		WHERE eqlist.strProduct_line_t IS NOT NULL
+		AND NOT EXISTS (
+			SELECT 1 
+			FROM Workstation ws
+			INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
+			WHERE ws.WorkstationName = eqlist.strEquipID
+			AND pl.LineName = eqlist.strProduct_line_t);`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
@@ -564,7 +602,16 @@ exports.getPmProTools = function(cp,res){
 			,eqlist.strEquip_Supplier AS [supplier]
 			,eqlist.datYearMaker AS [yearBought]
 			,eqlist.fltOriginalCost_USDollar AS [originalCostDollars]
-		FROM tblPM_MasterEquipment AS eqlist;`;
+		FROM tblPM_MasterEquipment AS eqlist
+		WHERE eqlist.strProduct_line_t IS NOT NULL
+		AND NOT EXISTS (
+			SELECT 1 
+			FROM Tool t
+			INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
+			INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
+			WHERE t.ToolName = eqlist.strEquipDescription
+			AND ws.WorkstationName = eqlist.strEquipID
+			AND pl.LineName = eqlist.strProduct_line_t);`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
@@ -954,6 +1001,12 @@ exports.setApprove = function(cp, req, res){
 
 var refreshActiveBit = function(cp){
 	var query = `
+		-- Turn ON Active bits for tools
+		UPDATE Tool
+		SET IsActive = 1;
+
+
+		-- Turn OFF Active bits for tools
 		UPDATE Tool
 		SET [IsActive] = 0
 		FROM(
@@ -965,16 +1018,73 @@ var refreshActiveBit = function(cp){
 			GROUP BY ToolID) AS [OffTools]
 		WHERE OffToolCount > 0;
 
-		UPDATE Tool
-		SET [IsActive] = 1
-		FROM(
-			SELECT ToolID, COUNT(*) AS [OffToolCount]
-			FROM Task 
-			WHERE TaskStatus = 'PastDue'
-			OR TaskStatus = 'ConfirmPending'
-			OR TaskStatus = 'ApprovePending'
-			GROUP BY ToolID) AS [OffTools]
-		WHERE OffToolCount = 0;
+
+		-- Turn OFF ALL lights
+		UPDATE Workstation
+		SET GreenLightOn = 0, YellowLightOn = 0, RedLightOn = 0;
+
+
+		-- Turn ON green lights
+		WITH Eq AS (
+			SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
+				DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
+			FROM Task tsk 
+			INNER JOIN Tool t ON t.ToolID = tsk.ToolID
+			INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
+		)
+		UPDATE Workstation
+		SET GreenLightOn = 1
+		FROM Eq
+		WHERE Eq.WorkstationID NOT IN (
+			SELECT DISTINCT Eq.WorkstationID
+			FROM Eq
+			WHERE Eq.TaskStatus = 'PastDue')
+		AND (Eq.WorkstationID NOT IN (
+				SELECT DISTINCT Eq.WorkstationID
+				FROM Eq
+				WHERE Eq.DaysLeft < 4)
+			OR Eq.TaskStatus = 'ConfirmPartial');
+
+
+		-- Turn ON yellow lights
+		WITH Eq AS (
+			SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
+				DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
+			FROM Task tsk 
+			INNER JOIN Tool t ON t.ToolID = tsk.ToolID
+			INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
+		)
+		UPDATE Workstation
+		SET YellowLightOn = 1
+		FROM Eq
+		WHERE Eq.WorkstationID IN (
+			SELECT DISTINCT Eq.WorkstationID
+			FROM Eq
+			WHERE Eq.DaysLeft < 15
+			AND Eq.TaskStatus = 'OnTime');
+
+
+		-- Turn ON red lights
+		WITH Eq AS (
+			SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
+				DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
+			FROM Task tsk 
+			INNER JOIN Tool t ON t.ToolID = tsk.ToolID
+			INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
+		)
+		UPDATE Workstation
+		SET RedLightOn = 1
+		FROM Eq
+		WHERE Eq.WorkstationID IN (
+			SELECT DISTINCT Eq.WorkstationID
+			FROM Eq
+			WHERE Eq.TaskStatus = 'PastDue'
+			OR Eq.TaskStatus = 'ConfirmPartial');
+
+		-- Update ChangeOccurred flag
+		UPDATE Flags
+		SET [value] = 1
+		WHERE [name] = 'ChangeOccurred';
 		`;
 
 	new sql.Request(cp).query(query, function(err, recordset){

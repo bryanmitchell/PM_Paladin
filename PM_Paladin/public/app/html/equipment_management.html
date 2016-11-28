@@ -134,7 +134,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': lineForm.lineName.$invalid && lineForm.lineName.$pristine }">
 						<label for="field-1" class="control-label">Line Name</label>
-						<select style="width: 150px;" name="lineName" ng-model="lineInfo.lineName" ng-options="lineName.lineName for lineName in lineNames" required>
+						<select style="width: 150px;" name="lineName" ng-model="lineInfo.lineName" ng-options="lineName.lineName as lineName.lineName for lineName in lineNames" required>
 						  <option value="" disabled selected>--- Select from list ---</option>
 						</select>				
 					</div>		
@@ -146,7 +146,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': lineForm.remoteIoAddress.$pristine }">
 						<label for="field-1" class="control-label">Remote IO Address</label>
-						<select style="width: 150px;" name="remoteIoAddress" ng-model="lineInfo.remoteIoAddresses" ng-options="address for address in remoteIoAddresses" required>
+						<select style="width: 150px;" name="remoteIoAddress" ng-model="lineInfo.remoteIoAddress" ng-options="address for address in remoteIoAddresses" required>
 							<option value="" disabled selected>--- Select from list ---</option>
 						</select>				
 					</div>		
@@ -219,7 +219,7 @@
 				<div class="col-md-6">	
 					<div class="form-group" ng-class="{ 'has-error': wsForm.wsName.$invalid && wsForm.wsName.$pristine }">
 						<label for="field-1" class="control-label">Workstation Name</label>
-						<select style="width: 150px;" ng-model="workstationInfo.workstationName" ng-options="wsName.workstationName for wsName in wsNames" name="wsName" required>
+						<select style="width: 150px;" ng-model="workstationInfo.workstationName" ng-options="wsName.workstationName as wsName.workstationName for wsName in wsNames" name="wsName" required>
 						  <option value="" disabled selected>--- Select from list ---</option>
 						</select>				
 					</div>		
@@ -322,7 +322,7 @@
 				</div>
 						
 				<div class="col-md-4">
-					<select style="width: 150px;" ng-model="toolInfo.toolName" name="toolName" ng-options="toolName.toolName for toolName in toolNames" required>
+					<select style="width: 150px;" ng-model="selectedTool" name="toolName" ng-options="toolName as toolName.toolName for toolName in toolNames" required>
 					  <option value="" disabled selected>--- Select from list ---</option>
 					</select>
 				</div>		
@@ -384,7 +384,7 @@
 					</div>
 				</div>
 				<div class="col-md-4">
-					<select style="width: 190px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="('Line: ' + add.Line + ', ' + 'Reader: ' + add.Reader + ', ' + 'Tag: ' + add.LastTagRead) for add in rfidAddresses">
+					<select style="width: 190px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add.LastTagRead as ('Line: ' + add.Line + ', ' + 'Reader: ' + add.Reader + ', ' + 'Tag: ' + add.LastTagRead) for add in rfidAddresses">
 						<option value="" disabled selected>--- Scan, Populate, Select ---</option>
 					</select>
 				</div>
@@ -411,7 +411,7 @@
 			<!-- SAVE BUTTON -->
 			<div class="modal-footer">
 				<font color="red" style="margin-right:15px;">Make sure tool Module and Point match enclosure.</font>
-				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss(); createtool();" ng-disabled="toolForm.$invalid">Save</button>
+				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss(); createTool();" ng-disabled="toolForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>
