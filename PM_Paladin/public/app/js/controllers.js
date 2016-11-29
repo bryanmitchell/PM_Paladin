@@ -512,6 +512,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$http.post('../../api/settoolactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
 				console.log("Tool activated.");
+				alert("Tool activated.");
 			})
 			.error(function(data, status) {
 				alert("Error turning on tool\n"+data);
@@ -522,6 +523,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$http.post('../../api/settoolinactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
 				console.log("Tool disactivated.");
+				alert("Tool disactivated.");
 			})
 			.error(function(data, status) {
 				alert("Error turning off tool\n"+data);
@@ -1028,6 +1030,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			angular.forEach($scope.selection, function (item) {
 				item.Selected = false;
 			})
+			$scope.selection = [];
 		};
 
 		$scope.confirmFull = function(){
@@ -1121,6 +1124,7 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 			angular.forEach($scope.selection, function (item) {
 				item.Selected = false;
 			})
+			$scope.selection = [];
 		};
 
 		$scope.sendEmail = function () {

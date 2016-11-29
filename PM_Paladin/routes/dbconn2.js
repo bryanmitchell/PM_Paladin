@@ -629,7 +629,9 @@ exports.setToolActive = function(cp,req,res){
 	WHERE ToolID = ${r.toolID}`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'setActive' success!");}
+		else{
+			res.send(recordset);
+			console.log("Query 'setActive' success!");}
 	});
 };
 exports.setToolInactive = function(cp,req,res){
@@ -640,7 +642,9 @@ exports.setToolInactive = function(cp,req,res){
 	WHERE ToolID = ${r.toolID}`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query 'setInactive' success!");}
+		else{
+			res.send(recordset);
+			console.log("Query 'setInactive' success!");}
 	});
 };
 
