@@ -26,14 +26,12 @@ function runQuery(query, cp, res) {
 		}
 		else{ 
 			console.log("Query good!"); 
-			console.dir(recordset);
 			if (res !== null){ res.send(recordset);}
 		}
 	});
 };
 
 function runPostQuery(query, cp, res) {
-	console.log('in dbconn.runPostQuery()');
 	var request = new sql.Request(cp);
 	request.query(query, function(err, recordset){
 		if(err){
@@ -55,7 +53,6 @@ DASHBOARD
 exports.getEmployeePassword = function(cp, req, res){
 	var sso = req.body.sso;
 	var pwd = req.body.password;
-	console.log(bcrypt.hashSync(pwd, salt));
 	var query = `
 		SELECT e.Sso AS [sso]
 			,e.FirstName AS [firstName]
@@ -122,7 +119,6 @@ exports.getToolDates = function(cp,res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getUpcomingTools' success!");
-			console.dir(recordset);
 			res.send(recordset);
 		}
 	});
@@ -177,7 +173,6 @@ exports.getBarChartInfo = function(cp,res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getBarChartInfo' success!");
-			console.dir(recordset);
 			res.send(recordset);
 		}
 	});
@@ -206,7 +201,6 @@ exports.getPieChartInfo = function(cp,res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'getPieChartInfo' success!");
-			console.dir(recordset);
 			res.send(recordset);
 		}
 	});
@@ -235,7 +229,6 @@ exports.createLine = function(cp, req, res){
 };
 exports.createWorkstation = function(cp, req, res){
 	var r = req.body;
-	console.log(r);
 	var query = `
 	DECLARE @wsid INT
 	BEGIN TRANSACTION;
@@ -291,7 +284,7 @@ exports.createWorkstation = function(cp, req, res){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
-		else{console.log("Query success!");}
+		else{console.log("Query createWorkstation success!");}
 	});
 
 	res.redirect('back');
@@ -380,8 +373,8 @@ exports.createTool = function(cp, req, res){
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
-			console.log("Query success!");
-			refreshActiveBit(cp);
+			console.log("Query createTool success!");
+			refreshActiveBit(cp, res);
 		}
 	});
 
@@ -453,7 +446,7 @@ exports.updateLine = function(cp, req, res){
 		}
 		else{
 			console.log("Query 'updateWorkstation' success!");
-			res.send();
+			res.sendStatus(200);
 		}
 	});
 }; // Change when RunPostQuery is changed
@@ -480,7 +473,7 @@ exports.updateWorkstation = function(cp, req, res){
 		}
 		else{
 			console.log("Query 'updateWorkstation' success!");
-			res.send();
+			res.sendStatus(200);
 		}
 	});
 }; //change when RunPostQuery is changed
@@ -505,7 +498,7 @@ exports.updateTool = function(cp, req, res){
 		}
 		else{
 			console.log("Query 'updateTool' success!");
-			res.send();
+			res.sendStatus();
 		}
 	});
 }; //change when RunPostQuery is changed
@@ -524,7 +517,10 @@ exports.deleteLine = function(cp, req, res){
 			console.log(err);
 			res.send(err);
 		}
-		else{console.log("Query deleteLine success!");}
+		else{
+			console.log("Query deleteLine success!");
+			res.sendStatus(200);
+		}
 	});
 };
 exports.deleteWorkstation = function(cp, req, res){
@@ -539,7 +535,10 @@ exports.deleteWorkstation = function(cp, req, res){
 			console.log(err);
 			res.send(err);
 		}
-		else{console.log("Query deleteWorkstation success!");}
+		else{
+			console.log("Query deleteWorkstation success!");
+			res.sendStatus(200);
+		}
 	});
 };
 exports.deleteTool = function(cp, req, res){
@@ -555,7 +554,7 @@ exports.deleteTool = function(cp, req, res){
 		}
 		else{
 			console.log("Query deleteTool success!");
-			res.send();
+			res.sendStatus(200);
 		}
 	});
 };
@@ -632,8 +631,9 @@ exports.setToolActive = function(cp,req,res){
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
+			console.log("Query 'setActive' success!");
 			res.send(recordset);
-			console.log("Query 'setActive' success!");}
+		}
 	});
 };
 exports.setToolInactive = function(cp,req,res){
@@ -646,8 +646,9 @@ exports.setToolInactive = function(cp,req,res){
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
+			console.log("Query 'setInactive' success!");
 			res.send(recordset);
-			console.log("Query 'setInactive' success!");}
+		}
 	});
 };
 
@@ -696,7 +697,6 @@ exports.createEmployee = function(cp, req, res){
 }; //TODO FIX
 
 exports.getEmployees = function(cp, res){
-	console.log("Getting all employees...");
 	runQuery(`
 		SELECT e.Sso as [sso]
 			,e.FirstName AS [firstName]
@@ -758,7 +758,6 @@ exports.updateEmployee = function(cp, req, res){
 
 	// Insert employee roles
 	for (var i=0; i<types.length; i++){
-		console.log('in for');
 		query2 += `
 			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
 			VALUES (${r.sso}, '${types[i]}')`;
@@ -808,7 +807,7 @@ exports.deleteEmployee = function(cp, req, res){
 		}
 		else{
 			console.log("Query deleteEmployee success!");
-			res.send();
+			res.sendStatus(200);
 		}
 	});
 };
@@ -818,7 +817,6 @@ MY TASKS
 **/
 exports.getTasks = function(cp, req, res){
 	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
-	console.log("Getting all tasks...");
 	runQuery(`
 		SELECT tsk.TaskID AS [Task], 
 			tsk.TaskDescription AS [Desc],
@@ -863,7 +861,6 @@ MAINTENANCE CONFIRMATION
 **/
 exports.getConfirmationTasks = function(cp, req, res){
 	// http://stackoverflow.com/questions/63447/how-to-perform-an-if-then-in-an-sql-select
-	console.log("Getting confirmation tasks...");
 	runQuery(`
 		SELECT tsk.TaskID AS [Task], 
 			tsk.TaskDescription AS [Desc], 
@@ -903,7 +900,6 @@ exports.getConfirmationTasks = function(cp, req, res){
 
 exports.setPartialConfirm = function(cp, req, res){
 	var r = req.body;
-	console.log(r.tasks.toString());
 	var query = `
 		UPDATE [dbo].[Task]
 		SET [TaskStatus] = 'ConfirmPartial'
@@ -914,8 +910,7 @@ exports.setPartialConfirm = function(cp, req, res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'setPartialConfirm' success!");
-			refreshActiveBit(cp);
-			res.sendStatus(200);
+			refreshActiveBit(cp, res);
 		}
 	});
 };
@@ -932,8 +927,7 @@ exports.setFullConfirm = function(cp, req, res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'setFullConfirm' success!");
-			refreshActiveBit(cp);
-			res.sendStatus(200);
+			refreshActiveBit(cp, res);
 		}
 	});	
 };
@@ -1003,7 +997,6 @@ exports.setApprove = function(cp, req, res){
 		if(err){console.log(err);}
 		else{
 			console.log("Query 'setApprove' success!");
-			refreshActiveBit(cp);
 			res.sendStatus(200);
 		}
 	});
@@ -1013,7 +1006,7 @@ exports.setApprove = function(cp, req, res){
 
 
 
-var refreshActiveBit = function(cp){
+var refreshActiveBit = function(cp, res){
 	var query = `
 		-- Turn ON Active bits for tools
 		UPDATE Tool
@@ -1049,15 +1042,19 @@ var refreshActiveBit = function(cp){
 		UPDATE Workstation
 		SET GreenLightOn = 1
 		FROM Eq
-		WHERE Eq.WorkstationID NOT IN (
+		WHERE Workstation.WorkstationID NOT IN (
 			SELECT DISTINCT Eq.WorkstationID
 			FROM Eq
 			WHERE Eq.TaskStatus = 'PastDue')
-		AND (Eq.WorkstationID NOT IN (
-				SELECT DISTINCT Eq.WorkstationID
-				FROM Eq
-				WHERE Eq.DaysLeft < 4)
-			OR Eq.TaskStatus = 'ConfirmPartial');
+		AND (Workstation.WorkstationID NOT IN (
+			SELECT DISTINCT Eq.WorkstationID
+			FROM Eq
+			WHERE Eq.DaysLeft < 4)
+		OR Workstation.WorkstationID IN (
+			SELECT Eq.WorkstationID
+			FROM Eq
+			WHERE Eq.TaskStatus = 'ConfirmPartial')
+		);
 
 
 		-- Turn ON yellow lights
@@ -1071,7 +1068,7 @@ var refreshActiveBit = function(cp){
 		UPDATE Workstation
 		SET YellowLightOn = 1
 		FROM Eq
-		WHERE Eq.WorkstationID IN (
+		WHERE Workstation.WorkstationID IN (
 			SELECT DISTINCT Eq.WorkstationID
 			FROM Eq
 			WHERE Eq.DaysLeft < 15
@@ -1089,7 +1086,7 @@ var refreshActiveBit = function(cp){
 		UPDATE Workstation
 		SET RedLightOn = 1
 		FROM Eq
-		WHERE Eq.WorkstationID IN (
+		WHERE Workstation.WorkstationID IN (
 			SELECT DISTINCT Eq.WorkstationID
 			FROM Eq
 			WHERE Eq.TaskStatus = 'PastDue'
@@ -1103,5 +1100,9 @@ var refreshActiveBit = function(cp){
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
+		else{
+			console.log('Success setting active bits!');
+			res.sendStatus(200);
+		}
 	});
 };

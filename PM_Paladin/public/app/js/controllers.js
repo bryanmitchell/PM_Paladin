@@ -4,7 +4,7 @@ var app = angular.module('xenon.controllers', []);
 
 app.controller('MainCtrl', function($scope, $rootScope, $location, $layout, $layoutToggles, $pageLoadingBar, Fullscreen)
 	{
-		$rootScope.isMainPage         = true;
+		$rootScope.isMainPage = true;
 
 		$rootScope.layoutOptions = {
 			horizontalMenu: {
@@ -163,8 +163,6 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 		$scope.validateLogIn = function () {
 			$http.post('../../api/getEmployeePassword', $scope.logInUser) 
 			.success(function(data, status) {
-				console.log(data);
-				// console.log(status);
 				$rootScope.isLoggedIn = data.success;
 				if($rootScope.isLoggedIn){
 					$rootScope.userPosition = data.types.split(',');
@@ -176,14 +174,13 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 				}
 			})
 			.error(function(data, status) {
-				console.log("Error");
 				alert("Invalid SSO or password. \nPlease try again.");
 			});
 		};
 
 
 		$scope.showLogoutButton =function () {
-			if ($rootScope.isLoggedIn == true) {
+			return ($rootScope.isLoggedIn == true) {
 				return true;
 			}
 			return false;
@@ -338,7 +335,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 						$scope.pieColors.push('#1a47d8'); // Blue
 						break;
 					default:
-						alert("Pie chart error, contact developers!");
+						alert("Oops! Pie chart error, contact developers!");
 				}
 			}
 		};
@@ -389,7 +386,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 					$scope.lines = data;
 				})
 				.error(function(data, status) {
-					console.log("Error");
+					console.log("Oops! Error retrieving production line info, contact developers!");
 				});
 
 			$http.get('../../api/workstations') 
@@ -397,7 +394,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 					$scope.workstations = data;
 				})
 				.error(function(data, status) {
-					console.log("Error");
+					console.log("Oops! Error retrieving workstation info, contact developers!");
 				});
 
 			$http.get('../../api/tools') 
@@ -405,7 +402,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 					$scope.tools = data;
 				})
 				.error(function(data, status) {
-					console.log("Error");
+					console.log("Oops! Error retrieving tool info, contact developers!");
 				});
 		}
 
@@ -471,7 +468,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$http.post('../../api/deleteline', {'lineID': $scope.selectedLine}) 
 			.success(function(data, status) {
 				if(data.name === 'RequestError'){
-					alert('Please reassign or unregister children workstations.');
+					alert('Please reassign or unregister workstations in this line.');
 				}
 				else{
 					alert("Line unregistered. Please press the purple Refresh button.");
@@ -486,7 +483,7 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$http.post('../../api/deleteworkstation', {'workstationID': $scope.selectedWS}) 
 			.success(function(data, status) {
 				if(data.name === 'RequestError'){
-					alert('Please reassign or unregister children tools.');
+					alert('Please reassign or unregister tools in this workstation.');
 				}
 				else{
 					alert("Workstation unregistered. Please press the purple Refresh button.");
@@ -500,7 +497,6 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		$scope.deleteTool = function(){
 			$http.post('../../api/deletetool', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				console.log("Tool unregister");
 				alert("Tool unregistered. Please press the purple Refresh button.");
 			})
 			.error(function(data, status) {
@@ -511,7 +507,6 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		$scope.turnToolOn = function () {
 			$http.post('../../api/settoolactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				console.log("Tool activated.");
 				alert("Tool activated.");
 			})
 			.error(function(data, status) {
@@ -522,7 +517,6 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		$scope.turnToolOff = function () {
 			$http.post('../../api/settoolinactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				console.log("Tool disactivated.");
 				alert("Tool disactivated.");
 			})
 			.error(function(data, status) {
@@ -628,56 +622,50 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 	
 		$http.get('../../api/employees')
 			.success(function (data) {
-				console.log("empleados");
 				$scope.users = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving employees info!');
 			});
 
 		$http.get('../../api/pmprolines')
 			.success(function (data) {
-				console.log("lineas de pmpro");
 				$scope.lineNames = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving production line info from PM Pro!');
 			});
 
 		$http.get('../../api/pmproworkstations')
 			.success(function (data) {
-				console.log("ws de pmpro");
 				$scope.wsNames = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving workstation info from PM Pro!');
 			});
 
 		$http.get('../../api/pmprotools')
 			.success(function (data) {
-				console.log("tools de pmpro");
 				$scope.toolNames = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving tool info from PM Pro!');
 			});
 
 		$scope.createLine = function () {
 			//Request
-			console.log("Called createLine");
 			$http.post('../../api/createline', $scope.lineInfo) 
 			.success(function(data, status) {
-				console.log("createline ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Controller createline Error");
+				alert('Oops! Error registering line, contact developers!');
 			});
 		};
 
 		$scope.createWorkstation = function () {
-			//Request
 			$http.post('../../api/createworkstation', $scope.workstationInfo) 
 			.success(function(data, status) {
-				console.log("createworkstation ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Controller createworkstation Error");
+				alert('Oops! Error registering workstation, contact developers!');
 			});
 		};
 
@@ -692,10 +680,10 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			$scope.toolInfo.originalCostDollars = $scope.selectedTool.originalCostDollars;
 			$http.post('../../api/createtool', $scope.toolInfo) 
 			.success(function(data, status) {
-				console.log("createtool ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Controller createtool Error");
+				alert('Oops! Error registering tool, contact developers!');
 			});
 		};
 
@@ -703,12 +691,10 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			//Request
 			$http.get('../../api/getscannedrfidtags') 
 			.success(function(data, status) {
-				console.log("get tags ok");
-				console.log(data);
 				$scope.rfidAddresses = data;
 			})
 			.error(function(data, status) {
-				console.log("Controller get tags Error");
+				alert('Oops! Error retrieving scanned RFID tags, contact developers!');
 			});
 		};
 
@@ -732,14 +718,12 @@ app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstan
 		$scope.lineInfo = selectedLine;
 
 		$scope.updateLine = function () {
-			//Request
-			console.log("Called updateLine");
 			$http.post('../../api/updateline', $scope.lineInfo) 
 			.success(function(data, status) {
-				console.log("updateLine ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Controller updateLine Error");
+				alert('Oops! Error updating production line, contact developers!');
 			});
 		};
 
@@ -757,21 +741,19 @@ app.controller('WSUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance
 		$scope.workstationInfo = selectedWS;
 		$scope.users = {};
 		$http.get('../../api/employees')
-			.success(function (data) {
-				$scope.users = data;
-			}).error(function (data, status) {
-				alert();
-			});
+		.success(function (data) {
+			$scope.users = data;
+		}).error(function (data, status) {
+			alert('Oops! Error retrieving users, contact developers!');
+		});
 
 		$scope.updateWorkstation = function () {
-			//Request
-			console.log("Called updateWorkstation");
 			$http.post('../../api/updateworkstation', $scope.workstationInfo) 
 			.success(function(data, status) {
-				console.log("updateWorkstation ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Controller updateWorkstation Error");
+				alert('Oops! Error updating workstation, contact developers!');
 			});
 		};
 
@@ -797,14 +779,12 @@ app.controller('ToolUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstan
 			});
 
 		$scope.updateTool = function () {
-			//Request
-			console.log("Called updateTool");
 			$http.post('../../api/updatetool', $scope.toolInfo) 
 			.success(function(data, status) {
-				console.log("updateTool ok");
+			
 			})
 			.error(function(data, status) {
-				console.log("Controller updateTool Error");
+				alert('Oops! Error registering tool, contact developers!');
 			});
 		};
 
@@ -845,7 +825,7 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 			.success(function (data) {
 				$scope.users = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving employees, contact developers!');
 			});	
 		};
 
@@ -871,15 +851,12 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 		};
 
 		$scope.createEmployee = function () {
-			console.log("createEmployee from controller.js")
-
-			//Request
 			$http.post('../../api/createemployee', $scope.userInfo) 
 			.success(function(data, status) {
 				alert("User created. Please click on the purple button to reflect changes.");
 			})
 			.error(function(data, status) {
-				console.log("Error");
+				alert('Oops! Error creating user, contact developers!');
 			});
 		};
 
@@ -890,30 +867,25 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 				//Request
 				$http.post('../../api/deleteemployee', {'sso': $scope.selectedUser.sso}) 
 				.success(function(data, status) {
-					console.log("User deleted");
 					alert("User deleted. Please refresh by clicking the purple button to reflect changes.");
 				})
 				.error(function(data, status) {
-					console.log("Error");
+					alert('Oops! Error deleting user, contact developers!');
 				});
 			}
 		};
 
 		$scope.sendEmail = function () {
-			console.log("sendEmail from controller.js");
-			
-			//Request
 			$http.post('../../api/emailnewuser', $scope.userInfo) 
 			.success(function(data, status) {
-				console.log("Sent ok");
+
 			})
 			.error(function(data, status) {
-				console.log("Error");
+				alert('Oops! Error sending new user email, contact developers!');
 			});
 		};
 
 		$scope.updateUserModal = function(modal_id, modal_size, modal_backdrop){
-			console.log("myOpenModal");
 			$scope.modalInstance = $modal.open({
 				templateUrl: modal_id,
 				controller: 'UpdateUserModalCtrl',
@@ -933,7 +905,6 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 	{
 		$rootScope.currentPageTitle = 'User Management';
 
-		console.log("UpdateUserModalCtrl");
 		$scope.selectedUser = selectedUser;
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
 		$scope.typesSelected = $scope.selectedUser.types.split(',');
@@ -954,15 +925,13 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		};
 
 		$scope.updateUser = function () {
-			//Request
-			console.log("Called updateUser");
 			$scope.selectedUser.types = $scope.typesSelected.join();
 			$http.post('../../api/updateemployee', $scope.selectedUser) 
 			.success(function(data, status) {
-				console.log("updateUser ok");
+				
 			})
 			.error(function(data, status) {
-				console.log("Controller updateUser Error");
+				alert('Oops! Error updating user, contact developers!');
 			});
 		};
 
@@ -981,13 +950,11 @@ app.controller('MyTasksCtrl', function($scope, $rootScope, $http)
 	{
 		$rootScope.currentPageTitle = 'My Tasks';
 
-		console.log('called getTasks')
 		$http.post('../../api/gettasks', {'sso': $rootScope.userSSO})
 		.success(function (data) {
-			console.log(data);
 			$scope.tasks = data;
 		}).error(function (data, status) {
-			alert();
+			alert('Oops! Error retrieving your tasks, try again later or contact developers!');
 		});
 
 	});
@@ -1092,7 +1059,7 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 			.success(function (data) {
 				$scope.tasks = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error retrieving your tasks to approve, try again later or contact developers!');
 			});
 		};
 		
@@ -1112,7 +1079,7 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 		$scope.uncheckBoxes = function () {
 			angular.forEach($scope.selection, function (item) {
 				item.Selected = false;
-			})
+			});
 			$scope.selection = [];
 		};
 
@@ -1142,4 +1109,3 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 
 		
 	});
-

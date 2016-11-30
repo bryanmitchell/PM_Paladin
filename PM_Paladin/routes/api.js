@@ -328,6 +328,7 @@ module.exports = function(cp){
 	router.route('/emailnewuser')
 		.post(function(req, res){
 			sendEmail(emailgen.newUserEmail(req), res);
+			res.sendStatus(200);
 		});
 
 	return router;
