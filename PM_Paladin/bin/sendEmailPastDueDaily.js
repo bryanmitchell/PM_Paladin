@@ -59,95 +59,98 @@ var isActiveQuery = `
 new sql.Request(cp).query(isActiveQuery, function(err, recordset) {if(err) { console.log(err); }});
 
 
-/** 
-* SEND EMAIL: Technicians with tools expiring today
-**/
-// List of technicians
-var getTecSsoQuery = `
-	SELECT DISTINCT tat.Sso AS [sso]
-	FROM [Task] tsk
-	INNER JOIN [ToolAssignedTo] tat ON tsk.ToolID = tat.ToolID
-	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
-// Task details for a given technician
-var tecEmailQuery = function(sso) {
-	return `
-	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
-		e.FirstName, e.LastName, e.Email
-	FROM Task tsk 
-	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
-	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
-	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
-	INNER JOIN ToolAssignedTo tat ON t.ToolID = tat.ToolID
-	INNER JOIN Employee e ON tat.Sso = e.Sso
-	WHERE e.Sso = ${sso}
-	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
-};
-new sql.Request(cp).query(getTecSsoQuery, function(err, recordset) {
-	if(err) {console.log(err);} 
-	else {
-		for(var i; i<recordset.length; ++i){
-			new sql.Request(cp).query(tecEmailQuery(recordset[i].sso), function(err, recordset) {
-				if(err) { console.log(err); }
-				else{sendEmail(recordset);}
-			});}}});
-
-
-/** 
-* SEND EMAIL: Technicians with tools expiring today
-**/
-// List of Production Line supervisors
-var getLineSupEmailQuery = `
-	SELECT DISTINCT pl.SupervisorEmail AS [email]
-	FROM [Task] tsk
-	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
-	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
-	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
-	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
-// Task details for a given line supervisor
-var lineSupEmailQuery = function(email) {
-	return `
-	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
-		pl.SupervisorFirstName AS [FirstName], pl.SupervisorLastName AS [LastName], pl.SupervisorEmail AS [Email]
-	FROM Task tsk 
-	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
-	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
-	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
-	WHERE pl.SupervisorEmail = ${email}
-	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
-};
-new sql.Request(cp).query(getLineSupEmailQuery, function(err, recordset) {
-	if(err) {console.log(err);} 
-	else {
-		for(var i; i<recordset.length; ++i){
-			new sql.Request(cp).query(lineSupEmailQuery(recordset[i].email), function(err, recordset) {
-				if(err) { console.log(err); }
-				else{sendEmail(recordset);}
-			});}}});
 
 
 
-/** SEND EMAIL **/
-var sendEmail = function(recordset) {
-	var helper = sg.mail;
-	var author = new helper.Email(process.env.EMAIL_AUTHOR);
-	var subject = "[PM Paladin] Past Due notification, tools have been turned off."
-	var recipient = new helper.Email(recordset[0].Email);
-	var header = `This is an automated message.<br><br>`;
-	var message = `Hello ${recordset[0].FirstName} ${recordset[0].LastName},<br>
-		The following task(s) entered Past Due status. Corresponding tools will be turned off until maintenance is performed.<br>`;
-	for(var i = 0; i<recordset.length; ++i) {
-		message += `<li>Line: ${recordset[i].LineName} - WS: ${recordset[i].WorkstationName} - Tool: ${recordset[i].ToolName} - Task: ${recordset[i].TaskDescription}</li>`;
-	}
-	var content = new helper.Content("text/html", header+message);
-	var mail = new helper.Mail(author, subject, recipient, content);
+// /** 
+// * SEND EMAIL: Technicians with tools expiring today
+// **/
+// // List of technicians
+// var getTecSsoQuery = `
+// 	SELECT DISTINCT tat.Sso AS [sso]
+// 	FROM [Task] tsk
+// 	INNER JOIN [ToolAssignedTo] tat ON tsk.ToolID = tat.ToolID
+// 	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
+// // Task details for a given technician
+// var tecEmailQuery = function(sso) {
+// 	return `
+// 	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
+// 		e.FirstName, e.LastName, e.Email
+// 	FROM Task tsk 
+// 	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
+// 	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
+// 	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
+// 	INNER JOIN ToolAssignedTo tat ON t.ToolID = tat.ToolID
+// 	INNER JOIN Employee e ON tat.Sso = e.Sso
+// 	WHERE e.Sso = ${sso}
+// 	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
+// };
+// new sql.Request(cp).query(getTecSsoQuery, function(err, recordset) {
+// 	if(err) {console.log(err);} 
+// 	else {
+// 		for(var i; i<recordset.length; ++i){
+// 			new sql.Request(cp).query(tecEmailQuery(recordset[i].sso), function(err, recordset) {
+// 				if(err) { console.log(err); }
+// 				else{sendEmail(recordset);}
+// 			});}}});
 
-	var request = sg.emptyRequest({
-		method: 'POST',
-		path: '/v3/mail/send',
-		body: mail.toJSON()
-	});
 
-	sg.API(request, function(error, response) {
-		if(error) { console.log(error); }
-	});
-};
+// /** 
+// * SEND EMAIL: Technicians with tools expiring today
+// **/
+// // List of Production Line supervisors
+// var getLineSupEmailQuery = `
+// 	SELECT DISTINCT pl.SupervisorEmail AS [email]
+// 	FROM [Task] tsk
+// 	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
+// 	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
+// 	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
+// 	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
+// // Task details for a given line supervisor
+// var lineSupEmailQuery = function(email) {
+// 	return `
+// 	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
+// 		pl.SupervisorFirstName AS [FirstName], pl.SupervisorLastName AS [LastName], pl.SupervisorEmail AS [Email]
+// 	FROM Task tsk 
+// 	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
+// 	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
+// 	INNER JOIN ProductionLine pl ON ws.LineID = pl.LineID
+// 	WHERE pl.SupervisorEmail = ${email}
+// 	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) = 0;`;
+// };
+// new sql.Request(cp).query(getLineSupEmailQuery, function(err, recordset) {
+// 	if(err) {console.log(err);} 
+// 	else {
+// 		for(var i; i<recordset.length; ++i){
+// 			new sql.Request(cp).query(lineSupEmailQuery(recordset[i].email), function(err, recordset) {
+// 				if(err) { console.log(err); }
+// 				else{sendEmail(recordset);}
+// 			});}}});
+
+
+
+// /** SEND EMAIL **/
+// var sendEmail = function(recordset) {
+// 	var helper = sg.mail;
+// 	var author = new helper.Email(process.env.EMAIL_AUTHOR);
+// 	var subject = "[PM Paladin] Past Due notification, tools have been turned off."
+// 	var recipient = new helper.Email(recordset[0].Email);
+// 	var header = `This is an automated message.<br><br>`;
+// 	var message = `Hello ${recordset[0].FirstName} ${recordset[0].LastName},<br>
+// 		The following task(s) entered Past Due status. Corresponding tools will be turned off until maintenance is performed.<br>`;
+// 	for(var i = 0; i<recordset.length; ++i) {
+// 		message += `<li>Line: ${recordset[i].LineName} - WS: ${recordset[i].WorkstationName} - Tool: ${recordset[i].ToolName} - Task: ${recordset[i].TaskDescription}</li>`;
+// 	}
+// 	var content = new helper.Content("text/html", header+message);
+// 	var mail = new helper.Mail(author, subject, recipient, content);
+
+// 	var request = sg.emptyRequest({
+// 		method: 'POST',
+// 		path: '/v3/mail/send',
+// 		body: mail.toJSON()
+// 	});
+
+// 	sg.API(request, function(error, response) {
+// 		if(error) { console.log(error); }
+// 	});
+// };

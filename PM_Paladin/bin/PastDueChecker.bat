@@ -1,0 +1,1 @@
+cmd /C sqlcmd -S GEIPC-PC\PMPALADIN -U paladin_watch -P pmpaladin -i PastDueChecker.sql

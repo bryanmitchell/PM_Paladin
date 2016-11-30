@@ -180,10 +180,7 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 
 		$scope.showLogoutButton =function () {
-			return ($rootScope.isLoggedIn == true) {
-				return true;
-			}
-			return false;
+			return $rootScope.isLoggedIn;
 		}
 
 		$scope.logout = function () {
@@ -581,7 +578,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 		$scope.userInCharge = {};
 		$scope.lineNames = [];
 		$scope.wsNames = {};
-		$scope.toolNames = {};
+		$scope.pmProTools = [];
 		$scope.selectedTool = {};
 
 		$scope.lineInfo = {
@@ -643,7 +640,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 
 		$http.get('../../api/pmprotools')
 			.success(function (data) {
-				$scope.toolNames = data;
+				$scope.pmProTools = data;
 			}).error(function (data, status) {
 				alert('Oops! Error retrieving tool info from PM Pro!');
 			});
@@ -678,6 +675,7 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			$scope.toolInfo.supplier = $scope.selectedTool.supplier;
 			$scope.toolInfo.yearBought = $scope.selectedTool.yearBought;
 			$scope.toolInfo.originalCostDollars = $scope.selectedTool.originalCostDollars;
+			console.dir($scope.toolInfo);
 			$http.post('../../api/createtool', $scope.toolInfo) 
 			.success(function(data, status) {
 
@@ -970,6 +968,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
 				$scope.tasks = data;
+				$scope.uncheckBoxes();
 			}).error(function (data, status) {
 				alert('Error performing query to get tasks to confirm, contact developers!');
 			});
@@ -1024,7 +1023,9 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/confirmfull', {'tasks': newSelection})
 			.success(function (data) {
-				$scope.sendEmail('full');
+				//$scope.sendEmail('full');
+				$scope.uncheckBoxes();
+				$scope.getConfirmTasks();
 			}).error(function (data, status) {
 				alert('Oops! Error performing Full Confirmation query, please contact developers!');
 			});
@@ -1037,7 +1038,9 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/confirmpartial', {'tasks': newSelection}) // Selected task IDs
 			.success(function (data) {
-				$scope.sendEmail('partial');
+				//$scope.sendEmail('partial');
+				$scope.uncheckBoxes();
+				$scope.getConfirmTasks();
 			})
 			.error(function (data, status) {
 				alert('Oops! Error performing Partial Confirmation query, please contact developers!');
@@ -1100,7 +1103,9 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/approve', {'tasks': newSelection}) // Selected task IDs
 			.success(function (data) {
-				$scope.sendEmail();
+				//$scope.sendEmail();
+				$scope.uncheckBoxes();
+				$scope.getApproveTasks();
 			})
 			.error(function (data, status) {
 				alert('Oops! Error performing Task Approval query, please contact developers!');
