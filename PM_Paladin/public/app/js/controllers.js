@@ -1000,20 +1000,17 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 		$rootScope.currentPageTitle = 'Maintenance Confirmation';
 
 		$scope.getConfirmTasks = function () {
-			console.log('called getConfirmTasks')
 			$http.post('../../api/confirmtasks', {'sso': $rootScope.userSSO})
 			.success(function (data) {
-				console.log(data);
 				$scope.tasks = data;
 			}).error(function (data, status) {
-				alert();
+				alert('Error performing query to get tasks to confirm, contact developers!');
 			});
 		};	
 		
 		$scope.getConfirmTasks();	
 
 		$scope.selection = [];
-		$scope.selectionID = [];
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.selection.indexOf(item);
@@ -1029,63 +1026,55 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 		$scope.uncheckBoxes = function () {
 			angular.forEach($scope.selection, function (item) {
 				item.Selected = false;
-			})
+			});
 			$scope.selection = [];
+		};
+
+		$scope.sendEmail = function (type) {
+			if (type === 'partial') {
+				$http.post('../../api/emailpartial', {'tecName': $rootScope.userName, 'tasks': $scope.selection}) // Technician name + selected tasks
+				.success(function(data, status) {
+					alert(`Emails have been sent to ${data.emails}`);
+				})
+				.error(function(data, status) {
+					alert(`Oops! Error sending partial confirmation notification emails, please contact developers!\nError status: ${status}`);
+				});
+			} else {
+				$http.post('../../api/emailfull', {'tecName': $rootScope.userName, 'tasks': $scope.selection}) 
+				.success(function(data, status) {
+					alert(`Emails have been sent to ${data.emails}`);
+				})
+				.error(function(data, status) {
+					alert("Oops! Error sending full confirmation notification emails, please contact developers!");
+				});
+			}
+			$scope.uncheckBoxes();
 		};
 
 		$scope.confirmFull = function(){
 			var newSelection = [];
-			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
+			for (var i = 0; i< $scope.selection.length; i++) {newSelection.push($scope.selection[i].Task);}
+
 			$http.post('../../api/confirmfull', {'tasks': newSelection})
 			.success(function (data) {
-				console.log('confirmFull');
 				$scope.sendEmail('full');
-				$scope.uncheckBoxes();
 			}).error(function (data, status) {
-				alert();
+				alert('Oops! Error performing Full Confirmation query, please contact developers!');
 			});
 		};
+		
 
 		$scope.confirmPartial = function(){
 			var newSelection = [];
-			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
-			$http.post('../../api/confirmpartial', {'tasks': newSelection})
-			.success(function (data) {
-				console.log('confirmPartial');
-				$scope.sendEmail('partial');
-				$scope.uncheckBoxes();
-			}).error(function (data, status) {
-				alert();
-			});
-		};
+			for (var i = 0; i< $scope.selection.length; i++) {newSelection.push($scope.selection[i].Task);}
 
-		$scope.sendEmail = function (type) {
-			console.log("TEST");
-			//Request
-			if (type == "partial") {
-				console.log("Partial");
-				
-				$http.post('../../api/emailpartial', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
-				.success(function(data, status) {
-					console.log("Sent ok");
-					alert("An email has been sent to "+$scope.tasks[0].EngFName+" "+$scope.tasks[0].EngLName+" at "+$scope.tasks[0].EngEmail);
-				})
-				.error(function(data, status) {
-					console.log("Error");
-				});
-			}
-			else {
-				console.log("Full");
-				
-				$http.post('../../api/emailfull', {'engineerEmail': $scope.tasks[0].EngEmail, 'task': $scope.selection}) 
-				.success(function(data, status) {
-					console.log("Sent ok");
-					alert("An email has been sent to "+$scope.tasks[0].EngFName+" "+$scope.tasks[0].EngLName+" at "+$scope.tasks[0].EngEmail);
-				})
-				.error(function(data, status) {
-					console.log("Error");
-				});
-			}
+			$http.post('../../api/confirmpartial', {'tasks': newSelection}) // Selected task IDs
+			.success(function (data) {
+				$scope.sendEmail('partial');
+			})
+			.error(function (data, status) {
+				alert('Oops! Error performing Partial Confirmation query, please contact developers!');
+			});
 		};
 	});
 
@@ -1128,26 +1117,26 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 		};
 
 		$scope.sendEmail = function () {
-			console.log("sendEmail from controller.js");
-			//Request
-			$http.post('../../api/emailapprove', {'supervisorEmail': $scope.tasks[0].LineSupervisorEmail, 'task': $scope.selection}) 
+			$http.post('../../api/emailapprove', {'engName': $rootScope.userName, 'tasks': $scope.selection}) // Engineer name + selected tasks
 			.success(function(data, status) {
-				console.log("Sent ok");
+				alert(`Emails have been sent to ${data.emails}`);
+				$scope.uncheckBoxes();
 			})
 			.error(function(data, status) {
-				console.log("Error");
+				alert(`Oops! Error sending approval notification emails, please contact developers!\nError status: ${status}`);
 			});
 		};
 
 		$scope.approveTasks = function(){
 			var newSelection = [];
-			for (var i=0;i<$scope.selection.length;i++){newSelection.push($scope.selection[i].Task);}
-			$http.post('../../api/approve', {'tasks': newSelection})
+			for (var i = 0; i< $scope.selection.length; i++) {newSelection.push($scope.selection[i].Task);}
+
+			$http.post('../../api/approve', {'tasks': newSelection}) // Selected task IDs
 			.success(function (data) {
-				console.log('approveTasks');
-				console.log(data);
-			}).error(function (data, status) {
-				alert();
+				$scope.sendEmail();
+			})
+			.error(function (data, status) {
+				alert('Oops! Error performing Task Approval query, please contact developers!');
 			});
 		};
 

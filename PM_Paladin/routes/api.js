@@ -16,8 +16,12 @@ module.exports = function(cp){
 		});
 
 		sg.API(request, function(error, response) {
-			if(error) {return next(error);}
-			return res.sendStatus(200);
+			if(error !== null)  {
+				console.log(error);
+				console.log(response.statusCode); 
+				console.log(response.body);
+				console.log(response.headers); 
+			}
 		});
 	};
 
@@ -208,17 +212,117 @@ module.exports = function(cp){
 	//Partial Confirmation Email
 	router.route('/emailpartial')
 		.post(function(req, res){
-			sendEmail(emailgen.partiallyConfirmedEmail(req), res);
+			// Get distinct SSOs
+			var tasks = req.body.tasks;
+			var engSsos = []; // just to make list-forming easier
+			var engInfo = [];
+			var i,j;
+
+			// Form list of engineer SSOs
+			for (i=0; i < tasks.length; i++){
+				if( engSsos.indexOf(tasks[i].EngSso) == -1){
+					engSsos.push(tasks[i].EngSso);
+					engInfo.push({'sso': tasks[i].EngSso, 'email': tasks[i].EngEmail});
+				}
+			}
+
+			// O(n*m)!
+			// For each engineer
+			for (i=0; i < engInfo.length; i++){ // For each engineer
+				var newReq = {'tecName': req.body.tecName, 'engEmail':engInfo[i].email, 'content':''};
+				// form list of tasks 
+				for (j=0; j < tasks.length; j++){ 
+					if (engInfo[i].sso == tasks[j].EngSso){
+						newReq.content+=`<li>Line: ${tasks[j].Line}; WS: ${tasks[j].WS}; Tool: ${tasks[j].Tool}; Task: ${tasks[j].Desc}</li>`;
+					}
+				}
+				// And finally send email
+				sendEmail(emailgen.partiallyConfirmedEmail(newReq), res);
+			}
+
+			console.log(`${engInfo.length} emails sent`);
+			var tmp = [];
+			for (i=0; i < engInfo.length; i++){tmp.push(engInfo[i].email);}
+			res.send({'emails': tmp.join(', ')});
 		});
 	//Full Confirmation Email
 	router.route('/emailfull')
 		.post(function(req, res){
-			sendEmail(emailgen.fullyConfirmedEmail(req), res);
+			var tasks = req.body.tasks;
+			var engSsos = []; // just to make list-forming easier
+			var engInfo = [];
+			var i,j;
+			var err = false;
+
+			// Form list of engineer SSOs
+			for (i=0; i < tasks.length; i++){
+				if( engSsos.indexOf(tasks[i].EngSso) == -1){
+					engSsos.push(tasks[i].EngSso);
+					engInfo.push({'sso': tasks[i].EngSso, 'email': tasks[i].EngEmail});
+				}
+			}
+			// O(n*m)!
+			// For each engineer
+			for (i=0; i < engInfo.length; i++){ // For each engineer
+				var newReq = {'tecName': req.body.tecName, 'engEmail':engInfo[i].email, 'content':''};
+				// form list of tasks 
+				for (j=0; j < tasks.length; j++){ 
+					if (engInfo[i].sso == tasks[j].EngSso){
+						newReq.content+=`<li>Line: ${tasks[j].Line}; WS: ${tasks[j].WS}; Tool: ${tasks[j].Tool}; Task: ${tasks[j].Desc}</li>`;
+					}
+				}
+				// And finally send email
+				if ( !sendEmail(emailgen.fullyConfirmedEmail(newReq), res) ) {err=true;}
+			}
+
+			if (!err){
+				console.log(`${engInfo.length} emails sent`);
+				var tmp = [];
+				for (i=0; i < engInfo.length; i++){tmp.push(engInfo[i].email);}
+				res.send({'emails': tmp.join(', ')});
+			} else {
+				res.sendStatus(500);
+			}
 		});
+
 	//Maintenance Approval Email
 	router.route('/emailapprove')
 		.post(function(req, res){
-			sendEmail(emailgen.approvedEmail(req), res);
+			var tasks = req.body.tasks;
+			var supervisorEmails = [];
+			var i,j; // Counters
+			var err = false;
+			var response = {};
+			// Form response
+			var tmp = [];
+			for (i=0; i < supervisorEmails.length; i++) {tmp.push(supervisorEmails[i]);}
+			response = {'emails': tmp.join(', ')};
+
+			// Form list of engineer SSOs
+			for (i=0; i < tasks.length; i++){
+				if( supervisorEmails.indexOf(tasks[i].LineSupervisorEmail) == -1){
+					supervisorEmails.push(tasks[i].LineSupervisorEmail);
+				}
+			}
+
+			// O(n*m)!
+			// For each engineer
+			for (i=0; i < supervisorEmails.length; i++){ // For each engineer
+				var newReq = {'engName': req.body.engName, 'supervisorEmail': supervisorEmails[i], 'content': ''};
+				// form list of tasks 
+				for (j=0; j < tasks.length; j++){ 
+					if (supervisorEmails[i] === tasks[j].LineSupervisorEmail){
+						newReq.content+=`<li>Line: ${tasks[j].Line}; WS: ${tasks[j].WS}; Tool: ${tasks[j].Tool}; Task: ${tasks[j].Desc}</li>`;
+					}
+				}
+				// And finally send email
+				// TODO Error handling for unsent emails, send Error 500
+				sendEmail(emailgen.approvedEmail(newReq), res);
+			}
+			console.log(`${supervisorEmails.length} emails sent`);
+			var tmp = [];
+			for (i=0; i < supervisorEmails.length; i++){tmp.push(supervisorEmails[i]);}
+			res.send({'emails': tmp.join(', ')});
 		});
 	//New User Email
 	router.route('/emailnewuser')

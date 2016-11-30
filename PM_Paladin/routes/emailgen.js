@@ -18,78 +18,36 @@ function formEmail(req, from_address, to_address, subject, cont){
 } 
 
 exports.partiallyConfirmedEmail = function(req){
-	var content_1 = "The following tasks have been partially confirmed: ";
-
-	//Parse JSON for keys and values
-	var index = 0;
-	var toolIDs = [];
-	var technicianName = "";
-	for (var key in req.body.task) {
-		if (req.body.task.hasOwnProperty(key)) {
-			item = req.body.task[key];
-			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
-			technicianName = item.TecFName + " " + item.TecLName;
-			console.log(toolIDs);
-			index++;    
-		}
-	};
+	var header = "The following tasks have been partially confirmed: <br>";
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		req.body.engineerEmail, 
-		"[PM Paladin] Tasks have been partially confirmed by technician " + technicianName + ".",
-		content_1 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
-		);
+		req.engEmail, 
+		`[PM Paladin] Tasks have been partially confirmed by technician ${req.tecName}.`,
+		header + req.content
+	);
 };
 
 exports.fullyConfirmedEmail = function(req){
-	var content_2 = "The following tasks have been fully confirmed: ";
-	var content_3 = "After inspecting the tool, go to the Maintenance Approval page for final approval.";
-
-	//Parse JSON for keys and values
-	var index = 0;
-	var toolIDs = [];
-	var technicianName = "";
-	for (var key in req.body.task) {
-		if (req.body.task.hasOwnProperty(key)) {
-			item = req.body.task[key];
-			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
-			technicianName = item.TecFName + " " + item.TecLName;
-			console.log(toolIDs);
-			index++;
-		}
-	};
+	var header = "The following tasks have been fully confirmed: ";
+	var footer = "After inspecting the tool, go to the Maintenance Approval page for final approval.";
 
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		req.body.engineerEmail, 
-		"[PM Paladin] Tasks have been fully confirmed by technician " + technicianName + ".",
-		content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>" + "<br>" + content_3
-		);
+		req.engEmail, 
+		`[PM Paladin] Tasks have been partially confirmed by technician ${req.tecName}.`,
+		header + req.content + "<br>" + footer
+	);
 };
 
 exports.approvedEmail = function(req){
-	var content_2 = "The following tasks have been approved: ";
-	
-	// Parse JSON for keys and values
-	var index = 0;
-	var toolIDs = [];
-	var engineerName = "";
-	for (var key in req.body.task) {
-		if (req.body.task.hasOwnProperty(key)) {
-			item = req.body.task[key];
-			toolIDs[index] = "<li>Line: " + item.Line + " - WS: " + item.WS + " - Tool: " + item.Tool + " - Task: " + item.Task + "</li>";
-			engineerName = item.EngFName + " " + item.EngLName;
-			// console.log(supervisorEmail);
-			index++;
-		}
-	};
+	var header = "The following tasks have been approved: <br>";
 
 	return formEmail(req, 
 		"luisr.murphy@gmail.com", 
-		req.body.supervisorEmail, 
-		"[PM Paladin] Tasks have been approved by engineer " + engineerName + ".",
-		content_2 + "<br>" + "<ul>" + toolIDs.join('') + "</ul>"
-		);
+		req.supervisorEmail, 
+		`[PM Paladin] Tasks have been approved by engineer ${req.engName}.`,
+		header + req.content
+	);
 };
 
 exports.newUserEmail = function(req){

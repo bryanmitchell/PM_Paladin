@@ -626,7 +626,9 @@ exports.setToolActive = function(cp,req,res){
 	var query=`
 	UPDATE [dbo].[Tool]
 	SET [IsActive] = 1
-	WHERE ToolID = ${r.toolID}`;
+	WHERE ToolID = ${r.toolID};
+
+	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
@@ -639,7 +641,8 @@ exports.setToolInactive = function(cp,req,res){
 	var query=`
 	UPDATE [dbo].[Tool]
 	SET [IsActive] = 0
-	WHERE ToolID = ${r.toolID}`;
+	WHERE ToolID = ${r.toolID};
+	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
@@ -871,7 +874,8 @@ exports.getConfirmationTasks = function(cp, req, res){
 			eng.LastName AS [EngLName], 
 			eng.Email AS [EngEmail], 
 			tec.FirstName AS [TecFName], 
-			tec.LastName AS [TecLName], 
+			tec.LastName AS [TecLName],
+			eng.Sso AS [EngSso], 
 			REPLACE(CAST(CASE 
 				WHEN tsk.TaskStatus = 'ConfirmPartial' THEN 'Y' 
 				ELSE 'N' 
@@ -892,12 +896,14 @@ exports.getConfirmationTasks = function(cp, req, res){
 		INNER JOIN Employee AS eng 
 		ON wat.Sso = eng.Sso 
 		WHERE (tsk.TaskStatus = 'ConfirmPending' OR tsk.TaskStatus = 'ConfirmPartial') 
-		AND tec.sso = ${req.body.sso};
+		AND tec.Sso = ${req.body.sso}
+		ORDER BY eng.Sso;
 		`, cp, res);
 };
 
 exports.setPartialConfirm = function(cp, req, res){
 	var r = req.body;
+	console.log(r.tasks.toString());
 	var query = `
 		UPDATE [dbo].[Task]
 		SET [TaskStatus] = 'ConfirmPartial'
@@ -909,6 +915,7 @@ exports.setPartialConfirm = function(cp, req, res){
 		else{
 			console.log("Query 'setPartialConfirm' success!");
 			refreshActiveBit(cp);
+			res.sendStatus(200);
 		}
 	});
 };
@@ -926,6 +933,7 @@ exports.setFullConfirm = function(cp, req, res){
 		else{
 			console.log("Query 'setFullConfirm' success!");
 			refreshActiveBit(cp);
+			res.sendStatus(200);
 		}
 	});	
 };
@@ -944,7 +952,8 @@ exports.getApprovalTasks = function(cp, req, res){
 	console.log("Getting approval tasks...");
 	runQuery(`
 		SELECT tsk.TaskID AS [Task], 
-			tsk.TaskDescription AS [Desc], t.toolName AS [Tool], 
+			tsk.TaskDescription AS [Desc], 
+			t.toolName AS [Tool], 
 			ws.WorkstationName AS [WS], 
 			pl.LineName AS [Line], 
 			eng.FirstName AS [EngFName], 
@@ -995,6 +1004,7 @@ exports.setApprove = function(cp, req, res){
 		else{
 			console.log("Query 'setApprove' success!");
 			refreshActiveBit(cp);
+			res.sendStatus(200);
 		}
 	});
 };
