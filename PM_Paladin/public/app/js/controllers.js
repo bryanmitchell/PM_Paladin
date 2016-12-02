@@ -1075,9 +1075,13 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 				scope: $scope
 			});
 
-			$scope.modalInstance.result.then(function () {
-				$scope.getEmployees();
-			});
+			$scope.modalInstance.result.then(
+				function () {
+					alert("User created. You should receive an email soon.");
+					$scope.getEmployees();
+				},
+				function () {$scope.getEmployees();}
+			);
 		};
 		
 	});
@@ -1115,15 +1119,6 @@ app.controller('CreateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			}
 		};
 
-		$scope.createEmployee = function () {
-			$http.post('../../api/createemployee', $scope.userInfo) 
-			.success(function(data, status) {
-				alert("User created.");
-			})
-			.error(function(data, status) {
-				alert('Oops! Error creating user, contact developers!');
-			});
-		};
 
 		$scope.sendEmail = function () {
 			$http.post('../../api/emailnewuser', $scope.userInfo) 
@@ -1134,13 +1129,20 @@ app.controller('CreateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			});
 		};
 
-		$scope.isTechnician = function(){return $scope.selection.indexOf('Technician') > -1;};
-
-		$scope.closeUser = function(){
-			$scope.createEmployee();
-			$scope.sendEmail();
-			$modalInstance.close();
+		$scope.createEmployee = function () {
+			$http.post('../../api/createemployee', $scope.userInfo) 
+			.success(function(data, status) {
+				//alert("User created. You should receive an email soon.");
+				//$scope.sendEmail();
+				$modalInstance.close();
+			})
+			.error(function(data, status) {
+				alert('Oops! Error creating user, contact developers!');
+			});
 		};
+		
+
+		$scope.isTechnician = function(){return $scope.selection.indexOf('Technician') > -1;};
 
 		$scope.close = function(){
 			$modalInstance.close();
