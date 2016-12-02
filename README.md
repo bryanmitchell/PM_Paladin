@@ -54,5 +54,14 @@ SQL_USER=your_ssms_user
 SQL_PASSWORD=your_ssms_pwd
 SQL_SERVER=your_ssms_server
 SQL_DB=your_ssms_db
-SECRET=your_secret
 SALT=your_salt_int
+EMAIL_AUTHOR=your@email.com
+PROJECT_PATH=C:\YOUR\PATH
+
+## To set up the recurring scripts (for updating tasks statuses, and notifications through emails):
+1. WinKey + R
+2. Type `taskschd.msc` and press Enter
+3. On the left-side menu, right-click on Task Scheduler Library and click 'New Folder', name it PMPaladin
+4. Right-click on the newly created folder and click 'Create Basic Task...'
+5. Create a task that starts a program (C:\PROJECT\PATH\PM_Paladin\PM_Paladin\bin\Daily.bat) daily at midnight, and set the task to start in C:\PROJECT\PATH\PM_Paladin
+6. Do the same for C:\PROJECT\PATH\PM_Paladin\PM_Paladin\bin\Weekly.bat, and set it to run every Sunday at midnight

@@ -19,16 +19,6 @@ var sqlConfig = {
 	server: process.env.SQL_SERVER,
 	database: process.env.SQL_DB
 };
-var cp = new sql.Connection(sqlConfig, function(err)
-	{
-		if (err){
-			console.log("Connection to db failed..."); 
-			console.log(err);
-		} else {
-			console.log("Connection to db success!"); 
-			cp.connect();
-		}
-	});
 
 
 /** 
@@ -40,11 +30,17 @@ var getTechSsoQuery = `
 	FROM [Task] tsk
 	INNER JOIN [ToolAssignedTo] tat ON tsk.ToolID = tat.ToolID
 	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) < 14;`;
+
 // Task details for a given technician
 var tecEmailQuery = function(sso) {
 	return `
-	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
-		e.FirstName, e.LastName, e.Email
+	SELECT tsk.TaskDescription AS [TaskDescription]
+		,t.ToolName AS [ToolName]
+		,ws.WorkstationName AS [WorkstationName]
+		,pl.LineName AS [LineName]
+		,e.FirstName AS [FirstName]
+		,e.LastName AS [LastName]
+		,e.Email AS [Email]
 	FROM Task tsk 
 	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
 	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
@@ -54,19 +50,7 @@ var tecEmailQuery = function(sso) {
 	WHERE e.Sso = ${sso}
 	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) < 14;`;
 };
-new sql.Request(cp).query(getTechSsoQuery, function(err, recordset) {
-	if(err) {console.log(err);} 
-	else {
-		for(var i; i<recordset.length; ++i){
-			new sql.Request(cp).query(tecEmailQuery(recordset[i].sso), function(err, recordset) {
-				if(err) { console.log(err); }
-				else{sendEmail(recordset);}
-			});}}});
 
-
-/** 
-* SEND EMAIL: Technician supervisors with upcoming tasks 
-**/
 // List of emails
 var getBossEmailQuery = `
 	SELECT DISTINCT es.Email AS [email]
@@ -75,12 +59,18 @@ var getBossEmailQuery = `
 	INNER JOIN [Employee] tec ON tat.Sso = tec.Sso
 	INNER JOIN [EmployeeSupervisor] es ON tec.Sso = es.Sso 
 	WHERE DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) < 14;`;
-// Task details for a given supervisor email
+
+// Task details for a given technician boss email
 var bossEmailQuery = function(email) {
 	return `
-	SELECT tsk.TaskDescription, t.ToolName, ws.WorkstationName, pl.LineName, 
-		es.FirstName, es.LastName, es.Email, 
-		DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) AS [DaysLeft]
+	SELECT tsk.TaskDescription
+		,t.ToolName AS [ToolName]
+		,ws.WorkstationName AS [WorkstationName]
+		,pl.LineName AS [LineName]
+		,es.FirstName AS [FirstName]
+		,es.LastName AS [LastName]
+		,es.Email AS [Email]
+		,DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) AS [DaysLeft]
 	FROM Task tsk 
 	INNER JOIN Tool t ON tsk.ToolID = t.ToolID
 	INNER JOIN Workstation ws ON t.WorkstationID = ws.WorkstationID
@@ -88,23 +78,49 @@ var bossEmailQuery = function(email) {
 	INNER JOIN ToolAssignedTo tat ON t.ToolID = tat.ToolID
 	INNER JOIN Employee e ON tat.Sso = e.Sso
 	INNER JOIN [EmployeeSupervisor] es ON tec.Sso = es.Sso 
-	WHERE es.Email = ${email}
+	WHERE es.Email = '${email}'
 	AND DATEDIFF(day, GETDATE(), DATEADD(day,tsk.[FrequencyDays],tsk.[LastCompleted])) < 14;`;
 };
-new sql.Request(cp).query(getBossEmailQuery, function(err, recordset) {
-	if(err) {console.log(err);} 
-	else {
-		for(var i; i<recordset.length; ++i){
-			new sql.Request(cp).query(bossEmailQuery(recordset[i].email), function(err, recordset) {
-				if(err) { console.log(err); }
-				else{sendEmail(recordset);}
-			});}}});
+
+var cp = new sql.Connection(sqlConfig, function(err)
+{
+	if (err){
+		console.log("Connection to db failed..."); 
+		console.log(err);
+	} else {
+		cp.connect();
+		// Send to process engineers
+		new sql.Request(cp).query(getTechSsoQuery, function(err, recordset) {
+			if(err) {console.log(err);} 
+			else {
+				console.log(`Sending ${recordset.length} technician emails...`);
+				for(var i=0; i<recordset.length; ++i){
+					new sql.Request(cp).query(tecEmailQuery(recordset[i].sso), function(err, recordset2) {
+						if(err) { console.log(err); }
+						else{
+							sendEmail(recordset2);
+						}
+					});}}});
+		//send to technician bosses
+		new sql.Request(cp).query(getBossEmailQuery, function(err, recordset) {
+			if(err) {console.log(err);} 
+			else {
+				console.log(`Sending ${recordset.length} boss emails...`);
+				for(var i=0; i<recordset.length; ++i){
+					new sql.Request(cp).query(bossEmailQuery(recordset[i].email), function(err, recordset2) {
+						if(err) { console.log(err); }
+						else{
+							sendEmail(recordset2);
+						}
+					});}}});
+	}
+});
 
 
 
 /** SEND EMAIL **/
 var sendEmail = function(recordset) {
-	var helper = sg.mail;
+	var helper = require('sendgrid').mail;
 	var author = new helper.Email(process.env.EMAIL_AUTHOR);
 	var subject = "[PM Paladin] Weekly report of upcoming or past due PM tasks"
 	var recipient = new helper.Email(recordset[0].Email);
