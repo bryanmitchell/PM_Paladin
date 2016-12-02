@@ -101,11 +101,11 @@
 				<div class="row">
 					<div class="equipment_buttons">
 						<div class="btn-group">
-							<button type="button" class="btn btn-red" ng-click="disableOffButtonDelay();" ng-disabled="offButtonDisabled">Turn Off</button>
+							<button type="button" class="btn btn-red" ng-click="turnToolOff();" ng-disabled="offButtonDisabled">Turn Off</button>
 						</div>
 
 						<div class="btn-group">
-							<button type="button" class="btn btn-success" ng-click="disableOnButtonDelay();" ng-disabled="onButtonDisabled">Turn On</button>
+							<button type="button" class="btn btn-success" ng-click="turnToolOn();" ng-disabled="onButtonDisabled">Turn On</button>
 						</div>	
 					</div>
 				</div>	<!-- END Tool Control Buttons -->
@@ -312,7 +312,7 @@
 		<form role="form" name="toolForm" novalidate>
 
 			<!-- TOOL NAME -->
-			<div class="row form-group" ng-class="{ 'has-error': toolForm.toolName.$invalid && toolForm.toolName.$pristine }">
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.toolName.$pristine }">
 				<div class="col-md-4">
 					<div>
 						<label for="field-1" class="control-label">Tool Name</label>
@@ -320,9 +320,7 @@
 				</div>
 						
 				<div class="col-md-4">
-
 					<select style="width: 150px;" ng-model="selectedTool" name="toolName" ng-options="tool as (tool.toolName + ' (Line: ' + tool.lineName + ', WS: ' + tool.workstationName + ')') for tool in pmProTools" required>
-
 					  <option value="" disabled selected>--- Select from list ---</option>
 					</select>
 				</div>		
@@ -376,7 +374,7 @@
 			</div>
 
 			<!-- RFID TAG -->
-			<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$invalid && toolForm.rfid.$pristine }">
+			<div class="row form-group" ng-class="{ 'has-error': toolForm.rfid.$pristine }">
 				<div class="col-md-4">
 					<div>
 						<label for="field-1" class="control-label">RFID Tag</label>
@@ -384,7 +382,7 @@
 					</div>
 				</div>
 				<div class="col-md-4">
-					<select style="width: 190px;" ng-model="toolInfo.rfidAddress" name="rfid" required ng-options="add.LastTagRead as ('Line: ' + add.Line + ', ' + 'Reader: ' + add.Reader + ', ' + 'Tag: ' + add.LastTagRead) for add in rfidAddresses">
+					<select style="width: 190px;" ng-model="selectedRfid" name="rfid" required ng-options="add as ('Line: ' + add.Line + ', ' + 'Reader: ' + add.Reader + ', ' + 'Tag: ' + add.LastTagRead) for add in rfidAddresses">
 						<option value="" disabled selected>--- Scan, Populate, Select ---</option>
 					</select>
 				</div>
@@ -411,7 +409,7 @@
 			<!-- SAVE BUTTON -->
 			<div class="modal-footer">
 				<font color="red" style="margin-right:15px;">Make sure tool Module and Point match enclosure.</font>
-				<button type="button" class="btn btn-info" ng-click="closeTool(); getEquipmentInfo();" ng-disabled="toolForm.$invalid">Save</button>
+				<button type="button" class="btn btn-info" ng-click="createTool();" ng-disabled="toolForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>

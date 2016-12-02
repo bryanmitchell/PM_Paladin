@@ -1,5 +1,6 @@
 USE paladin2;
 
+BEGIN TRAN
 -- Turn ON Active bits for tools
 UPDATE Tool
 SET IsActive = 1;
@@ -88,3 +89,4 @@ WHERE Workstation.WorkstationID IN (
 UPDATE Flags
 SET [value] = 1
 WHERE [name] = 'ChangeOccurred';
+COMMIT TRAN

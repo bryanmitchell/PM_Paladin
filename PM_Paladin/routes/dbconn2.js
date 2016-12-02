@@ -100,14 +100,10 @@ exports.getToolDates = function(cp,res){
 		,e.LastName AS [lastName]
 		,dates.Dates AS [date]
 	FROM Tool AS t
-	INNER JOIN Workstation AS ws
-	ON t.WorkstationID = ws.WorkstationID
-	INNER JOIN ProductionLine AS pl
-	ON ws.LineID = pl.LineID
-	INNER JOIN ToolAssignedTo AS tat
-	ON t.ToolID = tat.ToolID
-	INNER JOIN Employee AS e
-	ON tat.Sso = e.Sso
+	INNER JOIN Workstation AS ws ON t.WorkstationID = ws.WorkstationID
+	INNER JOIN ProductionLine AS pl ON ws.LineID = pl.LineID
+	INNER JOIN ToolAssignedTo AS tat ON t.ToolID = tat.ToolID
+	INNER JOIN Employee AS e ON tat.Sso = e.Sso
 	INNER JOIN (
 		SELECT tsk.ToolID AS [ToolID]
 			,DATEDIFF(day, GETDATE(), MIN(DATEADD(day,tsk.FrequencyDays,tsk.LastCompleted))) AS [Dates]
@@ -353,6 +349,11 @@ exports.createTool = function(cp, req, res){
 			FROM tblPM_ScheduledPmItems spi
 			WHERE spi.intEquipRecID = '${r.pmProToolID}';
 
+			UPDATE [dbo].[RfidReader]
+			SET LastTagRead = NULL
+			WHERE Line = ${r.rfidLine}
+			AND Reader = ${r.rfidReader};
+
 		END TRY
 		BEGIN CATCH
 			SELECT 
@@ -420,6 +421,7 @@ exports.getTools = function(cp, res){
 			,t.RemoteIoModuleNumber AS [RemoteIoModuleNumber]
 			,t.RemoteIoPointNumber AS [RemoteIoPointNumber]
 			,tat.Sso AS [employeeSso]
+			,t.IsActive AS [isActive]
 		FROM Tool as t 
 		INNER JOIN ToolAssignedTo AS tat
 		ON t.ToolID = tat.ToolID;
@@ -621,11 +623,13 @@ exports.getPmProTools = function(cp,res){
 exports.setToolActive = function(cp,req,res){
 	var r = req.body;
 	var query=`
+	BEGIN TRAN
 	UPDATE [dbo].[Tool]
 	SET [IsActive] = 1
 	WHERE ToolID = ${r.toolID};
 
-	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';`;
+	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';
+	COMMIT TRAN`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
@@ -637,10 +641,13 @@ exports.setToolActive = function(cp,req,res){
 exports.setToolInactive = function(cp,req,res){
 	var r = req.body;
 	var query=`
+	BEGIN TRAN
 	UPDATE [dbo].[Tool]
 	SET [IsActive] = 0
 	WHERE ToolID = ${r.toolID};
-	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';`;
+	
+	UPDATE [dbo].[Flags] SET [value]=1 WHERE [name] = 'ChangeOccurred';
+	COMMIT TRAN`;
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
 		else{
@@ -650,7 +657,7 @@ exports.setToolInactive = function(cp,req,res){
 	});
 };
 
-/* RFID GET/SET (Under consideration) */
+/* RFID GET */
 exports.getScannedRfidTags = function(cp,res){
 	var query=`SELECT * FROM RfidReader WHERE LastTagRead IS NOT NULL;`;
 	new sql.Request(cp).query(query, function(err, recordset){
@@ -809,6 +816,10 @@ exports.deleteEmployee = function(cp, req, res){
 		}
 	});
 };
+
+
+
+
 
 /**
 MY TASKS
@@ -1006,6 +1017,7 @@ exports.setApprove = function(cp, req, res){
 
 var refreshActiveBit = function(cp, res){
 	var query = `
+		BEGIN TRAN
 		-- Turn ON Active bits for tools
 		UPDATE Tool
 		SET IsActive = 1;
@@ -1095,7 +1107,7 @@ var refreshActiveBit = function(cp, res){
 		UPDATE Flags
 		SET [value] = 1
 		WHERE [name] = 'ChangeOccurred';
-		`;
+		COMMIT TRAN`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}

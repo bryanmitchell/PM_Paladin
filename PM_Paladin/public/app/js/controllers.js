@@ -227,6 +227,8 @@ app.controller('UIModalsTopCtrl', function($scope, $rootScope, $modal, $sce, $ht
 
 	});
 
+
+
 /**
 DASHBOARD
 **/
@@ -369,6 +371,7 @@ app.controller('DashboardCtrl', function($scope, $rootScope, $http)
 	});
 
 
+
 /**
 EQUIPMENT MANAGEMENT
 **/
@@ -381,25 +384,23 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$http.get('../../api/lines') 
 				.success(function(data, status) {
 					$scope.lines = data;
+					$http.get('../../api/workstations') 
+						.success(function(data, status) {
+							$scope.workstations = data;
+							$http.get('../../api/tools') 
+								.success(function(data, status) {
+									$scope.tools = data;
+								})
+								.error(function(data, status) {
+									console.log("Oops! Error retrieving tool info, contact developers!");
+								});
+						})
+						.error(function(data, status) {
+							console.log("Oops! Error retrieving workstation info, contact developers!");
+						});
 				})
 				.error(function(data, status) {
 					console.log("Oops! Error retrieving production line info, contact developers!");
-				});
-
-			$http.get('../../api/workstations') 
-				.success(function(data, status) {
-					$scope.workstations = data;
-				})
-				.error(function(data, status) {
-					console.log("Oops! Error retrieving workstation info, contact developers!");
-				});
-
-			$http.get('../../api/tools') 
-				.success(function(data, status) {
-					$scope.tools = data;
-				})
-				.error(function(data, status) {
-					console.log("Oops! Error retrieving tool info, contact developers!");
 				});
 		};
 
@@ -432,10 +433,9 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 				scope: $scope
 			});
 
-			$scope.modalInstance.result.then(function () {
-				$scope.getEquipmentInfo();
-
-			})
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}
+			);
 		};
 
 		$scope.createWSModal = function(modal_id, modal_size, modal_backdrop){
@@ -447,10 +447,9 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 				scope: $scope
 			});
 
-			$scope.modalInstance.result.then(function () {
-				$scope.getEquipmentInfo();
-
-			})
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}
+			);
 		};
 
 		$scope.createToolModal = function(modal_id, modal_size, modal_backdrop){
@@ -462,10 +461,9 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 				scope: $scope
 			});
 
-			$scope.modalInstance.result.then(function () {
-				$scope.getEquipmentInfo();
-
-			})
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}
+			);
 		};
 
 		$scope.updateLineModal = function(modal_id, modal_size, modal_backdrop){
@@ -482,6 +480,10 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 							}}}
 				}
 			});
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}, // On success
+				function () {$scope.getEquipmentInfo();} // On error/dismiss
+			);
 		};
 
 		$scope.updateWorkstationModal = function(modal_id, modal_size, modal_backdrop){
@@ -498,6 +500,10 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 							}}}
 				}
 			});
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}, // On success
+				function () {$scope.getEquipmentInfo();} // On error/dismiss
+			);
 		};
 
 		$scope.updateToolModal = function(modal_id, modal_size, modal_backdrop){
@@ -514,6 +520,10 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 							}}}
 				}
 			});
+			$scope.modalInstance.result.then(
+				function () {$scope.getEquipmentInfo();}, // On success
+				function () {$scope.getEquipmentInfo();} // On error/dismiss
+			);
 		};
 
 		$scope.deleteLine = function(){
@@ -568,9 +578,14 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		};
 
 		$scope.turnToolOn = function () {
+			$rootScope.onButtonDisabled=true;
+
 			$http.post('../../api/settoolactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				alert("Tool activated.");
+				alert("Tool activated. Please wait 20-30 seconds for changes to reflect.");
+				$timeout(function(){
+					$rootScope.offButtonDisabled=false;
+				},5000);
 			})
 			.error(function(data, status) {
 				alert("Error turning on tool\n"+data);
@@ -578,13 +593,19 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		};
 
 		$scope.turnToolOff = function () {
+			$rootScope.offButtonDisabled=true;
+
 			$http.post('../../api/settoolinactive', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				alert("Tool disactivated.");
+				alert("Tool disactivated. Please wait 20-30 seconds for changes to reflect.");
+				$timeout(function(){
+					$rootScope.onButtonDisabled=false;
+				},5000);
 			})
 			.error(function(data, status) {
 				alert("Error turning off tool\n"+data);
 			});
+			
 		};
 
 		$scope.setClickedLine = function(index){  //function that sets the value of selectedRow to current index
@@ -614,23 +635,6 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 			$rootScope.offButtonDisabled = !isActive;
 		};
 
-		$rootScope.disableOffButtonDelay = function(){
-			$rootScope.offButtonDisabled=true;
-			$scope.turnToolOff();
-			$timeout(function(){
-				$rootScope.onButtonDisabled=false;
-			},5000);
-		};
-
-		$rootScope.disableOnButtonDelay = function(){
-			$rootScope.onButtonDisabled=true;
-			$scope.turnToolOn();
-			$timeout(function(){
-				$rootScope.offButtonDisabled=false;
-			},5000);
-		};
-
-
 	});
 
 app.controller('CreateLineModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
@@ -640,7 +644,7 @@ app.controller('CreateLineModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		$scope.users = {}; // Just a declaration
 		$scope.userInCharge = {};
 		$scope.lineNames = [];
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
 
 
 		$scope.lineInfo = {
@@ -717,8 +721,6 @@ app.controller('CreateLineModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 app.controller('CreateWSModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
-
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 		$scope.rfidAddresses = [];
@@ -804,8 +806,6 @@ app.controller('CreateWSModalCtrl', ['$scope', '$rootScope', '$http', '$modalIns
 app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
-
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
 		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
 		$scope.rfidAddresses = [];
@@ -814,10 +814,13 @@ app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		$scope.lineNames = [];
 		$scope.pmProTools = [];
 		$scope.selectedTool = {};
+		$scope.selectedRfid = {};
 
 		$scope.toolInfo = {
 			'toolType': '',
 			'rfidAddress': '',
+			'rfidLine':'',
+			'rfidReader': '',
 			'remoteIoModuleNumber': '',
 			'remoteIoPointNumber': '',
 			'employeeSso': '',
@@ -830,29 +833,28 @@ app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			'originalCostDollars':''
 		};
 
-		$scope.getEquipmentInfo = function(){
+		$scope.getEquipmentInfoAndClose = function(){
 			$http.get('../../api/lines') 
 				.success(function(data, status) {
 					$scope.lines = data;
+					$http.get('../../api/workstations') 
+						.success(function(data, status) {
+							$scope.workstations = data;
+							$http.get('../../api/tools') 
+								.success(function(data, status) {
+									$scope.tools = data;
+									$modalInstance.close();
+								})
+								.error(function(data, status) {
+									console.log("Oops! Error retrieving tool info, contact developers!");
+								});
+						})
+						.error(function(data, status) {
+							console.log("Oops! Error retrieving workstation info, contact developers!");
+						});
 				})
 				.error(function(data, status) {
 					console.log("Oops! Error retrieving production line info, contact developers!");
-				});
-
-			$http.get('../../api/workstations') 
-				.success(function(data, status) {
-					$scope.workstations = data;
-				})
-				.error(function(data, status) {
-					console.log("Oops! Error retrieving workstation info, contact developers!");
-				});
-
-			$http.get('../../api/tools') 
-				.success(function(data, status) {
-					$scope.tools = data;
-				})
-				.error(function(data, status) {
-					console.log("Oops! Error retrieving tool info, contact developers!");
 				});
 		};
 
@@ -879,9 +881,13 @@ app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			$scope.toolInfo.supplier = $scope.selectedTool.supplier;
 			$scope.toolInfo.yearBought = $scope.selectedTool.yearBought;
 			$scope.toolInfo.originalCostDollars = $scope.selectedTool.originalCostDollars;
+			$scope.toolInfo.rfidAddress = $scope.selectedRfid.LastTagRead;
+			$scope.toolInfo.rfidLine = $scope.selectedRfid.Line;
+			$scope.toolInfo.rfidReader = $scope.selectedRfid.Reader;
+
 			$http.post('../../api/createtool', $scope.toolInfo) 
 			.success(function(data, status) {
-				$scope.getEquipmentInfo();
+				$scope.getEquipmentInfoAndClose();
 			})
 			.error(function(data, status) {
 				alert('Oops! Error registering tool, contact developers!');
@@ -995,6 +1001,9 @@ app.controller('ToolUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstan
 
 	}]);
 
+
+
+
 /**
 USER MANAGEMENT
 **/
@@ -1050,6 +1059,11 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 					selectedUser: function(){return $scope.selectedUser;}
 				}
 			});
+
+			$scope.modalInstance.result.then(
+				function () {$scope.getEmployees();},
+				function () {$scope.getEmployees();}
+			);
 		};
 
 		$scope.createUserModal = function(modal_id, modal_size, modal_backdrop){
@@ -1063,7 +1077,7 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 
 			$scope.modalInstance.result.then(function () {
 				$scope.getEmployees();
-			})
+			});
 		};
 		
 	});
@@ -1134,9 +1148,6 @@ app.controller('CreateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 
 	}]);
 
-
-
-
 app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedUser', function($scope, $rootScope, $http, $modalInstance, selectedUser)
 	{
 		$rootScope.currentPageTitle = 'User Management';
@@ -1180,6 +1191,8 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 
 	}]);
 
+
+
 /**
 MY TASKS
 **/
@@ -1195,6 +1208,8 @@ app.controller('MyTasksCtrl', function($scope, $rootScope, $http)
 		});
 
 	});
+
+
 
 /**
 MAINTENANCE CONFIRMATION
@@ -1262,7 +1277,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/confirmfull', {'tasks': newSelection})
 			.success(function (data) {
-				//$scope.sendEmail('full');
+				$scope.sendEmail('full');
 				$scope.uncheckBoxes();
 				$scope.getConfirmTasks();
 			}).error(function (data, status) {
@@ -1277,7 +1292,7 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/confirmpartial', {'tasks': newSelection}) // Selected task IDs
 			.success(function (data) {
-				//$scope.sendEmail('partial');
+				$scope.sendEmail('partial');
 				$scope.uncheckBoxes();
 				$scope.getConfirmTasks();
 			})
@@ -1286,6 +1301,8 @@ app.controller('MaintConfCtrl', function($scope, $rootScope, $http)
 			});
 		};
 	});
+
+
 
 /**
 MAINTENANCE APPROVAL
@@ -1342,7 +1359,7 @@ app.controller('MaintApprCtrl', function($scope, $rootScope, $http)
 
 			$http.post('../../api/approve', {'tasks': newSelection}) // Selected task IDs
 			.success(function (data) {
-				//$scope.sendEmail();
+				$scope.sendEmail();
 				$scope.uncheckBoxes();
 				$scope.getApproveTasks();
 			})
