@@ -12,13 +12,13 @@
 							</button>
 							<ul class="dropdown-menu dropdown-blue no-spacing" role="menu">
 								<li>
-									<a href="" ng-click="openModal('modal-line', null, 'static');">Manufacturing Line</a>
+									<a href="" ng-click="createLineModal('modal-line', null, 'static');">Manufacturing Line</a>
 								</li>
 								<li>
-									<a href="" ng-click="openModal('modal-ws', null, 'static');">Workstation</a>
+									<a href="" ng-click="createWSModal('modal-ws', null, 'static');">Workstation</a>
 								</li>
 								<li>
-									<a href="" ng-click="openModal('modal-tool');">Tool</a>
+									<a href="" ng-click="createToolModal('modal-tool');">Tool</a>
 								</li>
 							</ul>
 						</div>
@@ -26,13 +26,9 @@
 						<div class="btn-group">
 							<button type="button" class="btn btn-success" ng-click="updateModal('', null, 'static');">Update</button>
 						</div>
-
-						<div class="btn-group">
-							<button type="button" class="btn btn-purple" ng-click="getEquipmentInfo();"> <span class="fa-rotate-right"></span></button>
-						</div>
 						
 						<div class="btn-group pull-right">
-							<button type="button" class="btn btn-red" ng-click="deleteEquipment();">Delete</button>
+							<button type="button" class="btn btn-red" ng-click="deleteEquipment();getEquipmentInfo();">Delete</button>
 						</div>
 					</div>
 				</div>
@@ -122,11 +118,11 @@
 <!-- REGISTER MANUFACTURING LINE MODAL -->
 <script type="text/ng-template" id="modal-line">
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<button type="button" class="close" ng-click="close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Manufacturing Line</h4>
 	</div>
 	
-	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
+	<div class="modal-body">
 	
 		<form role="form" name="lineForm" novalidate>
 			<!-- LIST OF LINES FROM PM PRO -->
@@ -197,7 +193,7 @@
 
 			<!-- SAVE BUTTON -->
 			<div class="modal-footer">
-				<button type="button" class="btn btn-info" ng-click="console.log(lineInfo.lineName);currentModal.dismiss();createLine();" ng-disabled="lineForm.$invalid">Save</button>
+				<button type="button" class="btn btn-info" ng-click="closeLine(); getEquipmentInfo();" ng-disabled="lineForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>
@@ -206,11 +202,11 @@
 <!-- REGISTER WORKSTATION MODAL -->
 <script type="text/ng-template" id="modal-ws">
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<button type="button" class="close" ng-click="close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Workstation</h4>
 	</div>
 	
-	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
+	<div class="modal-body">
 		<form role="form" name="wsForm" novalidate>
 
 
@@ -298,7 +294,7 @@
 
 			<div class="modal-footer">
 				<font color="red" style="margin-right:15px;">Make sure workstation Module and Point match enclosure.</font>
-				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss();createWorkstation()" ng-disabled="wsForm.$invalid">Save</button>
+				<button type="button" class="btn btn-info" ng-click="closeWS(); getEquipmentInfo();" ng-disabled="wsForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>
@@ -308,11 +304,11 @@
 <!-- REGISTER TOOL MODAL -->
 <script type="text/ng-template" id="modal-tool">
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<button type="button" class="close" ng-click="close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Register Tool</h4>
 	</div>
 	
-	<div class="modal-body" ng-controller="EquipmentCreateCtrl">
+	<div class="modal-body">
 		<form role="form" name="toolForm" novalidate>
 
 			<!-- TOOL NAME -->
@@ -415,7 +411,7 @@
 			<!-- SAVE BUTTON -->
 			<div class="modal-footer">
 				<font color="red" style="margin-right:15px;">Make sure tool Module and Point match enclosure.</font>
-				<button type="button" class="btn btn-info" ng-click="currentModal.dismiss(); createTool();" ng-disabled="toolForm.$invalid">Save</button>
+				<button type="button" class="btn btn-info" ng-click="closeTool(); getEquipmentInfo();" ng-disabled="toolForm.$invalid">Save</button>
 			</div>
 		</form>
 	</div>

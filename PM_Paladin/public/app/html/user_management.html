@@ -4,11 +4,8 @@
 			<div class="panel-body">
 				<div class="row">
 					<div class="col-md-6">
-						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="openModal('modal-3', null, 'static');">
+						<button type="button" class="btn btn-blue dropdown-toggle" ng-click="createUserModal('modal-3', null, 'static');">
 							Create User
-						</button>
-						<button type="button" class="btn btn-purple" ng-click="getEmployees();">
-							<span class="fa-rotate-right"></span>
 						</button>
 					</div>
 				</div>
@@ -47,12 +44,12 @@
 <!-- Create User modal view template -->
 <script type="text/ng-template" id="modal-3">
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="currentModal.close();" aria-hidden="true">&times;</button>
+		<button type="button" class="close" ng-click="close();" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">Sign Up</h4>
 	</div>
 	
-	<div class="modal-body" ng-controller="UserMgmtCtrl">
-		<form role="form" name="createUserForm" novalidate>
+	<form role="form" name="createUserForm" novalidate>
+		<div class="modal-body">
 			<div class="row">
 				<div class="col-md-6">
 
@@ -135,13 +132,13 @@
 			</div>
 
 			<!-- User Type -->
-			<div class="row">		
+			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group no-margin" ng-class="{ 'has-error': createUserForm.type.$invalid && createUserForm.type.$pristine }">
 						<label for="field-7" class="control-label">Type of User</label>
-						</br>
+						<br>
 						<div class="col-sm-4" ng-repeat="item in employeeTypes">
-							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required> {{item}}
+							<input type="checkbox" value="{{item}}" name="type" ng-checked="selection.indexOf(item) > -1" ng-click="toggleSelection(item)" required /> {{item}}
 						</div>
 					</div>
 				</div>
@@ -150,7 +147,7 @@
 			<br>
 
 			<!-- SUPERVISOR INFORMATION -->
-			<div ng-show="isTechnician();">
+			<div ng-if="isTechnician();">
 				<!-- Supervisor FIRST AND LAST NAME -->
 				<div class="row">
 					<div class="col-md-6">
@@ -196,11 +193,11 @@
 			<br>
 				
 			<div class="modal-footer">
-					<button class="btn-info btn" ng-click="currentModal.dismiss(); createEmployee(); sendEmail();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
+					<button class="btn-info btn" ng-click="closeUser();" ng-disabled="createUserForm.$invalid || selection.length == 0">Save</button> 
 			</div>
 
-		</form>
-	</div> <!-- end modal body-->
+		</div> <!-- end modal body-->
+	</form>
 </script>
 
 <!-- Update User modal view template -->
@@ -220,7 +217,7 @@
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
 						<label for="field-1" class="control-label">FirstName</label>
 
-						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="selectedUser.firstName" ng-pattern="/^\w+\D$/" required />
+						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="placeholderUser.firstName" ng-pattern="/^\w+\D$/" required />
 
 						<p ng-show="updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
 					</div>
@@ -229,7 +226,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine }">
 						<label for="field-2" class="control-label">Last Name</label>
-						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="selectedUser.lastName" ng-pattern="/^\w+\D$/" required>
+						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="placeholderUser.lastName" ng-pattern="/^\w+\D$/" required>
 						<p ng-show="updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
 					</div>
 				</div>
@@ -241,7 +238,7 @@
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.email.$invalid && !updateUserForm.email.$pristine }">
 						<label for="field-3" class="control-label">Email Address</label>
 						
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="selectedUser.email" required ng-pattern="/.+@.+\..+/">
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="placeholderUser.email" required ng-pattern="/.+@.+\..+/">
 
 						<p ng-show="updateUserForm.email.$invalid && !updateUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	
@@ -253,7 +250,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.password.$invalid && !updateUserForm.password.$pristine }">
 						<label for="field-4" class="control-label">Password</label>
-						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="selectedUser.password" ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="placeholderUser.password" ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
 						<p ng-show="updateUserForm.password.$error.pattern" class="help-block">Password must contain at least one number, one upper and lower case letter, and one special character.</p>
 					</div>
 				</div>
@@ -261,7 +258,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.confirmPassword.$invalid && !updateUserForm.confirmPassword.$pristine }">
 						<label for="field-5" class="control-label">Confirm Password</label>
-						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="selectedUser.password" required>
+						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="placeholderUser.password" required>
 						<p ng-show="updateUserForm.confirmPassword.$error.passwordVerify" class="help-block">Must match password in previous field.</p>
 					</div>	
 				</div>
@@ -283,7 +280,7 @@
 			<br>
 
 			<!-- SUPERVISOR INFORMATION -->
-			<div ng-show="isTechnician();">
+			<div ng-if="isTechnician();">
 				<!-- Supervisor FIRST AND LAST NAME -->
 				<div class="row">
 					<div class="col-md-6">

@@ -401,17 +401,72 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 				.error(function(data, status) {
 					console.log("Oops! Error retrieving tool info, contact developers!");
 				});
-		}
+		};
+
+		$scope.getTools = function () {
+			$http.get('../../api/tools') 
+				.success(function(data, status) {
+					$scope.tools = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving tool info, contact developers!");
+				});
+		};
 
 		$scope.getEquipmentInfo();
 
 		$scope.selectedLine = null;  // initialize our variable to null
 		$scope.selectedWS = null;  // initialize our variable to null
 		$scope.selectedTool = null;  // initialize our variable to null
-		$scope.updateModal = null; //assign function to it according to what is selected
+		$scope.updateModal = null; // assign function to it according to what is selected
 		$scope.deleteEquipment = null;
 		$rootScope.onButtonDisabled = true;
 		$rootScope.offButtonDisabled = true;
+
+		$scope.createLineModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'CreateLineModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				scope: $scope
+			});
+
+			$scope.modalInstance.result.then(function () {
+				$scope.getEquipmentInfo();
+
+			})
+		};
+
+		$scope.createWSModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'CreateWSModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				scope: $scope
+			});
+
+			$scope.modalInstance.result.then(function () {
+				$scope.getEquipmentInfo();
+
+			})
+		};
+
+		$scope.createToolModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'CreateToolModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				scope: $scope
+			});
+
+			$scope.modalInstance.result.then(function () {
+				$scope.getEquipmentInfo();
+
+			})
+		};
 
 		$scope.updateLineModal = function(modal_id, modal_size, modal_backdrop){
 			$scope.modalInstance = $modal.open({
@@ -468,8 +523,10 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 					alert('Please reassign or unregister workstations in this line.');
 				}
 				else{
-					alert("Line unregistered. Please press the purple Refresh button.");
+					alert("Line unregistered.");
 				}
+				$scope.getEquipmentInfo();
+
 			})
 			.error(function(data, status) {
 				alert("Error unregistering line\n"+data);
@@ -483,8 +540,12 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 					alert('Please reassign or unregister tools in this workstation.');
 				}
 				else{
-					alert("Workstation unregistered. Please press the purple Refresh button.");
+					alert("Workstation unregistered.");
 				}
+				$scope.deleteEquipment = $scope.deleteLine;
+				$scope.selectedWS = null;
+				$scope.getEquipmentInfo();
+
 			})
 			.error(function(data, status) {
 				alert("Error deleting workstation\n"+data);
@@ -494,7 +555,12 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 		$scope.deleteTool = function(){
 			$http.post('../../api/deletetool', {'toolID': $scope.selectedTool}) 
 			.success(function(data, status) {
-				alert("Tool unregistered. Please press the purple Refresh button.");
+				alert("Tool unregistered.");
+				$rootScope.onButtonDisabled = true;
+				$rootScope.offButtonDisabled = true;
+				$scope.deleteEquipment = $scope.deleteWorkstation;
+				$scope.selectedTool = null;
+				$scope.getEquipmentInfo();
 			})
 			.error(function(data, status) {
 				alert("Error deleting tool\n"+data);
@@ -567,19 +633,15 @@ app.controller('EquipmentMgmtCtrl', function($scope, $rootScope, $http, $modal, 
 
 	});
 
-app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
+app.controller('CreateLineModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
 	{
 		$rootScope.currentPageTitle = 'Equipment Management';
-		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
-		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
-		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
-		$scope.rfidAddresses = [];
+
 		$scope.users = {}; // Just a declaration
 		$scope.userInCharge = {};
 		$scope.lineNames = [];
-		$scope.wsNames = {};
-		$scope.pmProTools = [];
-		$scope.selectedTool = {};
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+
 
 		$scope.lineInfo = {
 			'lineName': '',
@@ -588,6 +650,83 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'supervisorLastName': '',
 			'supervisorEmail': ''
 		};
+
+		$scope.getEquipmentInfo = function(){
+			$http.get('../../api/lines') 
+				.success(function(data, status) {
+					$scope.lines = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving production line info, contact developers!");
+				});
+
+			$http.get('../../api/workstations') 
+				.success(function(data, status) {
+					$scope.workstations = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving workstation info, contact developers!");
+				});
+
+			$http.get('../../api/tools') 
+				.success(function(data, status) {
+					$scope.tools = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving tool info, contact developers!");
+				});
+		};
+
+		$http.get('../../api/employees')
+			.success(function (data) {
+				$scope.users = data;
+			}).error(function (data, status) {
+				alert('Oops! Error retrieving employees info!');
+			});
+
+		$http.get('../../api/pmprolines')
+			.success(function (data) {
+				$scope.lineNames = data;
+			}).error(function (data, status) {
+				alert('Oops! Error retrieving production line info from PM Pro!');
+			});
+
+		$scope.createLine = function () {
+			//Request
+			$http.post('../../api/createline', $scope.lineInfo) 
+			.success(function(data, status) {
+				$scope.getEquipmentInfo();
+			})
+			.error(function(data, status) {
+				alert('Oops! Error registering line, contact developers!');
+			});
+		};
+		
+		$scope.closeLine = function(){
+			$scope.createLine();
+			$scope.getEquipmentInfo();
+			$modalInstance.close();
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+app.controller('CreateWSModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
+	{
+		$rootScope.currentPageTitle = 'Equipment Management';
+
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
+		$scope.rfidAddresses = [];
+		$scope.users = {}; // Just a declaration
+		$scope.userInCharge = {};
+		$scope.lineNames = [];
+		$scope.pmProTools = [];
+		$scope.selectedTool = {};
 
 		$scope.workstationInfo = {
 			'workstationName': '',
@@ -599,6 +738,82 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'redLightPointNumber': '',
 			'employeeSso': ''
 		};
+
+		$scope.getEquipmentInfo = function(){
+			$http.get('../../api/lines') 
+				.success(function(data, status) {
+					$scope.lines = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving production line info, contact developers!");
+				});
+
+			$http.get('../../api/workstations') 
+				.success(function(data, status) {
+					$scope.workstations = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving workstation info, contact developers!");
+				});
+
+			$http.get('../../api/tools') 
+				.success(function(data, status) {
+					$scope.tools = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving tool info, contact developers!");
+				});
+		};
+
+		$http.get('../../api/employees')
+			.success(function (data) {
+				$scope.users = data;
+			}).error(function (data, status) {
+				alert('Oops! Error retrieving employees info!');
+			});
+
+		$http.get('../../api/pmproworkstations')
+			.success(function (data) {
+				$scope.wsNames = data;
+			}).error(function (data, status) {
+				alert('Oops! Error retrieving workstation info from PM Pro!');
+			});
+
+		$scope.createWorkstation = function () {
+			$http.post('../../api/createworkstation', $scope.workstationInfo) 
+			.success(function(data, status) {
+				$scope.getEquipmentInfo();
+			})
+			.error(function(data, status) {
+				alert('Oops! Error registering workstation, contact developers!');
+			});
+		};
+		
+		$scope.closeWS = function(){
+			$scope.createWorkstation();
+			$scope.getEquipmentInfo();
+			$modalInstance.close();
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
+	{
+		$rootScope.currentPageTitle = 'Equipment Management';
+
+		$scope.remoteIoAddresses = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.moduleNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32];
+		$scope.pointNumbers = [0,1,2,3,4,5,6,7];
+		$scope.rfidAddresses = [];
+		$scope.users = {}; // Just a declaration
+		$scope.userInCharge = {};
+		$scope.lineNames = [];
+		$scope.pmProTools = [];
+		$scope.selectedTool = {};
 
 		$scope.toolInfo = {
 			'toolType': '',
@@ -615,27 +830,37 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			'originalCostDollars':''
 		};
 
+		$scope.getEquipmentInfo = function(){
+			$http.get('../../api/lines') 
+				.success(function(data, status) {
+					$scope.lines = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving production line info, contact developers!");
+				});
 
-	
+			$http.get('../../api/workstations') 
+				.success(function(data, status) {
+					$scope.workstations = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving workstation info, contact developers!");
+				});
+
+			$http.get('../../api/tools') 
+				.success(function(data, status) {
+					$scope.tools = data;
+				})
+				.error(function(data, status) {
+					console.log("Oops! Error retrieving tool info, contact developers!");
+				});
+		};
+
 		$http.get('../../api/employees')
 			.success(function (data) {
 				$scope.users = data;
 			}).error(function (data, status) {
 				alert('Oops! Error retrieving employees info!');
-			});
-
-		$http.get('../../api/pmprolines')
-			.success(function (data) {
-				$scope.lineNames = data;
-			}).error(function (data, status) {
-				alert('Oops! Error retrieving production line info from PM Pro!');
-			});
-
-		$http.get('../../api/pmproworkstations')
-			.success(function (data) {
-				$scope.wsNames = data;
-			}).error(function (data, status) {
-				alert('Oops! Error retrieving workstation info from PM Pro!');
 			});
 
 		$http.get('../../api/pmprotools')
@@ -644,27 +869,6 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			}).error(function (data, status) {
 				alert('Oops! Error retrieving tool info from PM Pro!');
 			});
-
-		$scope.createLine = function () {
-			//Request
-			$http.post('../../api/createline', $scope.lineInfo) 
-			.success(function(data, status) {
-
-			})
-			.error(function(data, status) {
-				alert('Oops! Error registering line, contact developers!');
-			});
-		};
-
-		$scope.createWorkstation = function () {
-			$http.post('../../api/createworkstation', $scope.workstationInfo) 
-			.success(function(data, status) {
-
-			})
-			.error(function(data, status) {
-				alert('Oops! Error registering workstation, contact developers!');
-			});
-		};
 
 		$scope.createTool = function () {
 			//Request
@@ -675,10 +879,9 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 			$scope.toolInfo.supplier = $scope.selectedTool.supplier;
 			$scope.toolInfo.yearBought = $scope.selectedTool.yearBought;
 			$scope.toolInfo.originalCostDollars = $scope.selectedTool.originalCostDollars;
-			console.dir($scope.toolInfo);
 			$http.post('../../api/createtool', $scope.toolInfo) 
 			.success(function(data, status) {
-
+				$scope.getEquipmentInfo();
 			})
 			.error(function(data, status) {
 				alert('Oops! Error registering tool, contact developers!');
@@ -695,18 +898,18 @@ app.controller('EquipmentCreateCtrl', function($scope, $rootScope, $http)
 				alert('Oops! Error retrieving scanned RFID tags, contact developers!');
 			});
 		};
-
-		$scope.instructions = function () {
-			alert(`Scan an unused RFID tag,\nthen click the Populate button,\nand select the Line and RFID Reader used to scan.`);
-		};
-
-		$scope.rfidUpdateInstructions = function () {
-			alert(`To update this tool's RFID Tag,\nyou must delete the tool and\nregister it again.`);
-		};
-
 		
+		$scope.closeTool = function(){
+			$scope.createTool();
+			$scope.getEquipmentInfo();
+			$modalInstance.close();
+		};
 
-	});
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
 
 app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedLine', function($scope, $rootScope, $http, $modalInstance, selectedLine)
 	{
@@ -799,24 +1002,8 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 	{	
 		$rootScope.currentPageTitle = 'User Management';
 
-		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
-		$scope.ssos = [3, 4, 5, 6, 7, 8, 9, 10]; // To be replaced with a read from Luis's SSO file
-		$scope.selection = []; // Binded to selected user roles in create user modal
-		$scope.userInfo = {
-			'sso': '',
-			'firstName': '',
-			'lastName': '',
-			'email': '',
-			'password': '',
-			'employeeType': $scope.selection,
-			'supervisorFirstName': '',
-			'supervisorLastName': '',
-			'supervisorEmail': ''
-		}; // Binded to Create User Modal fields
 		$scope.selectedUser = {}; // User (obtained from DB) to pass to Update User modal
-		
-		$scope.users = {}; // Just a declaration
-		$scope.confirmPassword = '';
+
 
 		$scope.getEmployees = function(){
 			$http.get('../../api/employees')
@@ -829,33 +1016,12 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 
 		$scope.getEmployees();
 
-		$scope.toggleSelection = function (item) {
-			var index = $scope.selection.indexOf(item);
-
-			if (index > -1) {
-				$scope.selection.splice(index, 1);
-			}
-			else {
-				$scope.selection.push(item);
-			}
-		};
-
 		$scope.checkSelectedUser = function (sso) {
 			for(var i=0; i<$scope.users.length; i++){
 				if($scope.users[i].sso == sso){
 					$scope.selectedUser = $scope.users[i];
 				}
 			}
-		};
-
-		$scope.createEmployee = function () {
-			$http.post('../../api/createemployee', $scope.userInfo) 
-			.success(function(data, status) {
-				alert("User created. Please click on the purple button to reflect changes.");
-			})
-			.error(function(data, status) {
-				alert('Oops! Error creating user, contact developers!');
-			});
 		};
 
 		$scope.deleteEmployee = function () {
@@ -865,22 +1031,13 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 				//Request
 				$http.post('../../api/deleteemployee', {'sso': $scope.selectedUser.sso}) 
 				.success(function(data, status) {
-					alert("User deleted. Please refresh by clicking the purple button to reflect changes.");
+					alert("User deleted.");
+					$scope.getEmployees();
 				})
 				.error(function(data, status) {
 					alert('Oops! Error deleting user, contact developers!');
 				});
 			}
-		};
-
-		$scope.sendEmail = function () {
-			$http.post('../../api/emailnewuser', $scope.userInfo) 
-			.success(function(data, status) {
-
-			})
-			.error(function(data, status) {
-				alert('Oops! Error sending new user email, contact developers!');
-			});
 		};
 
 		$scope.updateUserModal = function(modal_id, modal_size, modal_backdrop){
@@ -895,17 +1052,99 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 			});
 		};
 
-		$scope.isTechnician = function(){return $scope.selection.indexOf('Technician') > -1;};
+		$scope.createUserModal = function(modal_id, modal_size, modal_backdrop){
+			$scope.modalInstance = $modal.open({
+				templateUrl: modal_id,
+				controller: 'CreateUserModalCtrl',
+				size: modal_size,
+				backdrop: typeof modal_backdrop == 'undefined' ? true : modal_backdrop,
+				scope: $scope
+			});
+
+			$scope.modalInstance.result.then(function () {
+				$scope.getEmployees();
+			})
+		};
 		
 	});
+
+app.controller('CreateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', function($scope, $rootScope, $http, $modalInstance)
+	{
+		$rootScope.currentPageTitle = 'User Management';
+
+		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
+		$scope.selection = []; // Binded to selected user roles in create user modal
+		$scope.userInfo = {
+			'sso': '',
+			'firstName': '',
+			'lastName': '',
+			'email': '',
+			'password': '',
+			'employeeType': $scope.selection,
+			'supervisorFirstName': '',
+			'supervisorLastName': '',
+			'supervisorEmail': ''
+		}; // Binded to Create User Modal fields
+		
+		$scope.users = {}; // Just a declaration
+		$scope.confirmPassword = '';
+
+		// Handles user types
+		$scope.toggleSelection = function (item) {
+			var index = $scope.selection.indexOf(item);
+
+			if (index > -1) {
+				$scope.selection.splice(index, 1);
+			}
+			else {
+				$scope.selection.push(item);
+			}
+		};
+
+		$scope.createEmployee = function () {
+			$http.post('../../api/createemployee', $scope.userInfo) 
+			.success(function(data, status) {
+				alert("User created.");
+			})
+			.error(function(data, status) {
+				alert('Oops! Error creating user, contact developers!');
+			});
+		};
+
+		$scope.sendEmail = function () {
+			$http.post('../../api/emailnewuser', $scope.userInfo) 
+			.success(function(data, status) {
+			})
+			.error(function(data, status) {
+				alert('Oops! Error sending new user email, contact developers!');
+			});
+		};
+
+		$scope.isTechnician = function(){return $scope.selection.indexOf('Technician') > -1;};
+
+		$scope.closeUser = function(){
+			$scope.createEmployee();
+			$scope.sendEmail();
+			$modalInstance.close();
+		};
+
+		$scope.close = function(){
+			$modalInstance.close();
+		};
+
+	}]);
+
+
+
 
 app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedUser', function($scope, $rootScope, $http, $modalInstance, selectedUser)
 	{
 		$rootScope.currentPageTitle = 'User Management';
 
-		$scope.selectedUser = selectedUser;
+		$scope.userToUpdate = selectedUser;
+		$scope.placeholderUser = selectedUser;
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
-		$scope.typesSelected = $scope.selectedUser.types.split(',');
+		$scope.typesSelected = $scope.userToUpdate.types.split(',');
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.typesSelected.indexOf(item);
@@ -923,8 +1162,8 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		};
 
 		$scope.updateUser = function () {
-			$scope.selectedUser.types = $scope.typesSelected.join();
-			$http.post('../../api/updateemployee', $scope.selectedUser) 
+			$scope.userToUpdate.types = $scope.typesSelected.join();
+			$http.post('../../api/updateemployee', $scope.userToUpdate) 
 			.success(function(data, status) {
 				
 			})
