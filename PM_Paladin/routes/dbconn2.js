@@ -1068,6 +1068,7 @@ var refreshActiveBit = function(cp, res){
 			WHERE (Eq.DaysLeft <= 14
 				AND Eq.TaskStatus = 'OnTime')
 			OR Eq.TaskStatus = 'ConfirmPartial'
+			OR Eq.TaskStatus = 'ApprovePending'
 		);
 
 

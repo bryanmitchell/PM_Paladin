@@ -1,1 +1,2 @@
 cmd /C sqlcmd -S GEIPC-PC\PMPALADIN -U paladin_watch -P pmpaladin -i C:\Users\GEIPC\Documents\PM_Paladin\PM_Paladin\bin\PastDueDaily.sql
+cmd /C sqlcmd -S GEIPC-PC\PMPALADIN -U paladin_watch -P pmpaladin -i C:\Users\GEIPC\Documents\PM_Paladin\PM_Paladin\bin\updateActiveBits.sql

@@ -61,6 +61,7 @@ WHERE Workstation.WorkstationID IN (
 	WHERE (Eq.DaysLeft <= 14
 		AND Eq.TaskStatus = 'OnTime')
 	OR Eq.TaskStatus = 'ConfirmPartial'
+	OR Eq.TaskStatus = 'ApprovePending'
 );
 
 
