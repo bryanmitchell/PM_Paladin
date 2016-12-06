@@ -1,0 +1,57 @@
+'-------------------------------------
+'
+'Script Created: Nov 23, 2016
+
+'
+'Description:
+
+'
+'-------------------------------------
+
+' Declare variables
+Dim connectionSuccess
+Dim readSuccess
+Dim err
+Dim myRfidAddress
+Reader.Value = PLC.Element("Reader").Value
+myRfidAddress = PLC.Element("Tags").Index(PLC.Element("Reader").Value).Value
+Select Case (myRfidAddress Mod 2)
+	Case 0
+		RfidAddress.Value = myRfidAddress + 1
+	Case 1
+		RfidAddress.Value = myRfidAddress
+End Select 
+
+' Connect to DB
+connectionSuccess = View.dbConnect ("paladin2;uid=paladin_watch;pwd=pmpaladin") 
+If connectionSuccess <> 0 Then
+	
+	' Check if RFID tag is taken by any tool
+	dbHandle01.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLRFIDTAKEN.TXT")
+	readSuccess = View.dbFirstRecord (dbHandle01.Value)
+	' If so, Confirm its tasks
+	If (RfidAddressTaken.Value) Then
+
+		'dbHandle02.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLRFIDCONFIRM.TXT")
+		'View.dbEndSQL (dbHandle02.Value)
+		View.AppExec "cmd /C sqlcmd -S GEIPC-PC\PMPALADIN -U paladin_watch -P pmpaladin -i C:\Users\GEIPC\Documents\PM_Paladin\PM_Paladin\bin\RfidConfirm.sql -v rfidAddress="&RfidAddress.Value, 1
+	' Otherwise, add it to the read list
+	Else
+		dbHandle02.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLRFIDREGISTER.TXT")
+		If dbHandle02.Value = 0 Then
+			err = View.dbLastError (ErrorCode.Name, ErrorString.Name)
+			View.Message ErrorString.Value
+		End If 
+		View.dbEndSQL (dbHandle02.Value)
+	End If
+	View.dbEndSQL (dbHandle01.Value)
+	View.dbDisconnect	
+	Dim dteWait
+	dteWait = DateAdd("s", 2, Now())
+	Do Until (Now() > dteWait)
+	Loop
+	View.AppExec "cmd /C C:\Users\GEIPC\Documents\PM_Paladin\PM_Paladin\bin\UpdateActiveBits.bat", 1
+Else
+	err = View.dbLastError (ErrorCode.Name, ErrorString.Name)
+	View.Message ErrorString.Value
+End If

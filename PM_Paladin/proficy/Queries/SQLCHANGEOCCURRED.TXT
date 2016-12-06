@@ -1,0 +1,1 @@
+SELECT [value] INTO (>>ChangeOccurred) FROM [Flags] WHERE [name] = 'ChangeOccurred';

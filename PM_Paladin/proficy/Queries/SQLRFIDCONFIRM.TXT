@@ -1,0 +1,1 @@
+UPDATE Task SET TaskStatus = 'ConfirmPending' FROM Task tsk INNER JOIN Tool t ON t.ToolID = tsk.ToolID WHERE t.RfidAddress = <<RfidAddress AND (tsk.TaskStatus = 'OnTime' AND DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) <= 14) OR tsk.TaskStatus = 'PastDue';

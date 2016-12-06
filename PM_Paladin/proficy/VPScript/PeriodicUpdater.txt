@@ -1,0 +1,112 @@
+'-------------------------------------
+'
+'Script Created: Nov 12, 2016
+'
+'Description:
+'	Script that connects to the Paladin database, obtains physical addresses and their activity (On/Off)
+'	and sets PLC registers accordingly. Physical addresses are:
+'	- RSTi Network Adapter node address (1-16)
+'	- Discrete Output module number (1-32)
+'	- Output module point (0-7)
+'-------------------------------------
+
+' Declare variables
+Dim connectionSuccess
+Dim readSuccess
+Dim readSuccessChangeOccurred
+Dim err
+Dim tmp
+PLC.Element("FromDB")
+PLC.Element("E_Read")
+
+' Connect to DB
+connectionSuccess = View.dbConnect ("paladin2;uid=paladin_watch;pwd=pmpaladin") 
+If connectionSuccess <> 0 Then 
+
+	' Check if change occurred
+	dbHandleSqlChangeOccurred.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLCHANGEOCCURRED.TXT")
+	readSuccessChangeOccurred = View.dbFirstRecord (dbHandleSqlChangeOccurred.Value)
+	
+	Do While (ChangeOccurred.Value)
+		'View.Message "Change occurred!"
+		dbHandleSqlChangeOccurredUpdate.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLCHANGEOCCURREDUPDATE.TXT")
+		tmp = View.dbEndSQL (dbHandleSqlChangeOccurredUpdate.Value)
+		' Perform query for tool activity bits
+		dbHandle.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLTOOLS.TXT")
+		If dbHandle.Value <> 0 Then	
+
+			' Get first record from resulting recordset (tools)
+			readSuccess = View.dbFirstRecord (dbHandle.Value)
+			If readSuccess <> 0 Then 
+				'View.Message "DB read success"
+	
+				' Loop over tools recordset
+				Do Until readSuccess = 0
+					Dim bitActive
+					Dim arrayIndex
+					bitActive = IsActive.Value
+					arrayIndex = (LineAddress.Value-1)*256 + (Module.Value-1)*8 + (Point.Value)
+					PLC.Element("FromDB").Index(arrayIndex).Value = bitActive
+					readSuccess = View.dbNextRecord (dbHandle.Value)
+				Loop
+				tmp = View.dbEndSQL (dbHandle.Value)
+	
+			Else
+				View.Message "DB read failure"
+			End If ' End Read success
+
+		Else ' Bad query for tool activity
+			err = View.dbLastError (ErrorCode.Name, ErrorString.Name)
+			View.Message ErrorString.Value
+		End If ' End dbHandle
+	
+		' Perform query for stack light activity bits
+		dbHandle.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLLIGHTS.TXT")
+		If dbHandle.Value <> 0 Then
+	
+			' Get first record from resulting recordset (stack lights)
+			readSuccess = View.dbFirstRecord (dbHandle.Value)
+			If readSuccess <> 0 Then 
+				'View.Message "DB read success"
+	
+				' Loop over stack lights recordset
+				Do Until readSuccess = 0
+					Dim greenBit,yellowBit,redBit
+					Dim greenArrayIndex,yellowArrayIndex,redArrayIndex
+					greenBit = GreenOn.Value
+					yellowBit = YellowOn.Value
+					redBit = RedOn.Value
+					greenArrayIndex = (LineAddress.Value-1)*256 + (GreenModule.Value-1)*8 + (GreenPoint.Value)
+					yellowArrayIndex = (LineAddress.Value-1)*256 + (YellowModule.Value-1)*8 + (YellowPoint.Value)
+					redArrayIndex = (LineAddress.Value-1)*256 + (RedModule.Value-1)*8 + (RedPoint.Value)
+					PLC.Element("FromDB").Index(greenArrayIndex).Value = greenBit
+					PLC.Element("FromDB").Index(yellowArrayIndex).Value = yellowBit
+					PLC.Element("FromDB").Index(redArrayIndex).Value = redBit
+					readSuccess = View.dbNextRecord (dbHandle.Value)
+				Loop
+				tmp = View.dbEndSQL (dbHandle.Value)
+
+			Else ' Empty recordset (stack lights)
+				View.Message "DB read failure"
+			End If ' End read success (Stack lights)
+	
+		Else ' Bad query for stack light activity
+			err = View.dbLastError (ErrorCode.Name, ErrorString.Name)
+			View.Message ErrorString.Value
+		End If ' End dbHandle (stack lights)
+		
+		
+		dbHandleSqlChangeOccurred.Value = View.dbFileSQL ("C:\Users\GEIPC\Downloads\SQLCHANGEOCCURRED.TXT")
+		readSuccessChangeOccurred = View.dbFirstRecord (dbHandleSqlChangeOccurred.Value)
+		PLC.Element("E_Read").Value = 1
+	Loop 
+	tmp = View.dbEndSQL (dbHandleSqlChangeOccurred.Value)
+	'PLC.Element("E_Read").Value = 0
+
+	
+	' After both queries, disconnect
+	tmp = View.dbDisconnect
+
+Else ' Unable to connect 
+	View.Message "Unable to connect to dBase ODBC driver" 
+End If ' end Connection success

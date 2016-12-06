@@ -1,0 +1,11 @@
+'-------------------------------------
+'
+'Script Created: Dec 06, 2016
+
+'
+'Description: Update Active bits and changeoccurred flag on Startup
+
+'
+'-------------------------------------
+
+View.AppExec "cmd /C C:\Users\GEIPC\Documents\PM_Paladin\PM_Paladin\bin\UpdateActiveBits.bat", 1

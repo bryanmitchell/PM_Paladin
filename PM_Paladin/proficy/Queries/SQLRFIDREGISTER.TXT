@@ -1,0 +1,1 @@
+UPDATE RfidReader SET LastTagRead = <<RfidAddress WHERE Line = 1 AND Reader = <<Reader

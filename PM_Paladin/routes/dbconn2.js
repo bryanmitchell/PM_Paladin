@@ -180,8 +180,8 @@ exports.getPieChartInfo = function(cp,res){
 		,COUNT(*) AS [count]
 	FROM (
 		SELECT CASE 
-			WHEN (TaskStatus = 'Past Due')
-				THEN 'PastDue' 
+			WHEN (TaskStatus = 'PastDue')
+				THEN 'Past Due' 
 			WHEN (TaskStatus = 'OnTime' 
 				AND DATEDIFF(day, GETDATE(), DATEADD(day, FrequencyDays, LastCompleted)) BETWEEN 0 AND 14) 
 				THEN 'Upcoming'

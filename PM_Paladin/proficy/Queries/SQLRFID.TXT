@@ -1,0 +1,1 @@
+UPDATE Task SET TaskStatus = 'ConfirmPending' FROM Task tsk INNER JOIN Tool t ON t.ToolID = tsk.ToolID WHERE t.RfidAddress = <<RfidAddress;

@@ -1,0 +1,1 @@
+SELECT pl.RemoteIoAddress, t.RemoteIoModuleNumber, t.RemoteIoPointNumber, t.IsActive INTO (>>LineAddress, >>Module, >>Point, >>IsActive) FROM ProductionLine pl INNER JOIN Workstation ws ON pl.LineID = ws.LineID INNER JOIN Tool t ON ws.WorkstationID = t.WorkstationID;
