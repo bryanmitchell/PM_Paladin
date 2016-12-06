@@ -217,7 +217,7 @@
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
 						<label for="field-1" class="control-label">FirstName</label>
 
-						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="placeholderUser.firstName" ng-pattern="/^\w+\D$/" required />
+						<input type="text" class="form-control" name="fName" placeholder="First Name" ng-model="userToUpdate.firstName" ng-pattern="/^\w+\D$/" required />
 
 						<p ng-show="updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine" class="help-block">Enter a valid first name.</p>
 					</div>
@@ -226,7 +226,7 @@
 				<div class="col-md-6">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine }">
 						<label for="field-2" class="control-label">Last Name</label>
-						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="placeholderUser.lastName" ng-pattern="/^\w+\D$/" required>
+						<input type="text" class="form-control" name="lName" placeholder="Last Name" ng-model="userToUpdate.lastName" ng-pattern="/^\w+\D$/" required>
 						<p ng-show="updateUserForm.lName.$invalid && !updateUserForm.lName.$pristine" class="help-block">Enter a valid last name.</p>
 					</div>
 				</div>
@@ -238,7 +238,7 @@
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.email.$invalid && !updateUserForm.email.$pristine }">
 						<label for="field-3" class="control-label">Email Address</label>
 						
-						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="placeholderUser.email" required ng-pattern="/.+@.+\..+/">
+						<input type="email" class="form-control" name="email" placeholder="Email" ng-model="userToUpdate.email" required ng-pattern="/.+@.+\..+/">
 
 						<p ng-show="updateUserForm.email.$invalid && !updateUserForm.email.$pristine" class="help-block">Enter a valid email address.</p>
 					</div>	
@@ -246,19 +246,50 @@
 				</div>
 			</div>
 		
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group" ng-class="{ 'has-error': updateUserForm.password.$invalid && !updateUserForm.password.$pristine }">
+						<input 
+							type="checkbox" 
+							name="type" 
+							ng-checked="userToUpdate.updatePassword" 
+							ng-click="toggleUpdatePassword()">
+						<label for="field-4" class="control-label">New password?</label>
+					</div>
+				</div>
+			</div>
+
 			<div class="row"> <!-- Password Row -->
-				<div class="col-md-6">
+
+				<!-- New password -->
+				<div class="col-md-6" ng-if="userToUpdate.updatePassword">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.password.$invalid && !updateUserForm.password.$pristine }">
 						<label for="field-4" class="control-label">Password</label>
-						<input type="password" class="form-control" id="password" name="password" placeholder="8-25 Characters" ng-model="placeholderUser.password" ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" required>
+						<input 
+							type="password" 
+							class="form-control" 
+							id="password" 
+							name="password" 
+							placeholder="8-25 Characters" 
+							ng-model="userToUpdate.password" 
+							ng-pattern="/^(?=^.{8,25}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/" 
+							ng-required="userToUpdate.updatePassword">
 						<p ng-show="updateUserForm.password.$error.pattern" class="help-block">Password must contain at least one number, one upper and lower case letter, and one special character.</p>
 					</div>
 				</div>
 				
-				<div class="col-md-6">
+				<!-- Confirm new password -->
+				<div class="col-md-6" ng-if="userToUpdate.updatePassword">
 					<div class="form-group" ng-class="{ 'has-error': updateUserForm.confirmPassword.$invalid && !updateUserForm.confirmPassword.$pristine }">
 						<label for="field-5" class="control-label">Confirm Password</label>
-						<input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type Password" ng-model="confirmPassword" data-password-verify="placeholderUser.password" required>
+						<input type="password" 
+							class="form-control" 
+							id="confirmPassword" 
+							name="confirmPassword" 
+							placeholder="Re-type Password" 
+							ng-model="confirmPassword" 
+							data-password-verify="userToUpdate.password" 
+							ng-required="userToUpdate.updatePassword">
 						<p ng-show="updateUserForm.confirmPassword.$error.passwordVerify" class="help-block">Must match password in previous field.</p>
 					</div>	
 				</div>
@@ -267,7 +298,7 @@
 			<!-- USER ROLES CHECKBOXES -->
 			<div class="row">
 				<div class="col-md-12">
-					<div class="form-group no-margin" ng-class="{ 'has-error': updateUserForm.fName.$invalid && !updateUserForm.fName.$pristine }">
+					<div class="form-group no-margin">
 						<label for="field-7" class="control-label">Type of User</label>
 						</br>
 						<div class="col-sm-4" ng-repeat="item in employeeTypes">
@@ -312,10 +343,20 @@
 				<!-- Supervisor Email Address -->
 				<div class="row">
 					<div class="col-md-12">
-						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine }" required>
-							<label for="field-3" class="control-label">Supervisor Email Address</label>
+						<div class="form-group" 
+							ng-class="{ 'has-error': createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine }"
+							required>
+							<label 
+								for="field-3" 
+								class="control-label">Supervisor Email Address</label>
 							
-							<input type="email" class="form-control" name="supervisorEmail" placeholder="Supervisor's Email" ng-model="selectedUser.supervisorEmail" required ng-pattern="/.+@.+\..+/">
+							<input type="email" 
+								class="form-control" 
+								name="supervisorEmail" 
+								placeholder="Supervisor's Email" 
+								ng-model="selectedUser.supervisorEmail" 
+								required 
+								ng-pattern="/.+@.+\..+/">
 
 							<p ng-show="createUserForm.supervisorEmail.$invalid && !createUserForm.supervisorEmail.$pristine" class="help-block">Enter a valid email address.</p>
 						</div>	
@@ -328,8 +369,13 @@
 		
 		<!-- Modal footer -->
 		<div class="modal-footer">
-			<button type="button" class="btn btn-white" ng-click="close();">Close</button>
-			<button type="button" class="btn btn-info" ng-click="close();updateUser();" ng-disabled="(typesSelected.length < 1)">Save</button>
+			<button type="button" 
+				class="btn btn-white" 
+				ng-click="close();">Close</button>
+			<button type="button" 
+				class="btn btn-info" 
+				ng-click="updateUser();close();" 
+				ng-disabled="(updateUserForm.$invalid || typesSelected.length < 1)">Save</button>
 		</div>
 	</form>
 </script>

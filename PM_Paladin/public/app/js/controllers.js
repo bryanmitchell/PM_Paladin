@@ -1155,9 +1155,9 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 		$rootScope.currentPageTitle = 'User Management';
 
 		$scope.userToUpdate = selectedUser;
-		$scope.placeholderUser = selectedUser;
 		$scope.employeeTypes = ['Administrator', 'Engineer', 'Technician'];
 		$scope.typesSelected = $scope.userToUpdate.types.split(',');
+		$scope.userToUpdate.updatePassword = false;
 
 		$scope.toggleSelection = function (item) {
 			var index = $scope.typesSelected.indexOf(item);
@@ -1168,6 +1168,10 @@ app.controller('UpdateUserModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			else {
 				$scope.typesSelected.push(item);
 			}
+		};
+
+		$scope.toggleUpdatePassword = function (item) {
+			$scope.userToUpdate.updatePassword = !($scope.userToUpdate.updatePassword);
 		};
 
 		$scope.checkType = function(type){

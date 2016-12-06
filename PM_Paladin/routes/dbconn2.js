@@ -732,15 +732,22 @@ exports.updateEmployee = function(cp, req, res){
 	var r = req.body;
 	var types = r.types.split(',');
 
-	// First query
-	var query = `
-		UPDATE Employee
-		SET FirstName = '${r.firstName}'
-			,LastName = '${r.lastName}'
-			,Email = '${r.email}'
-			,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
-		WHERE Sso = ${r.sso};
-		`;
+	if (r.updatePassword) {
+		var query = `
+			UPDATE Employee
+			SET FirstName = '${r.firstName}'
+				,LastName = '${r.lastName}'
+				,Email = '${r.email}'
+				,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
+			WHERE Sso = ${r.sso};`;
+	} else {
+		var query = `
+			UPDATE Employee
+			SET FirstName = '${r.firstName}'
+				,LastName = '${r.lastName}'
+				,Email = '${r.email}'
+			WHERE Sso = ${r.sso};`;
+	}
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){
 			console.log(err);
@@ -755,7 +762,7 @@ exports.updateEmployee = function(cp, req, res){
 	var query2 = `
 		BEGIN TRANSACTION;
 		BEGIN TRY
-		DELETE FROM EmployeeType
+		DELETE FROM EmployeeRole
 		WHERE Sso = ${r.sso}
 		DELETE FROM EmployeeSupervisor
 		WHERE Sso = ${r.sso}
