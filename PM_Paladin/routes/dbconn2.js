@@ -71,7 +71,7 @@ exports.getEmployeePassword = function(cp, req, res){
 			FROM EmployeeRole st2
 		) [typeList] 
 		ON e.Sso = typeList.Sso 
-		WHERE e.Sso = ${sso};`;
+		WHERE e.Sso = '${sso}';`;
 	// Return Boolean (user exists, password works) and position string
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){console.log(err);}
@@ -260,7 +260,7 @@ exports.createWorkstation = function(cp, req, res){
 
 		SELECT @wsid = SCOPE_IDENTITY();
 		INSERT INTO [dbo].[WorkstationAssignedTo] ([WorkstationID], [Sso])
-		VALUES (@wsId, ${r.employeeSso});
+		VALUES (@wsId, '${r.employeeSso}');
 		END TRY
 		BEGIN CATCH
 			SELECT 
@@ -322,7 +322,7 @@ exports.createTool = function(cp, req, res){
 			SELECT @toolId = SCOPE_IDENTITY();
 
 			INSERT INTO [dbo].[ToolAssignedTo] ([ToolID], [Sso])
-			VALUES (@toolId, ${r.employeeSso});
+			VALUES (@toolId, '${r.employeeSso}');
 
 			INSERT INTO [dbo].[Task]
 				([ToolID]
@@ -464,7 +464,7 @@ exports.updateWorkstation = function(cp, req, res){
 		WHERE workstationId = ${r.wsID};
 
 		UPDATE WorkstationAssignedTo
-		SET Sso = ${r.employeeSso}
+		SET Sso = '${r.employeeSso}'
 		WHERE WorkstationID = ${r.wsID};
 		`;
 	new sql.Request(cp).query(query, function(err, recordset){
@@ -489,7 +489,7 @@ exports.updateTool = function(cp, req, res){
 		WHERE ToolID = ${r.toolID};
 
 		UPDATE ToolAssignedTo
-		SET Sso = ${r.employeeSso}
+		SET Sso = '${r.employeeSso}'
 		WHERE ToolID = ${r.toolID};
 		`;
 	new sql.Request(cp).query(query, function(err, recordset){
@@ -679,16 +679,17 @@ USER MANAGEMENT
 **/
 exports.createEmployee = function(cp, req, res){
 	var r = req.body;
-	query = `
+	// Create query
+	var query = `
 		INSERT INTO Employee
 			([Sso],[FirstName],[LastName],[Email],[PasswordHash])
 		VALUES
-			(${r.sso},'${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
+			('${r.sso}','${r.firstName}','${r.lastName}','${r.email}','${bcrypt.hashSync(r.password, salt)}');
 		`
 	for (i = 0; i < r.employeeType.length; i++){
 		query +=`
 			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
-			VALUES (${r.sso},'${r.employeeType[i]}');
+			VALUES ('${r.sso}','${r.employeeType[i]}');
 		`;
 	}
 	if (r.employeeType.indexOf('Technician') > -1){
@@ -696,7 +697,7 @@ exports.createEmployee = function(cp, req, res){
 			INSERT INTO EmployeeSupervisor
 				([Sso],[FirstName],[LastName],[Email])
 			VALUES
-				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
+				('${r.sso}', '${r.supervisorFirstName}', '${r.supervisorLastName}', '${r.supervisorEmail}')`;
 	}
 	runPostQuery(query, cp, res);
 }; //TODO FIX
@@ -731,23 +732,24 @@ exports.getEmployees = function(cp, res){
 exports.updateEmployee = function(cp, req, res){
 	var r = req.body;
 	var types = r.types.split(',');
-
+	var query = ``;
 	if (r.updatePassword) {
-		var query = `
+		query = `
 			UPDATE Employee
 			SET FirstName = '${r.firstName}'
 				,LastName = '${r.lastName}'
 				,Email = '${r.email}'
 				,PasswordHash = '${bcrypt.hashSync(r.password, salt)}'
-			WHERE Sso = ${r.sso};`;
+			WHERE Sso = '${r.sso}';`;
 	} else {
-		var query = `
+		query = `
 			UPDATE Employee
 			SET FirstName = '${r.firstName}'
 				,LastName = '${r.lastName}'
 				,Email = '${r.email}'
-			WHERE Sso = ${r.sso};`;
+			WHERE Sso = '${r.sso}';`;
 	}
+
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){
 			console.log(err);
@@ -763,16 +765,16 @@ exports.updateEmployee = function(cp, req, res){
 		BEGIN TRANSACTION;
 		BEGIN TRY
 		DELETE FROM EmployeeRole
-		WHERE Sso = ${r.sso}
+		WHERE Sso = '${r.sso}'
 		DELETE FROM EmployeeSupervisor
-		WHERE Sso = ${r.sso}
+		WHERE Sso = '${r.sso}'
 		`;
 
 	// Insert employee roles
 	for (var i=0; i<types.length; i++){
 		query2 += `
 			INSERT INTO EmployeeRole ([Sso],[EmpRole]) 
-			VALUES (${r.sso}, '${types[i]}')`;
+			VALUES ('${r.sso}', '${types[i]}')`;
 		if (i==types.length-1){query2+=`;\n`;}
 		else{query2+=`\n`;}
 	}
@@ -783,7 +785,7 @@ exports.updateEmployee = function(cp, req, res){
 			INSERT INTO EmployeeSupervisor
 				([Sso],[FirstName],[LastName],[Email])
 			VALUES
-				(${r.sso}, ${r.supervisorFirstName}, ${r.supervisorLastName}, ${r.supervisorEmail})`;
+				('${r.sso}', '${r.supervisorFirstName}', '${r.supervisorLastName}', '${r.supervisorEmail}')`;
 	}
 	query2 += `
 		END TRY
@@ -809,7 +811,7 @@ exports.deleteEmployee = function(cp, req, res){
 	var r = req.body;
 	var query = `
 		DELETE FROM [dbo].[Employee]
-			WHERE Sso = ${r.sso}`;
+			WHERE Sso = '${r.sso}'`;
 
 	new sql.Request(cp).query(query, function(err, recordset){
 		if(err){
@@ -861,7 +863,7 @@ exports.getTasks = function(cp, req, res){
 		ON ws.WorkstationID = wat.WorkstationID 
 		INNER JOIN Employee AS eng 
 		ON wat.Sso = eng.Sso
-		WHERE tec.sso = ${req.body.sso}
+		WHERE tec.sso = '${req.body.sso}'
 		ORDER BY DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted));
 		`, cp, res);
 };
@@ -909,7 +911,7 @@ exports.getConfirmationTasks = function(cp, req, res){
 		INNER JOIN Employee AS eng 
 		ON wat.Sso = eng.Sso 
 		WHERE (tsk.TaskStatus = 'ConfirmPending' OR tsk.TaskStatus = 'ConfirmPartial') 
-		AND tec.Sso = ${req.body.sso}
+		AND tec.Sso = '${req.body.sso}'
 		ORDER BY eng.Sso;
 		`, cp, res);
 };
@@ -989,8 +991,8 @@ exports.getApprovalTasks = function(cp, req, res){
 		INNER JOIN Employee AS tec
 		ON tat.Sso = tec.Sso
 		WHERE tsk.TaskStatus = 'ApprovePending' 
-		AND eng.Sso = ${req.body.sso};
-		`, cp, res);
+		AND eng.Sso = '${req.body.sso}';
+	`, cp, res);
 };
 
 exports.setApprove = function(cp, req, res){
@@ -1124,95 +1126,3 @@ var refreshActiveBit = function(cp, res){
 		}
 	});
 };
-
-
-	// var query = `
-	// 	-- Turn ON Active bits for tools
-	// 	UPDATE Tool
-	// 	SET IsActive = 1;
-
-
-	// 	-- Turn OFF Active bits for tools
-	// 	UPDATE Tool
-	// 	SET [IsActive] = 0
-	// 	FROM(
-	// 		SELECT ToolID, COUNT(*) AS [OffToolCount]
-	// 		FROM Task 
-	// 		WHERE TaskStatus = 'PastDue'
-	// 		OR TaskStatus = 'ConfirmPending'
-	// 		OR TaskStatus = 'ApprovePending'
-	// 		GROUP BY ToolID) AS [OffTools]
-	// 	WHERE OffToolCount > 0;
-
-
-	// 	-- Turn OFF ALL lights
-	// 	UPDATE Workstation
-	// 	SET GreenLightOn = 0, YellowLightOn = 0, RedLightOn = 0;
-
-
-	// 	-- Turn ON green lights
-	// 	WITH Eq AS (
-	// 		SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
-	// 			DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
-	// 		FROM Task tsk 
-	// 		INNER JOIN Tool t ON t.ToolID = tsk.ToolID
-	// 		INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
-	// 	)
-	// 	UPDATE Workstation
-	// 	SET GreenLightOn = 1
-	// 	FROM Eq
-	// 	WHERE Workstation.WorkstationID NOT IN (
-	// 		SELECT DISTINCT Eq.WorkstationID
-	// 		FROM Eq
-	// 		WHERE Eq.TaskStatus = 'PastDue')
-	// 	AND (Workstation.WorkstationID NOT IN (
-	// 		SELECT DISTINCT Eq.WorkstationID
-	// 		FROM Eq
-	// 		WHERE Eq.DaysLeft < 4)
-	// 	OR Workstation.WorkstationID IN (
-	// 		SELECT Eq.WorkstationID
-	// 		FROM Eq
-	// 		WHERE Eq.TaskStatus = 'ConfirmPartial')
-	// 	);
-
-
-	// 	-- Turn ON yellow lights
-	// 	WITH Eq AS (
-	// 		SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
-	// 			DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
-	// 		FROM Task tsk 
-	// 		INNER JOIN Tool t ON t.ToolID = tsk.ToolID
-	// 		INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
-	// 	)
-	// 	UPDATE Workstation
-	// 	SET YellowLightOn = 1
-	// 	FROM Eq
-	// 	WHERE Workstation.WorkstationID IN (
-	// 		SELECT DISTINCT Eq.WorkstationID
-	// 		FROM Eq
-	// 		WHERE Eq.DaysLeft < 15
-	// 		AND Eq.TaskStatus = 'OnTime');
-
-
-	// 	-- Turn ON red lights
-	// 	WITH Eq AS (
-	// 		SELECT ws.WorkstationID, t.ToolID, tsk.TaskID, tsk.TaskStatus, 
-	// 			DATEDIFF(day, GETDATE(), DATEADD(day, tsk.FrequencyDays, tsk.LastCompleted)) AS [DaysLeft]
-	// 		FROM Task tsk 
-	// 		INNER JOIN Tool t ON t.ToolID = tsk.ToolID
-	// 		INNER JOIN Workstation ws ON ws.WorkstationID = t.WorkstationID
-	// 	)
-	// 	UPDATE Workstation
-	// 	SET RedLightOn = 1
-	// 	FROM Eq
-	// 	WHERE Workstation.WorkstationID IN (
-	// 		SELECT DISTINCT Eq.WorkstationID
-	// 		FROM Eq
-	// 		WHERE Eq.TaskStatus = 'PastDue'
-	// 		OR Eq.TaskStatus = 'ConfirmPartial');
-
-	// 	-- Update ChangeOccurred flag
-	// 	UPDATE Flags
-	// 	SET [value] = 1
-	// 	WHERE [name] = 'ChangeOccurred';
-	// 	`;

@@ -102,12 +102,15 @@ CREATE TABLE paladin2.dbo.TaskLog (
     DateFinished DATETIME NULL, -- if NULL, not finished yet
 );
 
+-- dba.stackexchange.com/questions/149945/check-constraint-to-enforce-pattern-match
 CREATE TABLE paladin2.dbo.Employee (
-    Sso int NOT NULL PRIMARY KEY,
+    Sso VARCHAR(9) NOT NULL PRIMARY KEY,
     FirstName nvarchar(MAX) NOT NULL,
 	LastName nvarchar(MAX) NOT NULL,
 	Email varchar(320) NOT NULL,
-	PasswordHash VARCHAR(60) NOT NULL
+	PasswordHash VARCHAR(60) NOT NULL,
+	CONSTRAINT CK_Employee_Sso 
+		CHECK (Sso LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 );
 
 CREATE TABLE paladin2.dbo.EmployeeRole (

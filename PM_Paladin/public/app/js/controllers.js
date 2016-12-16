@@ -1027,18 +1027,18 @@ app.controller('UserMgmtCtrl', function($scope, $rootScope, $http, $modal)
 
 		$scope.checkSelectedUser = function (sso) {
 			for(var i=0; i<$scope.users.length; i++){
-				if($scope.users[i].sso == sso){
+				if($scope.users[i].sso === sso){
 					$scope.selectedUser = $scope.users[i];
 				}
 			}
 		};
 
-		$scope.deleteEmployee = function () {
-			if ($rootScope.userSSO == $scope.selectedUser.sso){
+		$scope.deleteEmployee = function (ssoToDelete) {
+			if ($rootScope.userSSO === ssoToDelete){
 				alert("Cannot delete currently logged in user!")
 			} else {
 				//Request
-				$http.post('../../api/deleteemployee', {'sso': $scope.selectedUser.sso}) 
+				$http.post('../../api/deleteemployee', {'sso': ssoToDelete}) 
 				.success(function(data, status) {
 					alert("User deleted.");
 					$scope.getEmployees();

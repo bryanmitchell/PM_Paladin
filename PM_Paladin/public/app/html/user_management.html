@@ -28,14 +28,22 @@
 								<td>{{user.firstName}} {{user.lastName}}</td>
 								<td>{{user.types}}</td>
 								<td>
-									<button type="button" class="btn btn-success" ng-model="user.empID" ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');">Update</button>
-									<button type="button" class="btn btn-red" ng-click="checkSelectedUser(user.sso);deleteEmployee()">Delete</button>
+									<button 
+										type="button" 
+										class="btn btn-success" 
+										ng-click="checkSelectedUser(user.sso); updateUserModal('modal-3-update', null, 'static');"
+									>Update</button>
+									<button 
+										type="button" 
+										class="btn btn-red" 
+										ng-click="deleteEmployee(user.sso);"
+									>Delete</button>
 								</td>
 							</tr>
 						</tbody>
 					</table>
 					</div> <!--end col-md-12-->
-				</div>
+				</div> <!-- end row -->
 			</div> <!--end panel-body-->
 		</div> <!--end panel-->
 	</div> <!--end col-md-12-->
@@ -154,7 +162,7 @@
 
 						<!-- Supervisor First Name -->
 						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine }">
-							<label for="field-1" class="control-label">Teechnician's Supervisor First Name</label>
+							<label for="field-1" class="control-label">Technician's Supervisor First Name</label>
 							
 							<input type="text" class="form-control" name="supervisorFirstName" placeholder="Supervisor First Name" ng-model="userInfo.supervisorFirstName" ng-pattern="/^\w+\D$/" required />
 
@@ -204,7 +212,12 @@
 <script type="text/ng-template" id="modal-3-update">
 	<!-- Modal header -->
 	<div class="modal-header">
-		<button type="button" class="close" ng-click="close(); getEmployees();" aria-hidden="true">&times;</button>
+		<button 
+			type="button" 
+			class="close" 
+			ng-click="close(); getEmployees();" 
+			aria-hidden="true"
+			>&times;</button>
 		<h4 class="modal-title">Update User</h4>
 	</div>
 	
@@ -320,7 +333,14 @@
 						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine }">
 							<label for="field-1" class="control-label">Technician's Supervisor First Name</label>
 							
-							<input type="text" class="form-control" name="supervisorFirstName" placeholder="Supervisor First Name" ng-model="selectedUser.supervisorFirstName" ng-pattern="/^\w+\D$/" required />
+							<input 
+								type="text" 
+								class="form-control" 
+								name="supervisorFirstName" 
+								placeholder="Supervisor First Name" 
+								ng-model="userToUpdate.supervisorFirstName" 
+								ng-pattern="/^\w+\D$/" 
+								required />
 
 							<p ng-show="createUserForm.supervisorFirstName.$invalid && !createUserForm.supervisorFirstName.$pristine" class="help-block">Enter a valid first name.</p>
 
@@ -333,7 +353,14 @@
 						<div class="form-group" ng-class="{ 'has-error': createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine }">
 							<label for="field-2" class="control-label">Technician's Supervisor Last Name</label>
 							
-							<input type="text" class="form-control" name="supervisorLastName" placeholder="Supervisor's Last Name" ng-model="selectedUser.supervisorLastName" ng-pattern="/^\w+\D$/" required />
+							<input 
+								type="text" 
+								class="form-control" 
+								name="supervisorLastName" 
+								placeholder="Supervisor's Last Name" 
+								ng-model="userToUpdate.supervisorLastName" 
+								ng-pattern="/^\w+\D$/" 
+								required />
 
 							<p ng-show="createUserForm.supervisorLastName.$invalid && !createUserForm.supervisorLastName.$pristine" class="help-block">Enter a valid last name.</p>
 						</div>
@@ -354,7 +381,7 @@
 								class="form-control" 
 								name="supervisorEmail" 
 								placeholder="Supervisor's Email" 
-								ng-model="selectedUser.supervisorEmail" 
+								ng-model="userToUpdate.supervisorEmail" 
 								required 
 								ng-pattern="/.+@.+\..+/">
 
