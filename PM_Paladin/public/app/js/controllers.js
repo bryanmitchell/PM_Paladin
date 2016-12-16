@@ -915,6 +915,10 @@ app.controller('CreateToolModalCtrl', ['$scope', '$rootScope', '$http', '$modalI
 			$modalInstance.close();
 		};
 
+		$scope.instructions = function () {
+			alert("To register an RFID tag, you must first scan the tool's tag.\nOnce scanned, click the Populate button to see the most recently scanned tags and select the correct tag.");
+		}
+
 	}]);
 
 app.controller('LineUpdateCtrl', ['$scope', '$rootScope', '$http', '$modalInstance', 'selectedLine', function($scope, $rootScope, $http, $modalInstance, selectedLine)
